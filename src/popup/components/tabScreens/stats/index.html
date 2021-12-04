@@ -1,0 +1,39 @@
+<section class="main-tabs-tab-content active" id="tab-content-stats">
+    <div class="top-stats">
+      <div class="top-stats-elem">
+        <h1 id="cat">95h</h1>
+        <h2>Day</h2>
+      </div>
+      <div class="top-stats-elem">
+        <h1>95h</h1>
+        <h2>Week</h2>
+      </div>
+      <div class="top-stats-elem">
+        <h1>95h</h1>
+        <h2>Month</h2>
+      </div>
+    </div>
+    <div>
+      @@include('../../tabs/index.html', {
+        "tab1": "Day",
+        "tab2": "Week",
+        "tab3": "Month",
+        "tabId": "chart-tabs"
+      })
+      @@include('./chart/index.html', {
+        "type": "day",
+        "active": "active"
+      })
+      @@include('./chart/index.html', {
+        "type": "week",
+        "active": ""
+      })
+      @@include('./chart/index.html', {
+        "type": "month",
+        "active": ""
+      })
+    </div>
+    <div class="detailed">
+
+    </div>
+</section>

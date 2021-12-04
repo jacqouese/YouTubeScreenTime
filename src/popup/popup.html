@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <h1>YouTube Screen Time</h1>
+    </header>
+    <main>
+      <div>
+        @@include('./components/tabs/index.html', {
+          "tab1": "Stats",
+          "tab2": "Restrict",
+          "tab3": "Settings",
+          "tabId": "main-tabs"
+        })
+        @@include('./components/tabScreens/stats/index.html')
+        @@include('./components/tabScreens/restrict/index.html')
+        @@include('./components/tabScreens/settings/index.html')
+      </div>
+    </main>
+  </body>
+  <script src="./js/tabLogic.js"></script>
+  <script src="./popup.js"></script>
+</html>

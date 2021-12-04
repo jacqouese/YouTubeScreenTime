@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+:root {
+    --primary: #45b1d5;
+    --lighter: #707070;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    width: 350px;
+    height: 550px;
+    padding: 5px 10px;
+}
+
+p {
+    font-size: 110%;
+    font-weight: 500;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+.tabs {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.tabs p {
+    padding: 0 10px 4px 10px;
+    color: var(--lighter);
+    cursor: pointer;
+}
+
+.tabs p.active {
+    color: #000000;
+    border-bottom: 2px solid var(--primary);
+    z-index: 2;
+}
+
+.tabs-elements {
+    display: flex;
+    gap: 10px;
+}
+
+hr {
+    border-color: #f2f2f2;
+    transform: translateY(-1px);
+    z-index: -1;
+    border-radius: 50%;
+}
+
+.main-tabs-tab-content {
+    display: none;
+}
+
+.main-tabs-tab-content.active {
+    display: block;
+}
+
+.top-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.top-stats h2 {
+    font-weight: 400;
+    color: var(--lighter);
+    margin-top: -7px;
+}
+
+.top-stats-elem {
+    width: 28%;
+}
+
+.chart-tabs-tab-content {
+    display: none;
+}
+
+.chart-tabs-tab-content.active {
+    display: block;
+}
