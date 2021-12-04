@@ -4,17 +4,17 @@
     "description": "Track your time spent on YouTube",
     "version": "1.0",
     "icons": {
-        "16": "icons/img.jpg",
-        "48": "icons/img.jpg",
-        "128": "icons/img.jpg"
+        "16": "icons/logo.png",
+        "48": "icons/logo.png",
+        "128": "icons/logo.png"
     },
     "browser_action": {
         "default_popup": "popup/popup.html",
         "default_title": "Check your screen time",
         "default_icon": {
-            "16": "icons/img.jpg",
-            "48": "icons/img.jpg",
-            "128": "icons/img.jpg"
+            "16": "icons/logo.png",
+            "48": "icons/logo.png",
+            "128": "icons/logo.png"
         }
     },
     "background": {

@@ -40,4 +40,4 @@ document.head.appendChild(script);
 // retrive video category
 const category = document.querySelector('#ytt-category').innerHTML;
 
-console.log(category);
+chrome.storage.local.set({ currentCategory: category });
