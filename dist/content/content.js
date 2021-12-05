@@ -31,7 +31,6 @@ const injectedCode = `
         ytInitialPlayerResponse.microformat.playerMicroformatRenderer.category;
 
     document.body.appendChild(yttDiv);
-
 `;
 var script = document.createElement('script');
 script.textContent = injectedCode;

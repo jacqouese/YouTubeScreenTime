@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset='UTF-8' />
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -21,15 +22,15 @@
         <section class="main-tabs-tab-content active" id="tab-content-stats">
     <div class="top-stats">
       <div class="top-stats-elem">
-        <h1 id="cat">2h</h1>
+        <div><h1 id="cat">2h</h1> <p class="percent">13%</p></div>
         <h2>Day</h2>
       </div>
       <div class="top-stats-elem">
-        <h1>22h</h1>
+        <div><h1>22h</h1> <p class="percent">23%</p></div>
         <h2>Week</h2>
       </div>
       <div class="top-stats-elem">
-        <h1>95h</h1>
+        <div><h1>52h</h1> <p class="percent percent-down">-7%</p></div>
         <h2>Month</h2>
       </div>
     </div>
@@ -44,17 +45,98 @@
   </div>
       <div class="chart-tabs-tab-content active" id="tab-content-day">
     <div class="chart-border">
-        chart day
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="70"></div>
+            <p>Mon</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="40"></div>
+            <p>Tue</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="15"></div>
+            <p>Wed</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="20"></div>
+            <p>Thu</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="35"></div>
+            <p>Fri</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="75"></div>
+            <p>Sat</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="50"></div>
+            <p>Sun</p>
+        </div>
     </div>
 </div>
       <div class="chart-tabs-tab-content " id="tab-content-week">
     <div class="chart-border">
-        chart week
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="70"></div>
+            <p>Mon</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="40"></div>
+            <p>Tue</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="15"></div>
+            <p>Wed</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="20"></div>
+            <p>Thu</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="35"></div>
+            <p>Fri</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="75"></div>
+            <p>Sat</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="50"></div>
+            <p>Sun</p>
+        </div>
     </div>
 </div>
       <div class="chart-tabs-tab-content " id="tab-content-month">
     <div class="chart-border">
-        chart month
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="70"></div>
+            <p>Mon</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="40"></div>
+            <p>Tue</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="15"></div>
+            <p>Wed</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="20"></div>
+            <p>Thu</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="35"></div>
+            <p>Fri</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="75"></div>
+            <p>Sat</p>
+        </div>
+        <div class="chart-bar-wrapper">
+            <div class="chart-bar" att-height="50"></div>
+            <p>Sun</p>
+        </div>
     </div>
 </div>
     </div>
@@ -67,14 +149,97 @@
     </div>
 </section>
         <section class="main-tabs-tab-content" id="tab-content-restrict">
-    restrict
+    <div class="my-restrictions">
+        <h5>My restrictions</h5>
+        <table class="table-restrict" id="table-restricted">
+            <!-- populated by js -->
+        </table>
+    </div>
+    <div class="restrict-list">
+        <h5>Restrict</h5>
+        <table class="table-restrict" id="table-restrict-list">
+            <!-- populated by js -->
+        </table>
+    </div>
 </section>
         <section class="main-tabs-tab-content" id="tab-content-settings">
-    settings
+    <div class="settings-block">
+        <h5>Stats</h5>
+        <table class="table-restrict">
+            <tr>
+                <td>
+                    <div class="table-inner-wrapper">
+                        <span>Display category on YouTube</span>
+                        <span><div class="switch-container switch">
+    <input type="checkbox" class="hidden-checkbox">
+    <div class="switch-track">
+        <div class="switch-head"></div>
+    </div>
+</div></span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="table-inner-wrapper">
+                        <span>Display stats on YouTube</span>
+                        <span><div class="switch-container switch">
+    <input type="checkbox" class="hidden-checkbox">
+    <div class="switch-track">
+        <div class="switch-head"></div>
+    </div>
+</div></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <p class="small-sprint">The extension will display information on YouTube</p>
+    </div>
+    <div class="settings-block">
+        <h5>Restrict</h5>
+        <table class="table-restrict">
+            <tr>
+                <td>
+                    <div class="table-inner-wrapper">
+                        <span>Only warn</span>
+                        <span><div class="switch-container switch">
+    <input type="checkbox" class="hidden-checkbox">
+    <div class="switch-track">
+        <div class="switch-head"></div>
+    </div>
+</div></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <p class="small-sprint">If you keep this setting on you will be able bypass the restriction</p>
+    </div>
+    <div class="settings-block">
+        <table class="table-restrict">
+            <tr>
+                <td>
+                    <div class="table-inner-wrapper">
+                        <span>Pause extension</span>
+                        <span><div class="switch-container switch">
+    <input type="checkbox" class="hidden-checkbox">
+    <div class="switch-track">
+        <div class="switch-head"></div>
+    </div>
+</div></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 </section>
       </div>
     </main>
   </body>
   <script src="./js/tabLogic.js"></script>
+  <script src="./js/handleStorage.js"></script>
+  <script src="./js/detailedTable.js"></script>
+  <script src="./js/restrictTable.js"></script>
+  <script src="./js/chartLogic.js"></script>
+  <script src="./js/switchLogic.js"></script>
   <script src="./popup.js"></script>
 </html>

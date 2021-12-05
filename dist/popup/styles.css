@@ -12,6 +12,7 @@
     padding: 0;
     margin: 0;
     font-family: 'Poppins', sans-serif;
+    user-select: none;
 }
 
 body {
@@ -23,6 +24,58 @@ body {
 p {
     font-size: 110%;
     font-weight: 500;
+}
+
+p.small-sprint {
+    font-size: 70%;
+    margin-left: 10px;
+    margin-top: 3px;
+    color: var(--lighter);
+}
+
+h5 {
+    font-weight: 500;
+    font-size: 110%;
+    margin-left: 10px;
+    margin-bottom: 5px;
+}
+
+.switch-container {
+    cursor: pointer;
+}
+
+.hidden-checkbox {
+    display: none;
+}
+
+.switch-track {
+    position: relative;
+    height: 12px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    background-color: #dadce0;
+    border-radius: 10px;
+    transition: 0.2s ease-out;
+}
+
+.switch-head {
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    background-color: #5f6368;
+    border-radius: 10px;
+    transition: 0.2s ease-out;
+    right: 12px;
+}
+
+.switch-active .switch-track {
+    background-color: var(--primary);
+}
+
+.switch-active .switch-head {
+    right: 0;
+    background-color: var(--primary-dark);
 }
 
 header {
@@ -93,7 +146,21 @@ hr {
 }
 
 .top-stats-elem {
-    width: 28%;
+    width: 25%;
+}
+
+.top-stats-elem div {
+    display: flex;
+    gap: 4px;
+}
+
+p.percent {
+    font-size: 90%;
+    color: green;
+}
+
+p.percent.percent-down {
+    color: red;
 }
 
 .chart-tabs-tab-content {
@@ -107,8 +174,30 @@ hr {
 .chart-border {
     width: 100%;
     height: 150px;
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 20px;
     border: 2px solid var(--x-lighter);
     margin-bottom: 20px;
+    font-size: 90%;
+}
+
+.chart-bar-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.chart-bar-wrapper p {
+    margin-top: 5px;
+}
+
+.chart-bar {
+    width: 22px;
+    height: 50%;
+    background-color: var(--primary);
+    border-radius: 4px;
 }
 
 table,
@@ -148,4 +237,33 @@ td {
     width: 0%;
     background-color: var(--primary-dark);
     border-radius: 2px;
+}
+
+/* restrict */
+.my-restrictions {
+    margin-top: 30px;
+}
+
+.restrict-list {
+    margin-top: 30px;
+}
+
+.table-restrict .table-inner-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 25px;
+    font-weight: 500;
+}
+
+.table-restrict img {
+    width: 15px;
+}
+
+#table-restricted div span.longer {
+    width: 40%;
+}
+
+.settings-block {
+    margin-bottom: 30px;
 }
