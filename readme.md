@@ -6,12 +6,12 @@ Track your time spend on YouTube by category.
 
 ## Features include:
 
--   Detailed charts
--   Track changes
--   Abbility to set limits to certain video categories
+- Detailed charts
+- Track changes
+- Abbility to set limits to certain video categories
 
 ## Tech
 
--   Vanilla JavaScript
--   HTML templating with gulp-file-include
--   Integration with Chrome Storage API
+- Vanilla JavaScript
+- HTML templating with gulp-file-include
+- Integration with Chrome Storage API
