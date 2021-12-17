@@ -9,7 +9,17 @@
   "author": "Jakub Czaja",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.16.5",
     "gulp": "^4.0.2",
-    "gulp-file-include": "^2.3.0"
+    "gulp-better-rollup": "^4.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-file-include": "^2.3.0",
+    "rollup": "^1.32.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  },
+  "dependencies": {
+    "gulp-uglify": "^3.0.2"
   }
 }

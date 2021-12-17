@@ -1,42 +1,32 @@
-const video = document.getElementsByTagName('video')[0];
+import { intervalTimer } from './helpers/intervalTimer';
+
+import { injectCategory, checkCategory } from './category/extractCategory';
+import { videoListeners } from './video/videoListeners';
+import { videoSaveProgress } from './video/videoSaveProgress';
+
+const video = document.getElementsByTagName('video')[0] || null;
 const hook = document.querySelector('#count');
 
-let isPaused = false;
-let time = 0;
+if (video !== null) {
+  // get category from YouTube
+  injectCategory();
 
-video.addEventListener('playing', () => {
-    isPaused = false;
-});
+  console.log(checkCategory());
 
-video.addEventListener('pause', () => {
-    isPaused = true;
-});
+  chrome.storage.local.set({ currentCategory: checkCategory() });
 
-setInterval(() => {
-    if (isPaused === false) {
-        time += 1;
-    }
-    chrome.runtime.sendMessage({
-        from: 'content',
-        subject: time,
-    });
-}, 1000);
+  var time = 0;
 
-// get video category by injecting JS
-const injectedCode = `
-    const yttDiv = document.createElement('div');
-    yttDiv.id = 'ytt-category'
-    yttDiv.style.display = 'hidden';
-    yttDiv.innerHTML =
-        ytInitialPlayerResponse.microformat.playerMicroformatRenderer.category;
+  // interval with play/pause ability
+  const timer = new intervalTimer(() => {
+    console.log(timer.time++);
+  }, 1000);
 
-    document.body.appendChild(yttDiv);
-`;
-var script = document.createElement('script');
-script.textContent = injectedCode;
-document.head.appendChild(script);
+  // listen for play / pause
+  videoListeners(video, timer);
 
-// retrive video category
-const category = document.querySelector('#ytt-category').innerHTML;
-
-chrome.storage.local.set({ currentCategory: category });
+  // save time when user exits
+  videoSaveProgress(video, timer);
+} else {
+  console.log('no video');
+}
