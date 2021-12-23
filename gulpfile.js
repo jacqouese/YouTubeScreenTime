@@ -28,7 +28,9 @@ function copyHTML() {
 }
 
 function copyJS() {
-  return src(['src/background/*.js']).pipe(gulp.dest('dist'));
+  return src(['src/background/*.js'])
+    .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
+    .pipe(gulp.dest('dist/background'));
 }
 
 function copyPopupJS() {

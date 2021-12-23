@@ -41,26 +41,21 @@ progressBars.forEach((bar) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  document.querySelector('#cat').innerHTML = `${(request.subject / 60).toFixed(
-    1
-  )}h`;
+  console.log(request);
 });
 
-let watchedCategory = null;
+function requestDayTotal() {
+  chrome.extension.sendMessage(
+    { type: 'dataRequest', body: { period: 'day', category: 'all' } },
+    function (response) {
+      document.querySelector('#cat').innerHTML = secondsToHms(
+        response.data.time
+      );
+    }
+  );
+}
 
-chrome.storage.sync.get(['currentCategory'], (result) => {
-  watchedCategory = result.currentCategory;
-
-  console.log(watchedCategory);
-});
-
-chrome.storage.sync.get(['category'], (result) => {
-  category = result.category;
-
-  console.log(result);
-
-  document.querySelector('#cat').innerHTML = `${(category / 60).toFixed(2)}h`;
-});
+requestDayTotal();
 
 const myRestrictions = {
     '🎧 Music': '10.0d',
@@ -106,6 +101,21 @@ for (const [key, value] of Object.entries(restrictionList)) {
     </tr>`;
 
     listTable.innerHTML += HTMLinsert;
+}
+
+function secondsToHms(d) {
+  d = Number(d);
+  var h = Math.floor(d / 3600);
+  var m = Math.floor((d % 3600) / 60);
+  var s = Math.floor((d % 3600) % 60);
+
+  if (h > 0) {
+    return `${h}<span class="smaller">h<span>`;
+  } else if (m > 0) {
+    return `${m}<span class="smaller">min<span>`;
+  } else {
+    return `0<span class="smaller">min<span>`;
+  }
 }
 
 const switches = document.querySelectorAll('.switch');

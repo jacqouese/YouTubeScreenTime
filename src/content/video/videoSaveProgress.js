@@ -1,31 +1,42 @@
-function saveToStorage(timer) {
-  // get total time from storage
-  chrome.storage.sync.get(['category'], (result) => {
-    console.log('progress has been saved');
+import { checkCategory } from '../category/extractCategory';
+import { getDate } from '../helpers/getDate';
 
-    // append current session time to total time
-    const total = timer.time + result.category;
-
-    // set total time to storage
-    chrome.storage.sync.set({ category: total });
-    timer.time = 0;
+function sendToDB(time, date, category) {
+  chrome.runtime.sendMessage({
+    for: 'background',
+    type: 'saveRequest',
+    videoSave: {
+      time: time,
+      date: date,
+      category: category,
+    },
   });
 }
 
-export function videoSaveProgress(video, timer) {
+export function videoSaveProgress(video, timer, category) {
   document.addEventListener('transitionend', () => {
     // pause timer if no video detected
     if (video.src === '') {
       if (timer.isResumed === true) {
         timer.pause();
-
-        saveToStorage(timer);
+        console.log('progress saved under', checkCategory());
+        sendToDB(timer.time, getDate(), checkCategory());
+        timer.time = 0;
       }
+    }
+  });
+  chrome.runtime.onMessage.addListener(() => {
+    if (timer.time != 0) {
+      console.log('progress saved under', checkCategory());
+      sendToDB(timer.time, getDate(), checkCategory());
+      timer.time = 0;
     }
   });
 
   window.onbeforeunload = () => {
-    saveToStorage(timer);
+    console.log('progress saved under', checkCategory());
+    sendToDB(timer.time, getDate(), checkCategory());
+    timer.time = 0;
 
     return 'you sure?';
   };

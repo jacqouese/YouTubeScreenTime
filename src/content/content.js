@@ -9,24 +9,24 @@ const hook = document.querySelector('#count');
 
 if (video !== null) {
   // get category from YouTube
-  injectCategory();
-
-  console.log(checkCategory());
 
   chrome.storage.sync.set({ currentCategory: checkCategory() });
-
-  var time = 0;
 
   // interval with play/pause ability
   const timer = new intervalTimer(() => {
     console.log(timer.time++);
   }, 1000);
 
+  // listen for URL change to update category
+  chrome.runtime.onMessage.addListener(() => {
+    console.log('url change');
+  });
+
   // listen for play / pause
   videoListeners(video, timer);
 
   // save time when user exits
-  videoSaveProgress(video, timer);
+  videoSaveProgress(video, timer, checkCategory());
 } else {
   console.log('no video');
 }

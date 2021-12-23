@@ -35,25 +35,12 @@
     resumeLoop();
   }
 
-  function injectCategory() {
-    // get video category by injecting JS
-    const injectedCode = `
-        const yttDiv = document.createElement('div');
-        yttDiv.id = 'ytt-category'
-        yttDiv.style.display = 'hidden';
-        yttDiv.innerHTML =
-            ytInitialPlayerResponse.microformat.playerMicroformatRenderer.category;
-
-        document.body.appendChild(yttDiv);
-      `;
-    var script = document.createElement('script');
-    script.textContent = injectedCode;
-    document.head.appendChild(script);
-  }
   function checkCategory() {
     // retrive video category
-    const category = document.querySelector('#ytt-category').innerHTML;
-    return category;
+    const categoryScript = document.getElementById('scriptTag');
+    if (!categoryScript) return;
+    console.log(JSON.parse(categoryScript.innerHTML)['genre']);
+    return JSON.parse(categoryScript.innerHTML)['genre'];
   }
 
   function videoListeners(video, timer) {
@@ -70,33 +57,48 @@
     });
   }
 
-  function saveToStorage(timer) {
-    // get total time from storage
-    chrome.storage.sync.get(['category'], result => {
-      console.log('progress has been saved'); // append current session time to total time
+  function getDate() {
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    return date;
+  }
 
-      const total = timer.time + result.category; // set total time to storage
-
-      chrome.storage.sync.set({
-        category: total
-      });
-      timer.time = 0;
+  function sendToDB(time, date, category) {
+    chrome.runtime.sendMessage({
+      for: 'background',
+      type: 'saveRequest',
+      videoSave: {
+        time: time,
+        date: date,
+        category: category
+      }
     });
   }
 
-  function videoSaveProgress(video, timer) {
+  function videoSaveProgress(video, timer, category) {
     document.addEventListener('transitionend', () => {
       // pause timer if no video detected
       if (video.src === '') {
         if (timer.isResumed === true) {
           timer.pause();
-          saveToStorage(timer);
+          console.log('progress saved under', checkCategory());
+          sendToDB(timer.time, getDate(), checkCategory());
+          timer.time = 0;
         }
+      }
+    });
+    chrome.runtime.onMessage.addListener(() => {
+      if (timer.time != 0) {
+        console.log('progress saved under', checkCategory());
+        sendToDB(timer.time, getDate(), checkCategory());
+        timer.time = 0;
       }
     });
 
     window.onbeforeunload = () => {
-      saveToStorage(timer);
+      console.log('progress saved under', checkCategory());
+      sendToDB(timer.time, getDate(), checkCategory());
+      timer.time = 0;
       return 'you sure?';
     };
   }
@@ -106,19 +108,21 @@
 
   if (video !== null) {
     // get category from YouTube
-    injectCategory();
-    console.log(checkCategory());
     chrome.storage.sync.set({
       currentCategory: checkCategory()
-    });
+    }); // interval with play/pause ability
 
     const timer = new intervalTimer(() => {
       console.log(timer.time++);
-    }, 1000); // listen for play / pause
+    }, 1000); // listen for URL change to update category
+
+    chrome.runtime.onMessage.addListener(() => {
+      console.log('url change');
+    }); // listen for play / pause
 
     videoListeners(video, timer); // save time when user exits
 
-    videoSaveProgress(video, timer);
+    videoSaveProgress(video, timer, checkCategory());
   } else {
     console.log('no video');
   }
