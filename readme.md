@@ -14,5 +14,5 @@ Track your time spend on YouTube by category.
 
 - Vanilla JavaScript
 - HTML templating with gulp-file-include
-- Integration with Chrome Storage API
--
+- Chrome message passing integration
+- IndexedDB for storing data
