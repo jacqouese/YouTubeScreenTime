@@ -11,6 +11,7 @@ export function intervalTimer(callback, delay) {
     remaining -= new Date() - start;
   };
 
+  // resume loop automatically
   var resumeLoop = function () {
     start = new Date();
     timerId = window.setTimeout(function () {

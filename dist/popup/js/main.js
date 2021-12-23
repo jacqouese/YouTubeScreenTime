@@ -48,16 +48,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 let watchedCategory = null;
 
-chrome.storage.local.get(['currentCategory'], (result) => {
+chrome.storage.sync.get(['currentCategory'], (result) => {
   watchedCategory = result.currentCategory;
 
   console.log(watchedCategory);
 });
 
-chrome.storage.local.get(['category'], (result) => {
+chrome.storage.sync.get(['category'], (result) => {
   category = result.category;
 
-  console.log('time', category);
+  console.log(result);
 
   document.querySelector('#cat').innerHTML = `${(category / 60).toFixed(2)}h`;
 });

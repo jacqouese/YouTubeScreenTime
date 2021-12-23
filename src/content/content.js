@@ -13,7 +13,7 @@ if (video !== null) {
 
   console.log(checkCategory());
 
-  chrome.storage.local.set({ currentCategory: checkCategory() });
+  chrome.storage.sync.set({ currentCategory: checkCategory() });
 
   var time = 0;
 

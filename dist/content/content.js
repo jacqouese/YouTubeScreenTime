@@ -14,7 +14,8 @@
       this.isResumed = false;
       window.clearTimeout(timerId);
       remaining -= new Date() - start;
-    };
+    }; // resume loop automatically
+
 
     var resumeLoop = function () {
       start = new Date();
@@ -69,28 +70,33 @@
     });
   }
 
-  function videoSaveProgress(video, timer, time) {
+  function saveToStorage(timer) {
+    // get total time from storage
+    chrome.storage.sync.get(['category'], result => {
+      console.log('progress has been saved'); // append current session time to total time
+
+      const total = timer.time + result.category; // set total time to storage
+
+      chrome.storage.sync.set({
+        category: total
+      });
+      timer.time = 0;
+    });
+  }
+
+  function videoSaveProgress(video, timer) {
     document.addEventListener('transitionend', () => {
       // pause timer if no video detected
       if (video.src === '') {
         if (timer.isResumed === true) {
           timer.pause();
-          chrome.storage.local.get(['category'], result => {
-            category = result.category;
-            console.log('total time');
-            timer.time = 0;
-          });
-          chrome.storage.local.set({
-            category: 600
-          });
-          console.log('paused cuz no video, progress saved');
+          saveToStorage(timer);
         }
       }
     });
 
     window.onbeforeunload = () => {
-      console.log('exited, progress saved');
-      timer.time = 0;
+      saveToStorage(timer);
       return 'you sure?';
     };
   }
@@ -102,7 +108,7 @@
     // get category from YouTube
     injectCategory();
     console.log(checkCategory());
-    chrome.storage.local.set({
+    chrome.storage.sync.set({
       currentCategory: checkCategory()
     });
 
