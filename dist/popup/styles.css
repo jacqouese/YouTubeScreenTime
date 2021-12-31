@@ -236,6 +236,12 @@ td {
   width: 100%;
 }
 
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .progress {
   height: 3px;
   width: 0%;

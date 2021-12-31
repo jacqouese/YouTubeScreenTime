@@ -1,4 +1,6 @@
-export async function queryDB(cb) {
+import { getCurrentWeekBound } from '../helpers/getCurrentWeekBound';
+
+export async function queryDB(period, cb) {
   let openRequest = indexedDB.open('YouTubeScreenTime', 1),
     db,
     tx,
@@ -35,7 +37,7 @@ export async function queryDB(cb) {
     index = store.index('date, category');
 
     db.onerror = (e) => {
-      console.log(e.target.error);
+      console.error(e.target.error);
     };
 
     var today = new Date();
@@ -47,16 +49,41 @@ export async function queryDB(cb) {
       '-' +
       today.getDate();
 
-    var request = store.index('date').getAll([date]);
+    var bound = [];
+
+    // check what period was requested
+    if (period === 'day') {
+      bound = [date];
+    } else if (period === 'week') {
+      bound = getCurrentWeekBound();
+    } else if (period === 'month') {
+      bound = [date];
+    } else {
+      return console.error(
+        'invalid period given, valid period values include: day, week, month'
+      );
+    }
+
+    var request = store.index('date').getAll();
 
     request.onsuccess = () => {
       if (request.result.length > 0) {
-        console.log(request.result);
         var total = 0;
+        var categoryObject = {};
         request.result.forEach((elem) => {
-          total += elem.time_in_sec;
+          if (bound.includes(elem.date)) {
+            if (elem.category in categoryObject) {
+              categoryObject[elem.category] =
+                categoryObject[elem.category] + elem.time_in_sec;
+            } else {
+              categoryObject[elem.category] = elem.time_in_sec;
+            }
+            total += elem.time_in_sec;
+          }
         });
-        cb(total);
+
+        const data = { totalTime: total, categoryObject: categoryObject };
+        cb(data);
       }
     };
   };

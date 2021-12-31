@@ -5,7 +5,7 @@ function sendToDB(time, date, category) {
   chrome.runtime.sendMessage({
     for: 'background',
     type: 'saveRequest',
-    videoSave: {
+    body: {
       time: time,
       date: date,
       category: category,
@@ -26,7 +26,7 @@ export function videoSaveProgress(video, timer, category) {
     }
   });
   chrome.runtime.onMessage.addListener(() => {
-    if (timer.time != 0) {
+    if (timer.time != 0 && video.src === '') {
       console.log('progress saved under', checkCategory());
       sendToDB(timer.time, getDate(), checkCategory());
       timer.time = 0;
@@ -34,10 +34,12 @@ export function videoSaveProgress(video, timer, category) {
   });
 
   window.onbeforeunload = () => {
-    console.log('progress saved under', checkCategory());
-    sendToDB(timer.time, getDate(), checkCategory());
-    timer.time = 0;
+    if (timer.time != 0 && video.src === '') {
+      console.log('progress saved under', checkCategory());
+      sendToDB(timer.time, getDate(), checkCategory());
+      timer.time = 0;
 
-    return 'you sure?';
+      return 'you sure?';
+    }
   };
 }

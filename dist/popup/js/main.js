@@ -6,16 +6,24 @@ chartBars.forEach((bar) => {
     bar.style.height = `${att}%`;
 });
 
-const categories = {
-    Music: 70,
-    Entertainment: 50,
-    Autos: 20,
-    Others: 10,
-};
+// populate detailed table on stats page with data
+function handleDetailedTable(period) {
+  const detailedTable = document.querySelector('#detailed-table-table');
+  detailedTable.innerHTML = '';
+  // determine what period to load the table for
+  var periodObject;
+  if (period === 'day') {
+    periodObject = window.ytData.dayTotalCategory;
+  } else if (period === 'week') {
+    periodObject = window.ytData.weekTotalCategory;
+  } else if (period === 'month') {
+    periodObject = window.ytData.monthTotalCategory;
+  } else {
+    console.warn('invalid period given');
+  }
 
-const detailedTable = document.querySelector('#detailed-table-table');
-
-for (const [key, value] of Object.entries(categories)) {
+  for (const [key, value] of Object.entries(periodObject)) {
+    var userFriendlyTime = secondsToHms(value);
     const HTMLinsert = `
     <tr>
     <td>
@@ -23,39 +31,61 @@ for (const [key, value] of Object.entries(categories)) {
       <div class="detailed-color-box"></div>
       <div class="detailed-category">
         ${key}
-        <div class="progress" att-progress="${value}"></div>
+        <div class="progress-container">
+          <div class="progress" att-progress="${value}"></div>
+          ${userFriendlyTime}
+        </div>
       </div>
     </div>
   </td>
   </tr>`;
 
     detailedTable.innerHTML += HTMLinsert;
-}
+  }
 
-const progressBars = document.querySelectorAll('.progress');
+  const progressBars = document.querySelectorAll('.progress');
 
-progressBars.forEach((bar) => {
+  progressBars.forEach((bar) => {
     const value = bar.getAttribute('att-progress');
 
-    bar.style.width = `${value}%`;
-});
+    bar.style.width = `${value % 100}%`;
+  });
+}
+
+// initialize global object
+window.ytData = {};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log(request);
 });
 
-function requestDayTotal() {
+function requestTotal(period, callback) {
   chrome.extension.sendMessage(
-    { type: 'dataRequest', body: { period: 'day', category: 'all' } },
-    function (response) {
-      document.querySelector('#cat').innerHTML = secondsToHms(
-        response.data.time
-      );
+    { type: 'dataRequest', body: { period: period, category: 'all' } },
+    function (res) {
+      if (res.status !== 200)
+        return console.warn('Failed to get data from background');
+
+      callback(res);
     }
   );
 }
 
-requestDayTotal();
+requestTotal('day', (res) => {
+  window.ytData.dayTotalCategory = res.data.categoryObject;
+  handleDetailedTable('day');
+  document.querySelector('#top-stats-day').innerHTML = secondsToHms(
+    res.data.time
+  );
+});
+
+requestTotal('week', (res) => {
+  window.ytData.weekTotalCategory = res.data.categoryObject;
+  console.log(res.data.categoryObject);
+  document.querySelector('#top-stats-week').innerHTML = secondsToHms(
+    res.data.time
+  );
+});
 
 const myRestrictions = {
     '🎧 Music': '10.0d',
@@ -136,30 +166,42 @@ switches.forEach((switchElem) => {
 const tabsElements = document.querySelectorAll('.tabs');
 
 tabsElements.forEach((tabsElement) => {
-    const tabs = Array.from(tabsElement.children[0].children);
+  const tabs = Array.from(tabsElement.children[0].children);
 
-    tabs.forEach((tab) => {
-        const tabContents = document.querySelectorAll(
-            `.${tabsElement.id}-tab-content`
-        );
-        // determine tab id
-        let tabContent = tab.innerHTML;
-        tabContent = tabContent.toLowerCase();
-        const tabId = `tab-content-${tabContent}`;
-        const tabContentCurrent = document.querySelector(`#${tabId}`);
+  tabs.forEach((tab) => {
+    const tabContents = document.querySelectorAll(
+      `.${tabsElement.id}-tab-content`
+    );
+    // determine tab id
+    let tabContent = tab.innerHTML;
+    tabContent = tabContent.toLowerCase();
+    const tabId = `tab-content-${tabContent}`;
+    const tabContentCurrent = document.querySelector(`#${tabId}`);
 
-        tab.addEventListener('click', () => {
-            // remove active class from all elements
-            tabContents.forEach((tabContent) => {
-                tabContent.classList.remove('active');
-            });
-            tabs.forEach((tabInner) => {
-                tabInner.classList.remove('active');
-            });
+    tab.addEventListener('click', () => {
+      // remove active class from all elements
+      tabContents.forEach((tabContent) => {
+        tabContent.classList.remove('active');
+      });
+      tabs.forEach((tabInner) => {
+        tabInner.classList.remove('active');
+      });
 
-            // append active class to active elements
-            tabContentCurrent.classList.add('active');
-            tab.classList.add('active');
-        });
+      // append active class to active elements
+      tabContentCurrent.classList.add('active');
+      tab.classList.add('active');
     });
+  });
+});
+
+// handle detailed category content
+const tabs = Array.from(
+  document.querySelector('#chart-tabs').children[0].children
+);
+console.log(tabs);
+tabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    const period = tab.innerHTML.toLowerCase();
+    handleDetailedTable(period);
+  });
 });

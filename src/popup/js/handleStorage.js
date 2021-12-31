@@ -1,16 +1,34 @@
+// initialize global object
+window.ytData = {};
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log(request);
 });
 
-function requestDayTotal() {
+function requestTotal(period, callback) {
   chrome.extension.sendMessage(
-    { type: 'dataRequest', body: { period: 'day', category: 'all' } },
-    function (response) {
-      document.querySelector('#cat').innerHTML = secondsToHms(
-        response.data.time
-      );
+    { type: 'dataRequest', body: { period: period, category: 'all' } },
+    function (res) {
+      if (res.status !== 200)
+        return console.warn('Failed to get data from background');
+
+      callback(res);
     }
   );
 }
 
-requestDayTotal();
+requestTotal('day', (res) => {
+  window.ytData.dayTotalCategory = res.data.categoryObject;
+  handleDetailedTable('day');
+  document.querySelector('#top-stats-day').innerHTML = secondsToHms(
+    res.data.time
+  );
+});
+
+requestTotal('week', (res) => {
+  window.ytData.weekTotalCategory = res.data.categoryObject;
+  console.log(res.data.categoryObject);
+  document.querySelector('#top-stats-week').innerHTML = secondsToHms(
+    res.data.time
+  );
+});

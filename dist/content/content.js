@@ -67,7 +67,7 @@
     chrome.runtime.sendMessage({
       for: 'background',
       type: 'saveRequest',
-      videoSave: {
+      body: {
         time: time,
         date: date,
         category: category
@@ -88,7 +88,7 @@
       }
     });
     chrome.runtime.onMessage.addListener(() => {
-      if (timer.time != 0) {
+      if (timer.time != 0 && video.src === '') {
         console.log('progress saved under', checkCategory());
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
@@ -96,10 +96,12 @@
     });
 
     window.onbeforeunload = () => {
-      console.log('progress saved under', checkCategory());
-      sendToDB(timer.time, getDate(), checkCategory());
-      timer.time = 0;
-      return 'you sure?';
+      if (timer.time != 0 && video.src === '') {
+        console.log('progress saved under', checkCategory());
+        sendToDB(timer.time, getDate(), checkCategory());
+        timer.time = 0;
+        return 'you sure?';
+      }
     };
   }
 

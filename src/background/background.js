@@ -4,6 +4,7 @@ import { sendMessage } from './message/sendMessage';
 
 console.log('bg');
 
+// handle listening for messages
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(
     sender.tab
@@ -13,21 +14,46 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   console.log(request);
 
+  // save time from content
   if (request.type === 'saveRequest') {
-    handleDB(
-      request.videoSave.category,
-      request.videoSave.date,
-      request.videoSave.time
-    );
-  }
-  if (request.type === 'dataRequest') {
-    queryDB((res) => {
-      sendResponse({
-        data: {
-          day: '2020-10-10',
-          time: res,
-        },
+    handleDB(request.body.category, request.body.date, request.body.time);
+  } else if (request.type === 'dataRequest') {
+    // data request from popup
+    if (request.body.period === 'day') {
+      queryDB('day', (res) => {
+        sendResponse({
+          status: 200,
+          data: {
+            time: res.totalTime,
+            categoryObject: res.categoryObject,
+          },
+        });
       });
+    } else if (request.body.period === 'week') {
+      queryDB('week', (res) => {
+        sendResponse({
+          status: 200,
+          data: {
+            time: res.totalTime,
+            categoryObject: res.categoryObject,
+          },
+        });
+      });
+    } else if (request.body.period === 'month') {
+      console.log('month requested');
+      sendResponse({
+        status: 200,
+      });
+    } else {
+      sendResponse({
+        status: 404,
+        error: `period invalid or not given: ${request.body.period}`,
+      });
+    }
+  } else {
+    sendResponse({
+      status: 404,
+      error: `request type invalid: "${request.type}"`,
     });
   }
 

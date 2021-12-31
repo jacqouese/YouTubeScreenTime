@@ -75,7 +75,23 @@
     };
   }
 
-  async function queryDB(cb) {
+  // return days of the current week
+  function getCurrentWeekBound() {
+    var arrayOfDays = [];
+    var curr = new Date(); // get current date
+
+    const first = curr.getDate() - curr.getDay() + 1; // First day is the day of the month - the day of the week
+
+    for (let i = 0; i <= 6; i++) {
+      var tempDay = first + i;
+      var tempDayISO = new Date(curr.setDate(tempDay)).toISOString().split('T')[0];
+      arrayOfDays.push(tempDayISO);
+    }
+
+    return arrayOfDays;
+  }
+
+  async function queryDB(period, cb) {
     let openRequest = indexedDB.open('YouTubeScreenTime', 1),
         db,
         tx,
@@ -111,43 +127,95 @@
       index = store.index('date, category');
 
       db.onerror = e => {
-        console.log(e.target.error);
+        console.error(e.target.error);
       };
 
       var today = new Date();
       var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-      var request = store.index('date').getAll([date]);
+      var bound = []; // check what period was requested
+
+      if (period === 'day') {
+        bound = [date];
+      } else if (period === 'week') {
+        bound = getCurrentWeekBound();
+      } else if (period === 'month') {
+        bound = [date];
+      } else {
+        return console.error('invalid period given, valid period values include: day, week, month');
+      }
+
+      var request = store.index('date').getAll();
 
       request.onsuccess = () => {
         if (request.result.length > 0) {
-          console.log(request.result);
           var total = 0;
+          var categoryObject = {};
           request.result.forEach(elem => {
-            total += elem.time_in_sec;
+            if (bound.includes(elem.date)) {
+              if (elem.category in categoryObject) {
+                categoryObject[elem.category] = categoryObject[elem.category] + elem.time_in_sec;
+              } else {
+                categoryObject[elem.category] = elem.time_in_sec;
+              }
+
+              total += elem.time_in_sec;
+            }
           });
-          cb(total);
+          const data = {
+            totalTime: total,
+            categoryObject: categoryObject
+          };
+          cb(data);
         }
       };
     };
   }
 
-  console.log('bg');
+  console.log('bg'); // handle listening for messages
+
   chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log(sender.tab ? 'from a content script:' + sender.tab.url : 'from the extension');
-    console.log(request);
+    console.log(request); // save time from content
 
     if (request.type === 'saveRequest') {
-      handleDB(request.videoSave.category, request.videoSave.date, request.videoSave.time);
-    }
-
-    if (request.type === 'dataRequest') {
-      queryDB(res => {
-        sendResponse({
-          data: {
-            day: '2020-10-10',
-            time: res
-          }
+      handleDB(request.body.category, request.body.date, request.body.time);
+    } else if (request.type === 'dataRequest') {
+      // data request from popup
+      if (request.body.period === 'day') {
+        queryDB('day', res => {
+          sendResponse({
+            status: 200,
+            data: {
+              time: res.totalTime,
+              categoryObject: res.categoryObject
+            }
+          });
         });
+      } else if (request.body.period === 'week') {
+        queryDB('week', res => {
+          sendResponse({
+            status: 200,
+            data: {
+              time: res.totalTime,
+              categoryObject: res.categoryObject
+            }
+          });
+        });
+      } else if (request.body.period === 'month') {
+        console.log('month requested');
+        sendResponse({
+          status: 200
+        });
+      } else {
+        sendResponse({
+          status: 404,
+          error: `period invalid or not given: ${request.body.period}`
+        });
+      }
+    } else {
+      sendResponse({
+        status: 404,
+        error: `request type invalid: "${request.type}"`
       });
     }
 
