@@ -219,6 +219,15 @@ td {
   padding: 5px 10px;
 }
 
+.detailed-table {
+  background-color: white;
+}
+
+.detailed-table-inner {
+  max-height: 180px;
+  overflow-y: scroll;
+}
+
 .detailed-elem {
   display: flex;
   gap: 10px;
