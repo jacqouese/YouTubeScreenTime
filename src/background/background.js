@@ -26,6 +26,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           data: {
             time: res.totalTime,
             categoryObject: res.categoryObject,
+            dateObject: res.dateObject,
           },
         });
       });
@@ -36,13 +37,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           data: {
             time: res.totalTime,
             categoryObject: res.categoryObject,
+            dateObject: res.dateObject,
           },
         });
       });
     } else if (request.body.period === 'month') {
-      console.log('month requested');
-      sendResponse({
-        status: 200,
+      queryDB('month', (res) => {
+        sendResponse({
+          status: 200,
+          data: {
+            time: res.totalTime,
+            categoryObject: res.categoryObject,
+            dateObject: res.dateObject,
+          },
+        });
       });
     } else {
       sendResponse({

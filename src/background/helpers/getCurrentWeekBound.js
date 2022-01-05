@@ -7,11 +7,16 @@ export function getCurrentWeekBound() {
 
   for (let i = 0; i <= 6; i++) {
     var tempDay = first + i;
-    var tempDayISO = new Date(curr.setDate(tempDay))
-      .toISOString()
-      .split('T')[0];
+    var tempDate = new Date(curr.setDate(tempDay));
 
-    arrayOfDays.push(tempDayISO);
+    var dateDateFormated =
+      tempDate.getFullYear() +
+      '-' +
+      (tempDate.getMonth() + 1) +
+      '-' +
+      tempDate.getDate();
+
+    arrayOfDays.push(dateDateFormated);
   }
   return arrayOfDays;
 }

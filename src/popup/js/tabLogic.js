@@ -38,5 +38,6 @@ tabs.forEach((tab) => {
   tab.addEventListener('click', () => {
     const period = tab.innerHTML.toLowerCase();
     handleDetailedTable(period);
+    chartLogic();
   });
 });

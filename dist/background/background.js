@@ -76,6 +76,22 @@
   }
 
   // return days of the current week
+  function getCurrentMonthBound() {
+    var arrayOfDays = [];
+    var curr = new Date(); // get current date
+
+    const daysInMonth = new Date(curr.getFullYear(), curr.getMonth() + 1, 0).getDate(); // returns how many days the current month has
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      var tempDate = new Date(curr.setDate(i));
+      var dateDateFormated = tempDate.getFullYear() + '-' + (tempDate.getMonth() + 1) + '-' + tempDate.getDate();
+      arrayOfDays.push(dateDateFormated);
+    }
+
+    return arrayOfDays;
+  }
+
+  // return days of the current week
   function getCurrentWeekBound() {
     var arrayOfDays = [];
     var curr = new Date(); // get current date
@@ -84,11 +100,20 @@
 
     for (let i = 0; i <= 6; i++) {
       var tempDay = first + i;
-      var tempDayISO = new Date(curr.setDate(tempDay)).toISOString().split('T')[0];
-      arrayOfDays.push(tempDayISO);
+      var tempDate = new Date(curr.setDate(tempDay));
+      var dateDateFormated = tempDate.getFullYear() + '-' + (tempDate.getMonth() + 1) + '-' + tempDate.getDate();
+      arrayOfDays.push(dateDateFormated);
     }
 
     return arrayOfDays;
+  }
+
+  function prepareDateObject(dateBound) {
+    const object = {};
+    dateBound.forEach(singleDate => {
+      object[singleDate] = {};
+    });
+    return object;
   }
 
   async function queryDB(period, cb) {
@@ -139,7 +164,7 @@
       } else if (period === 'week') {
         bound = getCurrentWeekBound();
       } else if (period === 'month') {
-        bound = [date];
+        bound = getCurrentMonthBound();
       } else {
         return console.error('invalid period given, valid period values include: day, week, month');
       }
@@ -150,20 +175,33 @@
         if (request.result.length > 0) {
           var total = 0;
           var categoryObject = {};
+          var dateObject = prepareDateObject(bound);
           request.result.forEach(elem => {
             if (bound.includes(elem.date)) {
+              // insert data into category object
               if (elem.category in categoryObject) {
+                // if the category already is in array
                 categoryObject[elem.category] = categoryObject[elem.category] + elem.time_in_sec;
               } else {
+                // if the category is not in array already
                 categoryObject[elem.category] = elem.time_in_sec;
+              } // insert data into date object
+
+
+              if (elem.category in dateObject[elem.date]) {
+                dateObject[elem.date][elem.category] = dateObject[elem.date][elem.category] + elem.time_in_sec;
+              } else {
+                dateObject[elem.date][elem.category] = elem.time_in_sec;
               }
 
               total += elem.time_in_sec;
             }
           });
+          const sortable = Object.fromEntries(Object.entries(categoryObject).sort(([, a], [, b]) => b - a));
           const data = {
             totalTime: total,
-            categoryObject: categoryObject
+            categoryObject: categoryObject,
+            dateObject: dateObject
           };
           cb(data);
         }
@@ -187,7 +225,8 @@
             status: 200,
             data: {
               time: res.totalTime,
-              categoryObject: res.categoryObject
+              categoryObject: res.categoryObject,
+              dateObject: res.dateObject
             }
           });
         });
@@ -197,14 +236,21 @@
             status: 200,
             data: {
               time: res.totalTime,
-              categoryObject: res.categoryObject
+              categoryObject: res.categoryObject,
+              dateObject: res.dateObject
             }
           });
         });
       } else if (request.body.period === 'month') {
-        console.log('month requested');
-        sendResponse({
-          status: 200
+        queryDB('month', res => {
+          sendResponse({
+            status: 200,
+            data: {
+              time: res.totalTime,
+              categoryObject: res.categoryObject,
+              dateObject: res.dateObject
+            }
+          });
         });
       } else {
         sendResponse({

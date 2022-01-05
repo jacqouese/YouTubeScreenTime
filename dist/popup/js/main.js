@@ -1,10 +1,33 @@
-const chartBars = document.querySelectorAll('.chart-bar');
+function formatHeights(data) {
+  let formatedNumbers = [];
+  // sum each day and push it into array
+  for (const [key, value] of Object.entries(data)) {
+    let total = 0;
+    for (const [innerKey, innerhValue] of Object.entries(value)) {
+      total += innerhValue;
+    }
+    formatedNumbers.push(total);
+  }
 
-chartBars.forEach((bar) => {
-    const att = bar.getAttribute('att-height');
+  // normalize data to fit between 0-100
+  const minValue = Math.min(...formatedNumbers);
+  const maxValue = Math.max(...formatedNumbers);
 
-    bar.style.height = `${att}%`;
-});
+  formatedNumbers.forEach((number, i) => {
+    formatedNumbers[i] = ((number - minValue) / (maxValue - minValue)) * 100;
+  });
+  return formatedNumbers;
+}
+
+function chartLogic() {
+  const chartBars = document.querySelectorAll('.chart-bar');
+  const weekProgressArray = window.ytData.weekTotalCategory.dateObject;
+  const formatedHeightArray = formatHeights(weekProgressArray);
+  formatedHeightArray.forEach((singleHeight, i) => {
+    const finalHeight = singleHeight === 0 ? 1 : singleHeight;
+    chartBars[i].style.height = `${finalHeight}%`;
+  });
+}
 
 // populate detailed table on stats page with data
 function handleDetailedTable(period) {
@@ -13,26 +36,41 @@ function handleDetailedTable(period) {
   // determine what period to load the table for
   var periodObject;
   if (period === 'day') {
-    periodObject = window.ytData.dayTotalCategory;
+    periodObject = window.ytData.dayTotalCategory.categoryObject;
   } else if (period === 'week') {
-    periodObject = window.ytData.weekTotalCategory;
+    periodObject = window.ytData.weekTotalCategory.categoryObject;
   } else if (period === 'month') {
-    periodObject = window.ytData.monthTotalCategory;
+    periodObject = window.ytData.monthTotalCategory.categoryObject;
   } else {
     console.warn('invalid period given');
   }
 
+  const formatedProgressValues = [];
+  const formatedProgressValuesTemp = [];
   for (const [key, value] of Object.entries(periodObject)) {
-    var userFriendlyTime = secondsToHms(value);
+    formatedProgressValues.push([key, value]);
+    formatedProgressValuesTemp.push(value);
+  }
+
+  var minValue = Math.min(...formatedProgressValuesTemp);
+  var maxValue = Math.max(...formatedProgressValuesTemp);
+
+  if ((minValue = maxValue)) minValue = 0; // prevent division by 0
+
+  formatedProgressValuesTemp.forEach((number, i) => {
+    const formatedValue = ((number - minValue) / (maxValue - minValue)) * 100;
+    console.log(minValue);
+    var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
+
     const HTMLinsert = `
     <tr>
     <td>
     <div class="detailed-elem">
       <div class="detailed-color-box"></div>
       <div class="detailed-category">
-        ${key}
+        ${formatedProgressValues[i][0]}
         <div class="progress-container">
-          <div class="progress" att-progress="${value}"></div>
+          <div class="progress" att-progress="${formatedValue}"></div>
           ${userFriendlyTime}
         </div>
       </div>
@@ -41,14 +79,14 @@ function handleDetailedTable(period) {
   </tr>`;
 
     detailedTable.innerHTML += HTMLinsert;
-  }
+  });
 
   const progressBars = document.querySelectorAll('.progress');
 
   progressBars.forEach((bar) => {
     const value = bar.getAttribute('att-progress');
 
-    bar.style.width = `${value % 100}%`;
+    bar.style.width = `${value}%`;
   });
 }
 
@@ -65,14 +103,13 @@ function requestTotal(period, callback) {
     function (res) {
       if (res.status !== 200)
         return console.warn('Failed to get data from background');
-
       callback(res);
     }
   );
 }
 
 requestTotal('day', (res) => {
-  window.ytData.dayTotalCategory = res.data.categoryObject;
+  window.ytData.dayTotalCategory = res.data;
   handleDetailedTable('day');
   document.querySelector('#top-stats-day').innerHTML = secondsToHms(
     res.data.time
@@ -80,9 +117,16 @@ requestTotal('day', (res) => {
 });
 
 requestTotal('week', (res) => {
-  window.ytData.weekTotalCategory = res.data.categoryObject;
-  console.log(res.data.categoryObject);
+  window.ytData.weekTotalCategory = res.data;
+  chartLogic();
   document.querySelector('#top-stats-week').innerHTML = secondsToHms(
+    res.data.time
+  );
+});
+
+requestTotal('month', (res) => {
+  window.ytData.monthTotalCategory = res.data;
+  document.querySelector('#top-stats-month').innerHTML = secondsToHms(
     res.data.time
   );
 });
@@ -203,5 +247,6 @@ tabs.forEach((tab) => {
   tab.addEventListener('click', () => {
     const period = tab.innerHTML.toLowerCase();
     handleDetailedTable(period);
+    chartLogic();
   });
 });
