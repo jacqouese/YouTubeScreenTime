@@ -1,5 +1,7 @@
+import { secondsToHms } from '../../helpers/secondsToHms';
+
 // populate detailed table on stats page with data
-function handleDetailedTable(period) {
+export function detailedTableLogic(period) {
   const detailedTable = document.querySelector('#detailed-table-table');
   detailedTable.innerHTML = '';
   // determine what period to load the table for

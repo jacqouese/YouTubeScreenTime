@@ -19,7 +19,7 @@ function formatHeights(data) {
   return formatedNumbers;
 }
 
-function chartLogic() {
+export function chartLogic() {
   const chartBars = document.querySelectorAll('.chart-bar');
   const weekProgressArray = window.ytData.weekTotalCategory.dateObject;
   const formatedHeightArray = formatHeights(weekProgressArray);

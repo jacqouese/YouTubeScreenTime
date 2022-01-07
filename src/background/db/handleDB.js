@@ -1,3 +1,5 @@
+import { upgradeDB } from './upgradeDB';
+
 export function handleDB(category, logTime, time) {
   let openRequest = indexedDB.open('YouTubeScreenTime', 1),
     db,
@@ -7,21 +9,7 @@ export function handleDB(category, logTime, time) {
 
   openRequest.onupgradeneeded = () => {
     console.log('upgrade needed! your version:' + IDBDatabase.version);
-
-    db = openRequest.result;
-    store = db.createObjectStore('time_logs', {
-      keyPath: 'id',
-      autoIncrement: true,
-    });
-    index = store.createIndex('date', ['date'], {
-      unique: false,
-    });
-    index = store.createIndex('category', ['category'], {
-      unique: false,
-    });
-    index = store.createIndex('date, category', ['date', 'category'], {
-      unique: false,
-    });
+    upgradeDB();
   };
   openRequest.onerror = () => {
     console.log('an error has occured');

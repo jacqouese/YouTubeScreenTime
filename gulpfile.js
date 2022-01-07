@@ -34,9 +34,9 @@ function copyJS() {
 }
 
 function copyPopupJS() {
-  return src(['src/popup/js/*.js'])
-    .pipe(concat('main.js'))
-    .pipe(gulp.dest('dist/popup/js'));
+  return src(['src/popup/*.js'])
+    .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
+    .pipe(gulp.dest('dist/popup'));
 }
 
 function copyContentJS() {

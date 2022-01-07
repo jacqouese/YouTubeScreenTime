@@ -1,4 +1,4 @@
-function secondsToHms(d) {
+export function secondsToHms(d) {
   d = Number(d);
   var h = Math.floor(d / 3600);
   var m = Math.floor((d % 3600) / 60);

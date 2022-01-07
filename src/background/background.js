@@ -1,3 +1,4 @@
+import { getAllWatched } from './db/getAllWatched';
 import { handleDB } from './db/handleDB';
 import { queryDB } from './db/queryDB';
 import { sendMessage } from './message/sendMessage';
@@ -16,11 +17,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   // save time from content
   if (request.type === 'saveRequest') {
+    // adds new entry to watch time log
     handleDB(request.body.category, request.body.date, request.body.time);
   } else if (request.type === 'dataRequest') {
-    // data request from popup
+    // watch time data request from popup
     if (request.body.period === 'day') {
-      queryDB('day', (res) => {
+      getAllWatched('day', (res) => {
         sendResponse({
           status: 200,
           data: {
@@ -31,7 +33,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
       });
     } else if (request.body.period === 'week') {
-      queryDB('week', (res) => {
+      getAllWatched('week', (res) => {
         sendResponse({
           status: 200,
           data: {
@@ -42,7 +44,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
       });
     } else if (request.body.period === 'month') {
-      queryDB('month', (res) => {
+      getAllWatched('month', (res) => {
         sendResponse({
           status: 200,
           data: {
@@ -58,13 +60,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         error: `period invalid or not given: ${request.body.period}`,
       });
     }
+  } else if (request.type === 'saveRestriction') {
+    console.log('restriction save requested');
+  } else if (request.type === 'getRestriction') {
+    console.log('restriction requested');
   } else {
     sendResponse({
       status: 404,
       error: `request type invalid: "${request.type}"`,
     });
   }
-
   return true; // prevent closed connection error
 });
 

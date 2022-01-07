@@ -1,4 +1,4 @@
-function switchLogic() {
+export function switchLogic() {
   const switches = document.querySelectorAll('.switch');
 
   switches.forEach((switchElem) => {
@@ -13,5 +13,3 @@ function switchLogic() {
     });
   });
 }
-
-switchLogic();

@@ -1,48 +1,15 @@
+import { getCurrentDayBound } from '../helpers/getCurrentDayBound';
 import { getCurrentMonthBound } from '../helpers/getCurrentMonthBound';
 import { getCurrentWeekBound } from '../helpers/getCurrentWeekBound';
 import { prepareDateObject } from '../helpers/prepareDateObject';
-import { upgradeDB } from './upgradeDB';
+import { queryDB } from './queryDBtest';
 
-export async function queryDB(period, cb) {
-  let openRequest = indexedDB.open('YouTubeScreenTime', 1),
-    db,
-    tx,
-    store,
-    index;
-
-  openRequest.onupgradeneeded = () => {
-    console.log('upgrade needed! your version:' + IDBDatabase.version);
-    upgradeDB();
-  };
-  openRequest.onerror = (e) => {
-    console.error(e.target.error);
-  };
-
-  openRequest.onsuccess = (e) => {
-    db = openRequest.result;
-    tx = db.transaction('time_logs', 'readwrite');
-    store = tx.objectStore('time_logs');
-
-    index = store.index('date, category');
-
-    db.onerror = (e) => {
-      console.error(e.target.error);
-    };
-
-    var today = new Date();
-
-    var date =
-      today.getFullYear() +
-      '-' +
-      (today.getMonth() + 1) +
-      '-' +
-      today.getDate();
-
-    var bound = [];
-
+export function getAllWatched(period, callback) {
+  queryDB('time_logs', 'date, category', (store) => {
     // check what period was requested
+    var bound = [];
     if (period === 'day') {
-      bound = [date];
+      bound = getCurrentDayBound();
     } else if (period === 'week') {
       bound = getCurrentWeekBound();
     } else if (period === 'month') {
@@ -83,18 +50,14 @@ export async function queryDB(period, cb) {
           }
         });
 
-        const sortable = Object.fromEntries(
-          Object.entries(categoryObject).sort(([, a], [, b]) => b - a)
-        );
-
         const data = {
           totalTime: total,
           categoryObject: categoryObject,
           dateObject: dateObject,
         };
 
-        cb(data);
+        callback(data);
       }
     };
-  };
+  });
 }

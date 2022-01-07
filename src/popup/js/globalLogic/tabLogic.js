@@ -1,3 +1,6 @@
+import { chartLogic } from '../tabs/stats/chartLogic';
+import { detailedTableLogic } from '../tabs/stats/detailedTableLogic';
+
 function handleMainTabs() {
   const tabsElement = document.querySelector('#main-tabs');
 
@@ -37,7 +40,7 @@ function handleDetailedCategoryTabs() {
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const period = tab.innerHTML.toLowerCase();
-      handleDetailedTable(period);
+      detailedTableLogic(period);
       chartLogic();
 
       tabs.forEach((tabInner) => {
@@ -50,5 +53,7 @@ function handleDetailedCategoryTabs() {
   });
 }
 
-handleMainTabs();
-handleDetailedCategoryTabs();
+export function tabLogic() {
+  handleMainTabs();
+  handleDetailedCategoryTabs();
+}
