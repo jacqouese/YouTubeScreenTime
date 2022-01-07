@@ -59,7 +59,6 @@ function handleDetailedTable(period) {
 
   formatedProgressValuesTemp.forEach((number, i) => {
     const formatedValue = ((number - minValue) / (maxValue - minValue)) * 100;
-    console.log(minValue);
     var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
 
     const HTMLinsert = `
@@ -184,32 +183,35 @@ function secondsToHms(d) {
   var s = Math.floor((d % 3600) % 60);
 
   if (h > 0) {
-    return `${h}<span class="smaller">h<span>`;
+    return `${h}<span class="smaller">h</span> ${m}<span class="smaller">m</span>`;
   } else if (m > 0) {
-    return `${m}<span class="smaller">min<span>`;
+    return `${m}<span class="smaller">min</span>`;
   } else {
-    return `0<span class="smaller">min<span>`;
+    return `0<span class="smaller">min</span>`;
   }
 }
 
-const switches = document.querySelectorAll('.switch');
+function switchLogic() {
+  const switches = document.querySelectorAll('.switch');
 
-switches.forEach((switchElem) => {
-  switchElem.addEventListener('click', () => {
-    console.log('click');
-    const isActive = switchElem.classList.contains('switch-active');
+  switches.forEach((switchElem) => {
+    switchElem.addEventListener('click', () => {
+      const isActive = switchElem.classList.contains('switch-active');
 
-    if (isActive === true) {
-      switchElem.classList.remove('switch-active');
-    } else {
-      switchElem.classList.add('switch-active');
-    }
+      if (isActive === true) {
+        switchElem.classList.remove('switch-active');
+      } else {
+        switchElem.classList.add('switch-active');
+      }
+    });
   });
-});
+}
 
-const tabsElements = document.querySelectorAll('.tabs');
+switchLogic();
 
-tabsElements.forEach((tabsElement) => {
+function handleMainTabs() {
+  const tabsElement = document.querySelector('#main-tabs');
+
   const tabs = Array.from(tabsElement.children[0].children);
 
   tabs.forEach((tab) => {
@@ -236,17 +238,28 @@ tabsElements.forEach((tabsElement) => {
       tab.classList.add('active');
     });
   });
-});
+}
 
 // handle detailed category content
-const tabs = Array.from(
-  document.querySelector('#chart-tabs').children[0].children
-);
-console.log(tabs);
-tabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    const period = tab.innerHTML.toLowerCase();
-    handleDetailedTable(period);
-    chartLogic();
+function handleDetailedCategoryTabs() {
+  const tabs = Array.from(
+    document.querySelector('#chart-tabs').children[0].children
+  );
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const period = tab.innerHTML.toLowerCase();
+      handleDetailedTable(period);
+      chartLogic();
+
+      tabs.forEach((tabInner) => {
+        tabInner.classList.remove('active');
+      });
+
+      // append active class to active element
+      tab.classList.add('active');
+    });
   });
-});
+}
+
+handleMainTabs();
+handleDetailedCategoryTabs();

@@ -28,7 +28,6 @@ function handleDetailedTable(period) {
 
   formatedProgressValuesTemp.forEach((number, i) => {
     const formatedValue = ((number - minValue) / (maxValue - minValue)) * 100;
-    console.log(minValue);
     var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
 
     const HTMLinsert = `

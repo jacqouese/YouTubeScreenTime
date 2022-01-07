@@ -1,6 +1,6 @@
-const tabsElements = document.querySelectorAll('.tabs');
+function handleMainTabs() {
+  const tabsElement = document.querySelector('#main-tabs');
 
-tabsElements.forEach((tabsElement) => {
   const tabs = Array.from(tabsElement.children[0].children);
 
   tabs.forEach((tab) => {
@@ -27,17 +27,28 @@ tabsElements.forEach((tabsElement) => {
       tab.classList.add('active');
     });
   });
-});
+}
 
 // handle detailed category content
-const tabs = Array.from(
-  document.querySelector('#chart-tabs').children[0].children
-);
-console.log(tabs);
-tabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    const period = tab.innerHTML.toLowerCase();
-    handleDetailedTable(period);
-    chartLogic();
+function handleDetailedCategoryTabs() {
+  const tabs = Array.from(
+    document.querySelector('#chart-tabs').children[0].children
+  );
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const period = tab.innerHTML.toLowerCase();
+      handleDetailedTable(period);
+      chartLogic();
+
+      tabs.forEach((tabInner) => {
+        tabInner.classList.remove('active');
+      });
+
+      // append active class to active element
+      tab.classList.add('active');
+    });
   });
-});
+}
+
+handleMainTabs();
+handleDetailedCategoryTabs();
