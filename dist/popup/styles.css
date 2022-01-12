@@ -44,6 +44,16 @@ h5 {
   margin-bottom: 5px;
 }
 
+button {
+  height: 40px;
+  width: 100%;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .switch-container {
   cursor: pointer;
 }
@@ -199,7 +209,7 @@ p.percent.percent-down {
 
 .chart-bar {
   width: 22px;
-  height: 50%;
+  height: 1%;
   background-color: var(--primary);
   border-radius: 4px;
 }
@@ -273,6 +283,7 @@ td {
   align-items: center;
   height: 25px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .table-restrict img {
@@ -285,4 +296,43 @@ td {
 
 .settings-block {
   margin-bottom: 30px;
+}
+
+.popup-section {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 80%;
+  padding: 10px 20px;
+  background-color: white;
+}
+
+.popup-section.show {
+  display: block;
+}
+
+.popup-inputs input {
+  width: 50px;
+  height: 60px;
+  font-size: 200%;
+  border: 2px solid rgb(227, 227, 227);
+  border-radius: 5px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.back-btn {
+  color: #45b1d5;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.popup-section button {
+  margin-top: 230px;
 }

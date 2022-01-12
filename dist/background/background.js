@@ -50,8 +50,8 @@
     return object;
   }
 
-  function upgradeDB(openRequest) {
-    db = openRequest.result; // create time_log table
+  function upgradeDB(openRequest, store, index) {
+    const db = openRequest.result; // create time_log table
 
     store = db.createObjectStore('time_logs', {
       keyPath: 'id',
@@ -85,7 +85,7 @@
 
     openRequest.onupgradeneeded = () => {
       console.log('upgrade needed! your version:' + IDBDatabase.version);
-      upgradeDB();
+      upgradeDB(openRequest, store, index);
     };
 
     openRequest.onerror = e => {
@@ -218,8 +218,6 @@
       };
     };
   }
-
-  console.log('bg'); // handle listening for messages
 
   chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log(sender.tab ? 'from a content script:' + sender.tab.url : 'from the extension');

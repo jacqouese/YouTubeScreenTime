@@ -9,7 +9,7 @@ export function queryDB(tableName, tableIndex, callback) {
 
   openRequest.onupgradeneeded = () => {
     console.log('upgrade needed! your version:' + IDBDatabase.version);
-    upgradeDB();
+    upgradeDB(openRequest, store, index);
   };
   openRequest.onerror = (e) => {
     console.error(e.target.error);

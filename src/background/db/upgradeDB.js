@@ -1,5 +1,5 @@
-export function upgradeDB(openRequest) {
-  db = openRequest.result;
+export function upgradeDB(openRequest, store, index) {
+  const db = openRequest.result;
 
   // create time_log table
   store = db.createObjectStore('time_logs', {

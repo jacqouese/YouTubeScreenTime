@@ -3,8 +3,6 @@ import { handleDB } from './db/handleDB';
 import { queryDB } from './db/queryDB';
 import { sendMessage } from './message/sendMessage';
 
-console.log('bg');
-
 // handle listening for messages
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(

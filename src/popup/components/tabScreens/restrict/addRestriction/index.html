@@ -1,0 +1,19 @@
+<section class="popup-section">
+    <p class="back-btn">< back</p>
+    <h1>You're restricting: <span id="restriction-name"></span></h1>
+
+    @@include('../../../tabs/index.html', {
+        "tab1": "Daily",
+        "tab2": "Weekly",
+        "tab3": "Monthly",
+        "tabId": "restrict-tabs"
+      })
+
+    <div class="popup-inputs">
+        <input type="number" class="time-input time-input-hours">
+        hours
+        <input type="number" class="time-input time-input-minutes">
+        minutes
+    </div>
+    <button id="restrict-btn">Restrict</button>
+    </section>

@@ -1,3 +1,20 @@
+function restrictPupup(restriction) {
+  const createPopup = () => {
+    document.querySelector('.popup-section').classList.add('show');
+  };
+
+  const destroyPupup = () => {
+    document.querySelector('.popup-section').classList.remove('show');
+  };
+
+  // inject category name
+  document
+    .querySelector('.popup-section')
+    .querySelector('#restriction-name').textContent = restriction;
+
+  createPopup();
+}
+
 export function restrictTable() {
   const myRestrictions = {
     '🎧 Music': '10.0d',
@@ -23,10 +40,10 @@ export function restrictTable() {
     restrictedTable.innerHTML += HTMLinsert;
   }
   const restrictionList = {
-    '🎧 Music': false,
-    '🖥️ Entertainment': false,
-    '📱 Autos': false,
-    '📚 Others': false,
+    Music: '🎧',
+    Entertainment: '🖥️',
+    Autos: '📱',
+    Others: '📚',
   };
 
   const listTable = document.querySelector('#table-restrict-list');
@@ -36,7 +53,7 @@ export function restrictTable() {
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span>${key}</span>
+                    <span class="restriction-name" att-name=${key}>${value} ${key}</span>
                     <span>></span>
                 </div>
             </td>
@@ -44,4 +61,16 @@ export function restrictTable() {
 
     listTable.innerHTML += HTMLinsert;
   }
+
+  console.log(listTable.querySelectorAll('td'));
+
+  listTable.querySelectorAll('td').forEach((elem) => {
+    elem.addEventListener('click', () => {
+      const restrictionName = elem
+        .querySelector('.restriction-name')
+        .getAttribute('att-name');
+      console.log(restrictionName);
+      restrictPupup(restrictionName);
+    });
+  });
 }

@@ -201,6 +201,16 @@
     handleDetailedCategoryTabs();
   }
 
+  function restrictPupup(restriction) {
+    const createPopup = () => {
+      document.querySelector('.popup-section').classList.add('show');
+    };
+
+
+    document.querySelector('.popup-section').querySelector('#restriction-name').textContent = restriction;
+    createPopup();
+  }
+
   function restrictTable() {
     const myRestrictions = {
       '🎧 Music': '10.0d',
@@ -225,10 +235,10 @@
     }
 
     const restrictionList = {
-      '🎧 Music': false,
-      '🖥️ Entertainment': false,
-      '📱 Autos': false,
-      '📚 Others': false
+      Music: '🎧',
+      Entertainment: '🖥️',
+      Autos: '📱',
+      Others: '📚'
     };
     const listTable = document.querySelector('#table-restrict-list');
 
@@ -237,17 +247,66 @@
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span>${key}</span>
+                    <span class="restriction-name" att-name=${key}>${value} ${key}</span>
                     <span>></span>
                 </div>
             </td>
         </tr>`;
       listTable.innerHTML += HTMLinsert;
     }
+
+    console.log(listTable.querySelectorAll('td'));
+    listTable.querySelectorAll('td').forEach(elem => {
+      elem.addEventListener('click', () => {
+        const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
+        console.log(restrictionName);
+        restrictPupup(restrictionName);
+      });
+    });
+  }
+
+  function timeInputs() {
+    // limit max hours to 999
+    document.querySelector('.time-input-hours').addEventListener('keyup', e => {
+      if (e.target.value > 999) {
+        e.target.value = Math.floor(e.target.value / 10); // trim last digit
+      }
+    }); // limit max minutes to 59
+
+    document.querySelector('.time-input-minutes').addEventListener('keyup', e => {
+      if (e.target.value > 59) {
+        e.target.value = 59;
+      }
+    });
+  }
+
+  function handleButtons() {
+    document.querySelector('#restrict-btn').addEventListener('click', () => {
+      const hours = document.querySelector('.time-input-hours').value;
+      const minutes = document.querySelector('.time-input-minutes').value;
+      if (hours <= 0 && minutes <= 0) return;
+      console.log(hours);
+      document.querySelector('.popup-section').classList.remove('show'); // reset inputs
+
+      document.querySelector('.time-input-hours').value = '';
+      document.querySelector('.time-input-minutes').value = '';
+    });
+  }
+
+  function handleBackButton() {
+    document.querySelector('.back-btn').addEventListener('click', () => {
+      document.querySelector('.popup-section').classList.remove('show'); // reset inputs
+
+      document.querySelector('.time-input-hours').value = '';
+      document.querySelector('.time-input-minutes').value = '';
+    });
   }
 
   function restrict() {
     restrictTable();
+    timeInputs();
+    handleButtons();
+    handleBackButton();
   }
 
   function stats() {
