@@ -1,3 +1,6 @@
+import youtubeCategories from '../../../data/youtubeCategories';
+import { secondsToHms } from '../../helpers/secondsToHms';
+
 function restrictPupup(restriction) {
   const createPopup = () => {
     document.querySelector('.popup-section').classList.add('show');
@@ -16,53 +19,50 @@ function restrictPupup(restriction) {
 }
 
 export function restrictTable() {
-  const myRestrictions = {
-    '🎧 Music': '10.0d',
-    '🖥️ Entertainment': '6.0d',
-    '📱 Autos': '16.0w',
-    '📚 Others': '2.0d',
-  };
+  const myRestrictions = window.ytData.allRestrictions;
+  const restrictionList = youtubeCategories;
 
   const restrictedTable = document.querySelector('#table-restricted');
 
-  for (const [key, value] of Object.entries(myRestrictions)) {
+  myRestrictions.forEach((restriction) => {
+    // remove duplicates from table by removing already added restrictions
+    if (restrictionList.includes(restriction.category)) {
+      const index = restrictionList.indexOf(restriction.category);
+
+      if (index > -1) restrictionList.splice(index, 1);
+    }
+
+    // populate table
+    const formatedTime = secondsToHms(restriction.time_in_sec);
     const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="longer">${key}</span>
-                    <span>${value}</span>
+                    <span class="longer">${restriction.category}</span>
+                    <span>${formatedTime} / ${restriction.timeframe}</span>
                     <span><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>
         </tr>`;
 
     restrictedTable.innerHTML += HTMLinsert;
-  }
-  const restrictionList = {
-    Music: '🎧',
-    Entertainment: '🖥️',
-    Autos: '📱',
-    Others: '📚',
-  };
+  });
 
   const listTable = document.querySelector('#table-restrict-list');
 
-  for (const [key, value] of Object.entries(restrictionList)) {
+  restrictionList.forEach((elem) => {
     const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="restriction-name" att-name=${key}>${value} ${key}</span>
+                    <span class="restriction-name" att-name="${elem}">${elem}</span>
                     <span>></span>
                 </div>
             </td>
         </tr>`;
 
     listTable.innerHTML += HTMLinsert;
-  }
-
-  console.log(listTable.querySelectorAll('td'));
+  });
 
   listTable.querySelectorAll('td').forEach((elem) => {
     elem.addEventListener('click', () => {

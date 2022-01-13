@@ -1,3 +1,6 @@
+import { addRestriction } from './db/addRestriction';
+import { checkForRestriction } from './db/checkForRestriction';
+import { getAllRestrictions } from './db/getAllRestrictions';
 import { getAllWatched } from './db/getAllWatched';
 import { handleDB } from './db/handleDB';
 import { queryDB } from './db/queryDB';
@@ -58,10 +61,34 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         error: `period invalid or not given: ${request.body.period}`,
       });
     }
-  } else if (request.type === 'saveRestriction') {
-    console.log('restriction save requested');
-  } else if (request.type === 'getRestriction') {
-    console.log('restriction requested');
+  } else if (request.type === 'addRestriction') {
+    checkForRestriction(
+      request.body.restriction,
+      () => {
+        addRestriction(request.body.restriction, request.body.time);
+        sendResponse({
+          status: 200,
+          data: {
+            ok: 'ok',
+          },
+        });
+      },
+      () => {
+        sendResponse({
+          status: 403,
+          error: 'restriction for this category already exists',
+        });
+      }
+    );
+  } else if (request.type === 'getAllRestrictions') {
+    getAllRestrictions((res) => {
+      sendResponse({
+        status: 200,
+        data: {
+          restrictions: res,
+        },
+      });
+    });
   } else {
     sendResponse({
       status: 404,

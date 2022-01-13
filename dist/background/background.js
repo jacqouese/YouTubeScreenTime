@@ -3,6 +3,100 @@
   factory();
 }((function () { 'use strict';
 
+  function upgradeDB(openRequest, store, index) {
+    const db = openRequest.result; // create time_log table
+
+    store = db.createObjectStore('time_logs', {
+      keyPath: 'id',
+      autoIncrement: true
+    });
+    index = store.createIndex('date', ['date'], {
+      unique: false
+    });
+    index = store.createIndex('category', ['category'], {
+      unique: false
+    });
+    index = store.createIndex('date, category', ['date', 'category'], {
+      unique: false
+    }); // create restrictions table
+
+    store = db.createObjectStore('restrictions', {
+      keyPath: 'id',
+      autoIncrement: true
+    });
+    index = store.createIndex('category', ['category'], {
+      unique: true
+    });
+  }
+
+  function queryDB(tableName, tableIndex, callback) {
+    let openRequest = indexedDB.open('YouTubeScreenTime', 1),
+        db,
+        tx,
+        store,
+        index;
+
+    openRequest.onupgradeneeded = () => {
+      console.log('upgrade needed! your version:' + IDBDatabase.version);
+      upgradeDB(openRequest, store, index);
+    };
+
+    openRequest.onerror = e => {
+      return console.error(tableName, e.target.error);
+    };
+
+    openRequest.onsuccess = e => {
+      db = openRequest.result;
+      tx = db.transaction(tableName, 'readwrite');
+      store = tx.objectStore(tableName);
+      index = store.index(tableIndex);
+
+      db.onerror = e => {
+        return console.error(tableName, e.target.error);
+      };
+
+      callback(store);
+    };
+  }
+
+  function addRestriction(restriction, time) {
+    queryDB('restrictions', 'category', store => {
+      var request = store.index('category').get(restriction);
+
+      request.onsuccess = () => {
+        store.put({
+          category: restriction,
+          time_in_sec: time,
+          timeframe: 'day'
+        });
+      };
+    });
+  }
+
+  function checkForRestriction(category, callback, errorCallback) {
+    queryDB('restrictions', 'category', store => {
+      var request = store.index('category').getAll();
+
+      request.onsuccess = () => {
+        if (!request.result) return errorCallback();
+        if (request.result.length < 1) return errorCallback();
+        if (request.result.includes(category)) return errorCallback();
+        return callback();
+      };
+    });
+  }
+
+  function getAllRestrictions(callback) {
+    queryDB('restrictions', 'category', store => {
+      var request = store.index('category').getAll();
+
+      request.onsuccess = () => {
+        console.log(request.result);
+        callback(request.result);
+      };
+    });
+  }
+
   function getCurrentDayBound() {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -48,62 +142,6 @@
       object[singleDate] = {};
     });
     return object;
-  }
-
-  function upgradeDB(openRequest, store, index) {
-    const db = openRequest.result; // create time_log table
-
-    store = db.createObjectStore('time_logs', {
-      keyPath: 'id',
-      autoIncrement: true
-    });
-    index = store.createIndex('date', ['date'], {
-      unique: false
-    });
-    index = store.createIndex('category', ['category'], {
-      unique: false
-    });
-    index = store.createIndex('date, category', ['date', 'category'], {
-      unique: false
-    }); // create restrictions table
-
-    store = db.createObjectStore('restrictions', {
-      keyPath: 'id',
-      autoIncrement: true
-    });
-    index = store.createIndex('category', ['category'], {
-      unique: true
-    });
-  }
-
-  function queryDB(tableName, tableIndex, callback) {
-    let openRequest = indexedDB.open('YouTubeScreenTime', 1),
-        db,
-        tx,
-        store,
-        index;
-
-    openRequest.onupgradeneeded = () => {
-      console.log('upgrade needed! your version:' + IDBDatabase.version);
-      upgradeDB(openRequest, store, index);
-    };
-
-    openRequest.onerror = e => {
-      console.error(e.target.error);
-    };
-
-    openRequest.onsuccess = e => {
-      db = openRequest.result;
-      tx = db.transaction(tableName, 'readwrite');
-      store = tx.objectStore(tableName);
-      index = store.index(tableIndex);
-
-      db.onerror = e => {
-        console.error(e.target.error);
-      };
-
-      callback(store);
-    };
   }
 
   function getAllWatched(period, callback) {
@@ -267,10 +305,30 @@
           error: `period invalid or not given: ${request.body.period}`
         });
       }
-    } else if (request.type === 'saveRestriction') {
-      console.log('restriction save requested');
-    } else if (request.type === 'getRestriction') {
-      console.log('restriction requested');
+    } else if (request.type === 'addRestriction') {
+      checkForRestriction(request.body.restriction, () => {
+        addRestriction(request.body.restriction, request.body.time);
+        sendResponse({
+          status: 200,
+          data: {
+            ok: 'ok'
+          }
+        });
+      }, () => {
+        sendResponse({
+          status: 403,
+          error: 'restriction for this category already exists'
+        });
+      });
+    } else if (request.type === 'getAllRestrictions') {
+      getAllRestrictions(res => {
+        sendResponse({
+          status: 200,
+          data: {
+            restrictions: res
+          }
+        });
+      });
     } else {
       sendResponse({
         status: 404,

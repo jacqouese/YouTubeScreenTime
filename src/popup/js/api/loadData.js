@@ -1,5 +1,6 @@
 import { requestTotal } from './requestTotal';
 import { secondsToHms } from '../helpers/secondsToHms';
+import { requestAllRestricions } from './requestAllRestrictions';
 
 export function loadData(callback) {
   // initialize global object
@@ -30,5 +31,9 @@ export function loadData(callback) {
       res.data.time
     );
     callback();
+  });
+
+  requestAllRestricions((res) => {
+    window.ytData.allRestrictions = res.data.restrictions;
   });
 }

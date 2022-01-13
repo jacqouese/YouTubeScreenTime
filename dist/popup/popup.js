@@ -30,6 +30,16 @@
     }
   }
 
+  function requestAllRestricions(callback) {
+    chrome.extension.sendMessage({
+      type: 'getAllRestrictions',
+      body: {}
+    }, res => {
+      if (res.status !== 200 || !res.status) return console.warn('something went wrong!');
+      callback(res);
+    });
+  }
+
   function loadData(callback) {
     // initialize global object
     window.ytData = {};
@@ -49,6 +59,9 @@
       window.ytData.monthTotalCategory = res.data;
       document.querySelector('#top-stats-month').innerHTML = secondsToHms(res.data.time);
       callback();
+    });
+    requestAllRestricions(res => {
+      window.ytData.allRestrictions = res.data.restrictions;
     });
   }
 
@@ -201,6 +214,28 @@
     handleDetailedCategoryTabs();
   }
 
+  function addRestriction(restriction, time) {
+    chrome.extension.sendMessage({
+      type: 'addRestriction',
+      body: {
+        restriction: restriction,
+        time: time
+      }
+    }, function (res) {
+      if (res.status === 200) return console.log('restriction added');
+      if (res.status === 403) return console.log('restriction already exists');
+      return console.warn('Some error occured');
+    });
+  }
+
+  // convert hours, minutes, seconds to seconds
+  function hmsToSeconds(h, m, s) {
+    const seconds = +h * 60 * 60 + +m * 60 + +s;
+    return seconds;
+  }
+
+  const youtubeCategories = ['Film & Animation', 'Autos & Vehicles', 'Music', 'Pets & Animals', 'Sports', 'Travel & Events', 'Gaming', 'People & Blogs', 'Comedy', 'Entertainment', 'News & Politics', 'Howto & Style', 'Education', 'Science & Technology', 'Nonprofits & Activism'];
+
   function restrictPupup(restriction) {
     const createPopup = () => {
       document.querySelector('.popup-section').classList.add('show');
@@ -212,50 +247,43 @@
   }
 
   function restrictTable() {
-    const myRestrictions = {
-      '🎧 Music': '10.0d',
-      '🖥️ Entertainment': '6.0d',
-      '📱 Autos': '16.0w',
-      '📚 Others': '2.0d'
-    };
+    const myRestrictions = window.ytData.allRestrictions;
+    const restrictionList = youtubeCategories;
     const restrictedTable = document.querySelector('#table-restricted');
+    myRestrictions.forEach(restriction => {
+      // remove duplicates from table by removing already added restrictions
+      if (restrictionList.includes(restriction.category)) {
+        const index = restrictionList.indexOf(restriction.category);
+        if (index > -1) restrictionList.splice(index, 1);
+      } // populate table
 
-    for (const [key, value] of Object.entries(myRestrictions)) {
+
+      const formatedTime = secondsToHms(restriction.time_in_sec);
       const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="longer">${key}</span>
-                    <span>${value}</span>
+                    <span class="longer">${restriction.category}</span>
+                    <span>${formatedTime} / ${restriction.timeframe}</span>
                     <span><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>
         </tr>`;
       restrictedTable.innerHTML += HTMLinsert;
-    }
-
-    const restrictionList = {
-      Music: '🎧',
-      Entertainment: '🖥️',
-      Autos: '📱',
-      Others: '📚'
-    };
+    });
     const listTable = document.querySelector('#table-restrict-list');
-
-    for (const [key, value] of Object.entries(restrictionList)) {
+    restrictionList.forEach(elem => {
       const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="restriction-name" att-name=${key}>${value} ${key}</span>
+                    <span class="restriction-name" att-name="${elem}">${elem}</span>
                     <span>></span>
                 </div>
             </td>
         </tr>`;
       listTable.innerHTML += HTMLinsert;
-    }
-
-    console.log(listTable.querySelectorAll('td'));
+    });
     listTable.querySelectorAll('td').forEach(elem => {
       elem.addEventListener('click', () => {
         const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
@@ -284,9 +312,15 @@
     document.querySelector('#restrict-btn').addEventListener('click', () => {
       const hours = document.querySelector('.time-input-hours').value;
       const minutes = document.querySelector('.time-input-minutes').value;
+      const restriction = document.querySelector('.popup-section').querySelector('#restriction-name').textContent || null;
       if (hours <= 0 && minutes <= 0) return;
-      console.log(hours);
-      document.querySelector('.popup-section').classList.remove('show'); // reset inputs
+      if (restriction === null) return;
+      const seconds = hmsToSeconds(hours, minutes, 0); // convert hours, minutes, seconds to seconds
+
+      addRestriction(restriction, seconds); // add restriction to database
+
+      document.querySelector('.popup-section').classList.remove('show'); // hide popup
+      // reset inputs
 
       document.querySelector('.time-input-hours').value = '';
       document.querySelector('.time-input-minutes').value = '';

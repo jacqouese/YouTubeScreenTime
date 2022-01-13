@@ -1,3 +1,5 @@
+import { addRestriction } from '../../api/addRestriciton';
+import { hmsToSeconds } from '../../helpers/hmsToSeconds';
 import { restrictTable } from './restrictTable';
 
 function timeInputs() {
@@ -22,12 +24,18 @@ function handleButtons() {
   document.querySelector('#restrict-btn').addEventListener('click', () => {
     const hours = document.querySelector('.time-input-hours').value;
     const minutes = document.querySelector('.time-input-minutes').value;
+    const restriction =
+      document
+        .querySelector('.popup-section')
+        .querySelector('#restriction-name').textContent || null;
 
     if (hours <= 0 && minutes <= 0) return;
+    if (restriction === null) return;
 
-    console.log(hours);
+    const seconds = hmsToSeconds(hours, minutes, 0); // convert hours, minutes, seconds to seconds
 
-    document.querySelector('.popup-section').classList.remove('show');
+    addRestriction(restriction, seconds); // add restriction to database
+    document.querySelector('.popup-section').classList.remove('show'); // hide popup
 
     // reset inputs
     document.querySelector('.time-input-hours').value = '';

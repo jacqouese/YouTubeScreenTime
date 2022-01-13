@@ -1,14 +1,15 @@
 import { queryDB } from './queryDBtest';
 
-function checkForRestriction(category) {
+export function checkForRestriction(category, callback, errorCallback) {
   queryDB('restrictions', 'category', (store) => {
-    var request = store.index('category').get(category);
+    var request = store.index('category').getAll();
     request.onsuccess = () => {
-      if (request.result.length > 0) {
-        return true;
-      } else {
-        return false;
-      }
+      if (!request.result) return errorCallback();
+      if (request.result.length < 1) return errorCallback();
+
+      if (request.result.includes(category)) return errorCallback();
+
+      return callback();
     };
   });
 }

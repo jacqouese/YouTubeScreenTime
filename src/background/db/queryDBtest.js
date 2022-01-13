@@ -12,7 +12,7 @@ export function queryDB(tableName, tableIndex, callback) {
     upgradeDB(openRequest, store, index);
   };
   openRequest.onerror = (e) => {
-    console.error(e.target.error);
+    return console.error(tableName, e.target.error);
   };
 
   openRequest.onsuccess = (e) => {
@@ -23,7 +23,7 @@ export function queryDB(tableName, tableIndex, callback) {
     index = store.index(tableIndex);
 
     db.onerror = (e) => {
-      console.error(e.target.error);
+      return console.error(tableName, e.target.error);
     };
 
     callback(store);

@@ -277,6 +277,11 @@ td {
   margin-top: 30px;
 }
 
+.restrict-list-table-container {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
 .table-restrict .table-inner-wrapper {
   display: flex;
   justify-content: space-between;
