@@ -186,6 +186,7 @@ p.percent.percent-down {
 }
 
 .chart-border {
+  position: relative;
   width: 100%;
   height: 150px;
   display: flex;
@@ -196,7 +197,16 @@ p.percent.percent-down {
   font-size: 90%;
 }
 
+.chart-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .chart-bar-wrapper {
+  z-index: 1;
   height: 100%;
   display: flex;
   flex-direction: column;
