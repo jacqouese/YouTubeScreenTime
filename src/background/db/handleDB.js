@@ -1,6 +1,6 @@
 import { upgradeDB } from './upgradeDB';
 
-export function handleDB(category, logTime, time) {
+export function handleDB(category, logTime, time, callback) {
   let openRequest = indexedDB.open('YouTubeScreenTime', 1),
     db,
     tx,
@@ -60,6 +60,8 @@ export function handleDB(category, logTime, time) {
         var obj = { category: category, date: logTime, time_in_sec: time };
         store.put(obj);
       }
+
+      callback();
     };
   };
 }

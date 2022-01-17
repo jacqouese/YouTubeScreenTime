@@ -1,0 +1,57 @@
+#ytt-notification-contianer * {
+  box-sizing: border-box;
+  font-family: 'Roboto', 'Arial', sans-serif;
+}
+
+#ytt-notification-contianer {
+  position: fixed;
+  right: 20px;
+  top: 70px;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#ytt-notification-contianer button {
+  background-color: transparent;
+  color: #4d9ade;
+  padding: 0.5rem 0.1rem;
+  font-size: 150%;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#ytt-notification-contianer button:hover {
+  background-color: #292929;
+}
+
+#ytt-notification-contianer img {
+  max-height: 2.2rem;
+}
+
+#ytt-notification-contianer .flex {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.ytt-simple-notification {
+  width: 100%;
+  min-height: 50px;
+  padding: 2.5rem 3rem 2rem 3rem;
+  background-color: #202020;
+  border-radius: 10px;
+  color: white;
+}
+
+.ytt-simple-notification h1 {
+  font-weight: 400;
+}
+
+.ytt-simple-notification p {
+  margin-bottom: 1rem;
+  font-size: 120%;
+}

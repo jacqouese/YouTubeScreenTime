@@ -1,5 +1,6 @@
 import { addRestriction } from './db/addRestriction';
 import { checkForRestriction } from './db/checkForRestriction';
+import { checkTimeRemainingForCategory } from './db/checkTimeRemainingForCategory';
 import { getAllRestrictions } from './db/getAllRestrictions';
 import { getAllWatched } from './db/getAllWatched';
 import { handleDB } from './db/handleDB';
@@ -19,7 +20,28 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // save time from content
   if (request.type === 'saveRequest') {
     // adds new entry to watch time log
-    handleDB(request.body.category, request.body.date, request.body.time);
+    handleDB(
+      request.body.category,
+      request.body.date,
+      request.body.time,
+      () => {
+        getAllWatched('day', (res) => {
+          checkTimeRemainingForCategory(
+            request.body.category,
+            res.categoryObject[request.body.category],
+            'day',
+            (isTimeLeft) => {
+              sendResponse({
+                status: 200,
+                data: {
+                  isTimeLeft: isTimeLeft,
+                },
+              });
+            }
+          );
+        });
+      }
+    );
   } else if (request.type === 'dataRequest') {
     // watch time data request from popup
     if (request.body.period === 'day') {
@@ -98,9 +120,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   return true; // prevent closed connection error
 });
 
+// send message to tab when its URL changes
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo && changeInfo.status == 'complete') {
     console.log('Tab updated: ');
-    chrome.tabs.sendMessage(tabId, { data: 'new url' });
+    chrome.tabs.sendMessage(tabId, { type: 'newURL' });
   }
 });

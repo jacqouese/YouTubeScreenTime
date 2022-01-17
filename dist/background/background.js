@@ -86,6 +86,21 @@
     });
   }
 
+  function checkTimeRemainingForCategory(category, time, timeframe, callback) {
+    queryDB('restrictions', 'category', store => {
+      var request = store.index('category').getAll([category]);
+
+      request.onsuccess = () => {
+
+        if (!request.result) return callback(true);
+        if (request.result.length < 1) return callback(true);
+        if (request.result[0].timeframe !== timeframe) return callback(true);
+        if (request.result[0].time_in_sec > time) return callback(true);
+        return callback(false);
+      };
+    });
+  }
+
   function getAllRestrictions(callback) {
     queryDB('restrictions', 'category', store => {
       var request = store.index('category').getAll();
@@ -198,7 +213,7 @@
     });
   }
 
-  function handleDB(category, logTime, time) {
+  function handleDB(category, logTime, time, callback) {
     let openRequest = indexedDB.open('YouTubeScreenTime', 1),
         db,
         tx,
@@ -253,6 +268,8 @@
           };
           store.put(obj);
         }
+
+        callback();
       };
     };
   }
@@ -263,7 +280,18 @@
 
     if (request.type === 'saveRequest') {
       // adds new entry to watch time log
-      handleDB(request.body.category, request.body.date, request.body.time);
+      handleDB(request.body.category, request.body.date, request.body.time, () => {
+        getAllWatched('day', res => {
+          checkTimeRemainingForCategory(request.body.category, res.categoryObject[request.body.category], 'day', isTimeLeft => {
+            sendResponse({
+              status: 200,
+              data: {
+                isTimeLeft: isTimeLeft
+              }
+            });
+          });
+        });
+      });
     } else if (request.type === 'dataRequest') {
       // watch time data request from popup
       if (request.body.period === 'day') {
@@ -337,12 +365,13 @@
     }
 
     return true; // prevent closed connection error
-  });
+  }); // send message to tab when its URL changes
+
   chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo && changeInfo.status == 'complete') {
       console.log('Tab updated: ');
       chrome.tabs.sendMessage(tabId, {
-        data: 'new url'
+        type: 'newURL'
       });
     }
   });
