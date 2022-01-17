@@ -64,6 +64,8 @@
   }
 
   function sendToDB(time, date, category) {
+    if (category === undefined || time === 0) return;
+    console.log('progress saved under', category);
     chrome.runtime.sendMessage({
       for: 'background',
       type: 'saveRequest',
@@ -75,21 +77,19 @@
     });
   }
 
-  function videoSaveProgress(video, timer, category) {
+  function videoSaveProgressListener(video, timer, category) {
     document.addEventListener('transitionend', () => {
       // pause timer if no video detected
       if (video.src === '') {
         if (timer.isResumed === true) {
           timer.pause();
-          console.log('progress saved under', checkCategory());
           sendToDB(timer.time, getDate(), checkCategory());
           timer.time = 0;
         }
       }
     });
     chrome.runtime.onMessage.addListener(() => {
-      if (timer.time != 0 && video.src === '') {
-        console.log('progress saved under', checkCategory());
+      if (timer.time != 0) {
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
       }
@@ -97,7 +97,6 @@
 
     window.onbeforeunload = () => {
       if (timer.time != 0 && video.src === '') {
-        console.log('progress saved under', checkCategory());
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
         return 'you sure?';
@@ -105,28 +104,36 @@
     };
   }
 
-  const video = document.getElementsByTagName('video')[0] || null;
-  const hook = document.querySelector('#count');
+  // listen for first video after opening YouTube
+  function listenForFirstVideo(callback) {
+    chrome.runtime.onMessage.addListener(function listenForFirstVideoInner() {
+      const video = document.getElementsByTagName('video')[0] || null; // when the video has been found, remove listener and run callback
 
-  if (video !== null) {
-    // get category from YouTube
+      if (video !== null) {
+        chrome.runtime.onMessage.removeListener(listenForFirstVideoInner);
+        console.log('video found');
+        callback(video);
+      }
+    });
+  }
+
+  let video = document.getElementsByTagName('video')[0] || null;
+  const hook = document.querySelector('#count');
+  listenForFirstVideo(foundVideo => {
+    console.log('video found');
+    video = foundVideo; // get category from YouTube
+
     chrome.storage.sync.set({
       currentCategory: checkCategory()
     }); // interval with play/pause ability
 
     const timer = new intervalTimer(() => {
       console.log(timer.time++);
-    }, 1000); // listen for URL change to update category
+    }, 1000); // listen for play / pause
 
-    chrome.runtime.onMessage.addListener(() => {
-      console.log('url change');
-    }); // listen for play / pause
+    videoListeners(video, timer); // listen when to save progress to database
 
-    videoListeners(video, timer); // save time when user exits
-
-    videoSaveProgress(video, timer, checkCategory());
-  } else {
-    console.log('no video');
-  }
+    videoSaveProgressListener(video, timer, checkCategory());
+  });
 
 })));

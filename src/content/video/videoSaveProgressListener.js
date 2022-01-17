@@ -2,6 +2,9 @@ import { checkCategory } from '../category/extractCategory';
 import { getDate } from '../helpers/getDate';
 
 function sendToDB(time, date, category) {
+  if (category === undefined || time === 0) return;
+
+  console.log('progress saved under', category);
   chrome.runtime.sendMessage({
     for: 'background',
     type: 'saveRequest',
@@ -13,21 +16,19 @@ function sendToDB(time, date, category) {
   });
 }
 
-export function videoSaveProgress(video, timer, category) {
+export function videoSaveProgressListener(video, timer, category) {
   document.addEventListener('transitionend', () => {
     // pause timer if no video detected
     if (video.src === '') {
       if (timer.isResumed === true) {
         timer.pause();
-        console.log('progress saved under', checkCategory());
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
       }
     }
   });
   chrome.runtime.onMessage.addListener(() => {
-    if (timer.time != 0 && video.src === '') {
-      console.log('progress saved under', checkCategory());
+    if (timer.time != 0) {
       sendToDB(timer.time, getDate(), checkCategory());
       timer.time = 0;
     }
@@ -35,7 +36,6 @@ export function videoSaveProgress(video, timer, category) {
 
   window.onbeforeunload = () => {
     if (timer.time != 0 && video.src === '') {
-      console.log('progress saved under', checkCategory());
       sendToDB(timer.time, getDate(), checkCategory());
       timer.time = 0;
 

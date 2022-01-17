@@ -1,15 +1,19 @@
 import { intervalTimer } from './helpers/intervalTimer';
 
+import { listenForNewURL } from './api/listenForNewURL';
 import { injectCategory, checkCategory } from './category/extractCategory';
 import { videoListeners } from './video/videoListeners';
-import { videoSaveProgress } from './video/videoSaveProgress';
+import { videoSaveProgressListener } from './video/videoSaveProgressListener';
+import { listenForFirstVideo } from './api/listenForFirstVideo';
 
-const video = document.getElementsByTagName('video')[0] || null;
+let video = document.getElementsByTagName('video')[0] || null;
 const hook = document.querySelector('#count');
 
-if (video !== null) {
-  // get category from YouTube
+listenForFirstVideo((foundVideo) => {
+  console.log('video found');
+  video = foundVideo;
 
+  // get category from YouTube
   chrome.storage.sync.set({ currentCategory: checkCategory() });
 
   // interval with play/pause ability
@@ -17,16 +21,9 @@ if (video !== null) {
     console.log(timer.time++);
   }, 1000);
 
-  // listen for URL change to update category
-  chrome.runtime.onMessage.addListener(() => {
-    console.log('url change');
-  });
-
   // listen for play / pause
   videoListeners(video, timer);
 
-  // save time when user exits
-  videoSaveProgress(video, timer, checkCategory());
-} else {
-  console.log('no video');
-}
+  // listen when to save progress to database
+  videoSaveProgressListener(video, timer, checkCategory());
+});
