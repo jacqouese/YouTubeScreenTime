@@ -9,15 +9,18 @@ export function checkTimeRemainingForCategory(
   queryDB('restrictions', 'category', (store) => {
     var request = store.index('category').getAll([category]);
     request.onsuccess = () => {
+      const remaining = request.result[0].time_in_sec - time;
+
       if (!request.result) return callback(true, null);
       if (request.result.length < 1) return callback(true, null);
 
       if (request.result[0].timeframe !== timeframe)
-        return callback(true, null);
+        return callback(true, remaining);
 
-      if (request.result[0].time_in_sec > time) return callback(true, null);
+      if (request.result[0].time_in_sec > time)
+        return callback(true, remaining);
 
-      return callback(false, request.result[0].time_in_sec);
+      return callback(false, remaining);
     };
   });
 }

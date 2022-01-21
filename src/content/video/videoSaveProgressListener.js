@@ -16,14 +16,17 @@ function sendToDB(time, date, category) {
       },
     },
     (res) => {
+      console.log(`${res.data.timeRemaining} seconds left`);
       if (res.data.isTimeLeft === false) {
         console.log('%cRestriction trigger!!!', 'color: red');
         mainNotification.createSimpleNotification(
           `Time for ${category} has run out`,
           `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`
         );
-      } else if (res.data.timeRemaining < 300) {
-        console.log('%cLess than 5 min left for category', 'color: yellow');
+      } else if (
+        res.data.timeRemaining !== null &&
+        res.data.timeRemaining < 300
+      ) {
         mainNotification.createSimpleNotification(
           `Less than 5 min for ${category}`,
           `The time limit you set for ${category} has almost run out.`
