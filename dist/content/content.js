@@ -132,7 +132,7 @@
     document.body.appendChild(mainContainer);
 
     this.dismissNotificationById = id => {
-      const notificationElem = document.querySelector(`#${id}`).remove;
+      const notificationElem = document.querySelector(`#${id}`);
       notificationElem.parentNode.removeChild(notificationElem);
     };
 
@@ -158,6 +158,9 @@
       });
       simpleNotification.innerHTML = html;
       simpleNotification.appendChild(button);
+      setTimeout(() => {
+        this.dismissNotificationById(notificationId);
+      }, 10000);
     };
   }
 

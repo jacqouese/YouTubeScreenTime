@@ -39,12 +39,29 @@
 }
 
 .ytt-simple-notification {
+  opacity: 0;
   width: 100%;
   min-height: 50px;
   padding: 2.5rem 3rem 2rem 3rem;
   background-color: #202020;
   border-radius: 10px;
   color: white;
+  animation: opacityFade 10s;
+}
+
+@keyframes opacityFade {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .ytt-simple-notification h1 {
