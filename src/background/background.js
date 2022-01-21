@@ -1,6 +1,7 @@
 import { addRestriction } from './db/addRestriction';
 import { checkForRestriction } from './db/checkForRestriction';
 import { checkTimeRemainingForCategory } from './db/checkTimeRemainingForCategory';
+import { deleteRestriction } from './db/deleteRestriction';
 import { getAllRestrictions } from './db/getAllRestrictions';
 import { getAllWatched } from './db/getAllWatched';
 import { handleDB } from './db/handleDB';
@@ -30,11 +31,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             request.body.category,
             res.categoryObject[request.body.category],
             'day',
-            (isTimeLeft) => {
+            (isTimeLeft, timeRemaining) => {
               sendResponse({
                 status: 200,
                 data: {
                   isTimeLeft: isTimeLeft,
+                  timeRemaining: timeRemaining,
                 },
               });
             }
@@ -87,6 +89,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     checkForRestriction(
       request.body.restriction,
       () => {
+        console.log('here');
         addRestriction(request.body.restriction, request.body.time);
         sendResponse({
           status: 200,
@@ -96,6 +99,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
       },
       () => {
+        console.log('here');
         sendResponse({
           status: 403,
           error: 'restriction for this category already exists',
@@ -110,6 +114,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           restrictions: res,
         },
       });
+    });
+  } else if (request.type === 'deleteRestriction') {
+    deleteRestriction(request.body.restriction);
+    sendResponse({
+      status: 200,
     });
   } else {
     sendResponse({

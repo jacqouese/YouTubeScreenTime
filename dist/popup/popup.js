@@ -1,7 +1,8 @@
-(function (factory) {
-  typeof define === 'function' && define.amd ? define('popup', factory) :
-  factory();
-}((function () { 'use strict';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define('popup', ['exports'], factory) :
+  (global = global || self, factory(global.popup = {}));
+}(this, (function (exports) { 'use strict';
 
   function requestTotal(period, callback) {
     chrome.extension.sendMessage({
@@ -214,7 +215,7 @@
     handleDetailedCategoryTabs();
   }
 
-  function addRestriction(restriction, time) {
+  function addRestriction(restriction, time, callback) {
     chrome.extension.sendMessage({
       type: 'addRestriction',
       body: {
@@ -222,9 +223,25 @@
         time: time
       }
     }, function (res) {
-      if (res.status === 200) return console.log('restriction added');
+      if (res.status === 200) {
+        callback();
+        return console.log('restriction added');
+      }
+
       if (res.status === 403) return console.log('restriction already exists');
       return console.warn('Some error occured');
+    });
+  }
+
+  function deleteRestriction(restriction, callback) {
+    chrome.extension.sendMessage({
+      type: 'deleteRestriction',
+      body: {
+        restriction: restriction
+      }
+    }, function (res) {
+      if (res.status !== 200) return console.warn('Some error occured');
+      callback();
     });
   }
 
@@ -250,6 +267,7 @@
     const myRestrictions = window.ytData.allRestrictions;
     const restrictionList = youtubeCategories;
     const restrictedTable = document.querySelector('#table-restricted');
+    restrictedTable.innerHTML = '';
     myRestrictions.forEach(restriction => {
       // remove duplicates from table by removing already added restrictions
       if (restrictionList.includes(restriction.category)) {
@@ -265,13 +283,14 @@
                 <div class="table-inner-wrapper">
                     <span class="longer">${restriction.category}</span>
                     <span>${formatedTime} / ${restriction.timeframe}</span>
-                    <span><img src="./assets/remove.png" alt="x"></span>
+                    <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>
         </tr>`;
       restrictedTable.innerHTML += HTMLinsert;
     });
     const listTable = document.querySelector('#table-restrict-list');
+    listTable.innerHTML = '';
     restrictionList.forEach(elem => {
       const HTMLinsert = `
         <tr>
@@ -317,13 +336,27 @@
       if (restriction === null) return;
       const seconds = hmsToSeconds(hours, minutes, 0); // convert hours, minutes, seconds to seconds
 
-      addRestriction(restriction, seconds); // add restriction to database
+      addRestriction(restriction, seconds, () => {
+        main();
+      }); // add restriction to database
 
       document.querySelector('.popup-section').classList.remove('show'); // hide popup
       // reset inputs
 
       document.querySelector('.time-input-hours').value = '';
       document.querySelector('.time-input-minutes').value = '';
+    });
+  }
+
+  function handleDeleteButton() {
+    const buttons = document.querySelectorAll('.delete-restriction');
+    buttons.forEach(button => {
+      const restrictionCategory = button.getAttribute('att-restriction');
+      button.addEventListener('click', () => {
+        deleteRestriction(restrictionCategory, () => {
+          main();
+        });
+      });
     });
   }
 
@@ -340,6 +373,7 @@
     restrictTable();
     timeInputs();
     handleButtons();
+    handleDeleteButton();
     handleBackButton();
   }
 
@@ -348,13 +382,20 @@
     chartLogic();
   }
 
-  loadData(() => {
-    // global elements logic
-    tabLogic();
-    switchLogic(); // logic for each tab
+  function main() {
+    loadData(() => {
+      // global elements logic
+      tabLogic();
+      switchLogic(); // logic for each tab
 
-    stats();
-    restrict();
-  });
+      stats();
+      restrict();
+    });
+  }
+  main();
+
+  exports.main = main;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

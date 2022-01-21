@@ -6,12 +6,16 @@ import { tabLogic } from './js/globalLogic/tabLogic';
 import { restrict } from './js/tabs/restrict/restrict';
 import { stats } from './js/tabs/stats/stats';
 
-loadData(() => {
-  // global elements logic
-  tabLogic();
-  switchLogic();
+export function main() {
+  loadData(() => {
+    // global elements logic
+    tabLogic();
+    switchLogic();
 
-  // logic for each tab
-  stats();
-  restrict();
-});
+    // logic for each tab
+    stats();
+    restrict();
+  });
+}
+
+main();

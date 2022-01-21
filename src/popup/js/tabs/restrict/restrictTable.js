@@ -24,6 +24,8 @@ export function restrictTable() {
 
   const restrictedTable = document.querySelector('#table-restricted');
 
+  restrictedTable.innerHTML = '';
+
   myRestrictions.forEach((restriction) => {
     // remove duplicates from table by removing already added restrictions
     if (restrictionList.includes(restriction.category)) {
@@ -40,7 +42,7 @@ export function restrictTable() {
                 <div class="table-inner-wrapper">
                     <span class="longer">${restriction.category}</span>
                     <span>${formatedTime} / ${restriction.timeframe}</span>
-                    <span><img src="./assets/remove.png" alt="x"></span>
+                    <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>
         </tr>`;
@@ -49,6 +51,8 @@ export function restrictTable() {
   });
 
   const listTable = document.querySelector('#table-restrict-list');
+
+  listTable.innerHTML = '';
 
   restrictionList.forEach((elem) => {
     const HTMLinsert = `

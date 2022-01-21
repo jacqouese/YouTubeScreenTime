@@ -18,7 +18,16 @@ function sendToDB(time, date, category) {
     (res) => {
       if (res.data.isTimeLeft === false) {
         console.log('%cRestriction trigger!!!', 'color: red');
-        mainNotification.createSimpleNotification(category);
+        mainNotification.createSimpleNotification(
+          `Time for ${category} has run out`,
+          `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`
+        );
+      } else if (res.data.timeRemaining < 300) {
+        console.log('%cLess than 5 min left for category', 'color: yellow');
+        mainNotification.createSimpleNotification(
+          `Less than 5 min for ${category}`,
+          `The time limit you set for ${category} has almost run out.`
+        );
       }
     }
   );
@@ -46,7 +55,7 @@ export function videoSaveProgressListener(video, timer, category) {
 
   // when user closes tab
   window.onbeforeunload = () => {
-    if (timer.time != 0 && video.src === '') {
+    if (timer.time != 0) {
       sendToDB(timer.time, getDate(), checkCategory());
       timer.time = 0;
 

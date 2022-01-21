@@ -25,7 +25,6 @@ export function queryDB(tableName, tableIndex, callback) {
     db.onerror = (e) => {
       return console.error(tableName, e.target.error);
     };
-
     callback(store);
   };
 }

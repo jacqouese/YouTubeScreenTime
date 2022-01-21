@@ -1,12 +1,14 @@
 import { queryDB } from './queryDBtest';
 
-export function checkForRestriction(category, callback, errorCallback) {
+export function deleteRestriction(restriction) {
   queryDB('restrictions', 'category', (store) => {
     var request = store.index('category').getAll();
     request.onsuccess = () => {
-      if (!request.result.includes(category)) return callback();
-
-      return errorCallback();
+      request.result.forEach((elem) => {
+        if (elem.category === restriction) {
+          store.delete(elem.id);
+        }
+      });
     };
   });
 }

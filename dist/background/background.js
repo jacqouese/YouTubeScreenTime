@@ -78,10 +78,8 @@
       var request = store.index('category').getAll();
 
       request.onsuccess = () => {
-        if (!request.result) return errorCallback();
-        if (request.result.length < 1) return errorCallback();
-        if (request.result.includes(category)) return errorCallback();
-        return callback();
+        if (!request.result.includes(category)) return callback();
+        return errorCallback();
       };
     });
   }
@@ -91,12 +89,25 @@
       var request = store.index('category').getAll([category]);
 
       request.onsuccess = () => {
+        if (!request.result) return callback(true, null);
+        if (request.result.length < 1) return callback(true, null);
+        if (request.result[0].timeframe !== timeframe) return callback(true, null);
+        if (request.result[0].time_in_sec > time) return callback(true, null);
+        return callback(false, request.result[0].time_in_sec);
+      };
+    });
+  }
 
-        if (!request.result) return callback(true);
-        if (request.result.length < 1) return callback(true);
-        if (request.result[0].timeframe !== timeframe) return callback(true);
-        if (request.result[0].time_in_sec > time) return callback(true);
-        return callback(false);
+  function deleteRestriction(restriction) {
+    queryDB('restrictions', 'category', store => {
+      var request = store.index('category').getAll();
+
+      request.onsuccess = () => {
+        request.result.forEach(elem => {
+          if (elem.category === restriction) {
+            store.delete(elem.id);
+          }
+        });
       };
     });
   }
@@ -282,11 +293,12 @@
       // adds new entry to watch time log
       handleDB(request.body.category, request.body.date, request.body.time, () => {
         getAllWatched('day', res => {
-          checkTimeRemainingForCategory(request.body.category, res.categoryObject[request.body.category], 'day', isTimeLeft => {
+          checkTimeRemainingForCategory(request.body.category, res.categoryObject[request.body.category], 'day', (isTimeLeft, timeRemaining) => {
             sendResponse({
               status: 200,
               data: {
-                isTimeLeft: isTimeLeft
+                isTimeLeft: isTimeLeft,
+                timeRemaining: timeRemaining
               }
             });
           });
@@ -335,6 +347,7 @@
       }
     } else if (request.type === 'addRestriction') {
       checkForRestriction(request.body.restriction, () => {
+        console.log('here');
         addRestriction(request.body.restriction, request.body.time);
         sendResponse({
           status: 200,
@@ -343,6 +356,7 @@
           }
         });
       }, () => {
+        console.log('here');
         sendResponse({
           status: 403,
           error: 'restriction for this category already exists'
@@ -356,6 +370,11 @@
             restrictions: res
           }
         });
+      });
+    } else if (request.type === 'deleteRestriction') {
+      deleteRestriction(request.body.restriction);
+      sendResponse({
+        status: 200
       });
     } else {
       sendResponse({

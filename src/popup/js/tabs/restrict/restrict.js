@@ -1,4 +1,7 @@
+import { main } from '../../../popup';
 import { addRestriction } from '../../api/addRestriciton';
+import { deleteRestriction } from '../../api/deleteRestriction';
+import { loadData } from '../../api/loadData';
 import { hmsToSeconds } from '../../helpers/hmsToSeconds';
 import { restrictTable } from './restrictTable';
 
@@ -34,12 +37,28 @@ function handleButtons() {
 
     const seconds = hmsToSeconds(hours, minutes, 0); // convert hours, minutes, seconds to seconds
 
-    addRestriction(restriction, seconds); // add restriction to database
+    addRestriction(restriction, seconds, () => {
+      main();
+    }); // add restriction to database
     document.querySelector('.popup-section').classList.remove('show'); // hide popup
 
     // reset inputs
     document.querySelector('.time-input-hours').value = '';
     document.querySelector('.time-input-minutes').value = '';
+  });
+}
+
+function handleDeleteButton() {
+  const buttons = document.querySelectorAll('.delete-restriction');
+
+  buttons.forEach((button) => {
+    const restrictionCategory = button.getAttribute('att-restriction');
+
+    button.addEventListener('click', () => {
+      deleteRestriction(restrictionCategory, () => {
+        main();
+      });
+    });
   });
 }
 
@@ -57,5 +76,6 @@ export function restrict() {
   restrictTable();
   timeInputs();
   handleButtons();
+  handleDeleteButton();
   handleBackButton();
 }

@@ -21,9 +21,9 @@ export function notification() {
     const html = `
     <div class="flex">
         <img src="${imgURL}" alt="">
-        <h1>Time for ${title} has run out</h1>
+        <h1>${title}</h1>
     </div>
-    <p>The time limit you set for ${title} has run out. The video will stop playing if you don’t take any action. Check YouTubeScreenTime extension for more detail.</p>
+    <p>${subtitle}</p>
     `;
 
     const button = document.createElement('button');
