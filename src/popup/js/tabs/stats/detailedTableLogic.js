@@ -53,9 +53,14 @@ export function detailedTableLogic(period) {
 
   const progressBars = document.querySelectorAll('.progress');
 
-  progressBars.forEach((bar) => {
+  progressBars.forEach((bar, i) => {
     const value = bar.getAttribute('att-progress');
 
-    bar.style.width = `${value}%`;
+    setTimeout(() => {
+      bar.style.width = `${value}%`;
+      bar.style.transition = `all ${
+        ((i + 1) / (i + 2)) * 3
+      }s cubic-bezier(0.23, 0.76, 0.735, 0.955)`;
+    }, 50);
   });
 }
