@@ -377,6 +377,26 @@
       sendResponse({
         status: 200
       });
+    } else if (request.type === 'setUserSettings') {
+      localStorage.setItem(request.body.settingName, request.body.settingValue);
+      sendResponse({
+        status: 201,
+        message: 'setting added successfully'
+      });
+    } else if (request.type === 'getUserSettings') {
+      const setting = localStorage.getItem(request.body.settingName);
+
+      if (setting === null) {
+        localStorage.setItem(request.body.settingName, false);
+      }
+
+      sendResponse({
+        status: 200,
+        data: {
+          settingName: request.body.settingName,
+          settingValue: setting
+        }
+      });
     } else {
       sendResponse({
         status: 404,

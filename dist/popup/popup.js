@@ -41,9 +41,22 @@
     });
   }
 
+  function getUserSettings(settingName, callback) {
+    chrome.extension.sendMessage({
+      type: 'getUserSettings',
+      body: {
+        settingName: settingName
+      }
+    }, res => {
+      if (res.status !== 200 && res.status !== 201 || !res.status) return console.warn('something went wrong!', res.status);
+      callback(res);
+    });
+  }
+
   function loadData(callback) {
     // initialize global object
     window.ytData = {};
+    window.ytData.settings = {};
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.log(request);
     }); // request total for each period
@@ -63,19 +76,61 @@
     });
     requestAllRestricions(res => {
       window.ytData.allRestrictions = res.data.restrictions;
+    }); // load settings
+
+    getUserSettings('displayCategory', res => {
+      window.ytData.settings.displayCategory = res.data.settingValue;
+    });
+    getUserSettings('lowTimeNotifications', res => {
+      window.ytData.settings.lowTimeNotifications = res.data.settingValue;
+    });
+    getUserSettings('warnOnly', res => {
+      window.ytData.settings.warnOnly = res.data.settingValue;
+    });
+    getUserSettings('isDark', res => {
+      window.ytData.settings.isDark = res.data.settingValue;
+
+      if (res.data.settingValue == 'true') {
+        document.body.classList.add('dark');
+      }
+    });
+    getUserSettings('isExtensionPaused', res => {
+      window.ytData.settings.isExtensionPaused = res.data.settingValue;
+    });
+  }
+
+  function setUserSettings(settingName, settingValue) {
+    chrome.extension.sendMessage({
+      type: 'setUserSettings',
+      body: {
+        settingName: settingName,
+        settingValue: settingValue
+      }
+    }, res => {
+      if (res.status !== 200 && res.status !== 201 || !res.status) return console.warn('something went wrong!', res.status);
     });
   }
 
   function switchLogic() {
     const switches = document.querySelectorAll('.switch');
     switches.forEach(switchElem => {
+      const switchName = switchElem.getAttribute('att-switch-name'); // set initial switch state
+
+      if (window.ytData.settings[switchName]) {
+        if (window.ytData.settings[switchName] == 'true') {
+          switchElem.classList.add('switch-active');
+        }
+      }
+
       switchElem.addEventListener('click', () => {
         const isActive = switchElem.classList.contains('switch-active');
 
         if (isActive === true) {
           switchElem.classList.remove('switch-active');
+          setUserSettings(switchName, false);
         } else {
           switchElem.classList.add('switch-active');
+          setUserSettings(switchName, true);
         }
       });
     });

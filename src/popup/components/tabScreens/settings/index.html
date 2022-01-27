@@ -6,7 +6,7 @@
                 <td>
                     <div class="table-inner-wrapper">
                         <span>Display category on YouTube</span>
-                        <span>@@include('./switch/index.html')</span>
+                        <span>@@include('./switch/index.html', {"switch-name": "displayCategory",})</span>
                     </div>
                 </td>
             </tr>
@@ -20,7 +20,7 @@
                 <td>
                     <div class="table-inner-wrapper">
                         <span>Notify when time is running low</span>
-                        <span>@@include('./switch/index.html')</span>
+                        <span>@@include('./switch/index.html', {"switch-name": "lowTimeNotifications",})</span>
                     </div>
                 </td>
             </tr>
@@ -28,7 +28,7 @@
                 <td>
                     <div class="table-inner-wrapper">
                         <span>Warn only</span>
-                        <span>@@include('./switch/index.html')</span>
+                        <span>@@include('./switch/index.html', {"switch-name": "warnOnly",})</span>
                     </div>
                 </td>
             </tr>
@@ -40,8 +40,16 @@
             <tr>
                 <td>
                     <div class="table-inner-wrapper">
+                        <span>Dark appearance</span>
+                        <span>@@include('./switch/index.html', {"switch-name": "isDark",})</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="table-inner-wrapper">
                         <span>Pause extension</span>
-                        <span>@@include('./switch/index.html')</span>
+                        <span>@@include('./switch/index.html', {"switch-name": "isExtensionPaused",})</span>
                     </div>
                 </td>
             </tr>

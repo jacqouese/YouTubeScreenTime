@@ -3,8 +3,20 @@
 :root {
   --primary: #45b1d5;
   --primary-dark: #00516b;
+  --font: #000000;
   --lighter: #707070;
   --x-lighter: #f1f0f0;
+  --bg: #ffffff;
+}
+
+.dark {
+  --primary: #45b1d5;
+  --primary-dark: #00516b;
+  --font: #ffffff;
+  --lighter: #c2c2c2;
+  --x-lighter: #343434;
+  --bg: #181818;
+  color-scheme: dark;
 }
 
 * {
@@ -19,6 +31,8 @@ body {
   width: 350px;
   height: 590px;
   padding: 5px 10px;
+  background-color: var(--bg);
+  color: var(--font);
 }
 
 p {
@@ -106,7 +120,7 @@ header img {
 }
 
 header h1 {
-  color: #949494;
+  color: var(--lighter);
   font-weight: 500;
 }
 
@@ -122,7 +136,7 @@ header h1 {
 }
 
 .tabs p.active {
-  color: #000000;
+  color: var(--font);
   border-bottom: 2px solid var(--primary);
   z-index: 2;
 }
@@ -133,7 +147,7 @@ header h1 {
 }
 
 hr {
-  border-color: rgba(242, 242, 242, 0.4);
+  border-color: var(--x-lighter);
   transform: translateY(-1px);
   z-index: -1;
   border-radius: 2px;
@@ -241,7 +255,7 @@ td {
 }
 
 .detailed-table {
-  background-color: white;
+  background-color: var(--bg);
 }
 
 .detailed-table-inner {
@@ -291,6 +305,7 @@ td {
 .restrict-list-table-container {
   max-height: 300px;
   overflow-y: scroll;
+  scrollbar-color: yellow red;
 }
 
 .table-restrict .table-inner-wrapper {
@@ -322,7 +337,7 @@ td {
   width: 100vw;
   height: 80%;
   padding: 10px 20px;
-  background-color: white;
+  background-color: var(--bg);
 }
 
 .popup-section.show {

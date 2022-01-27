@@ -48,11 +48,11 @@
     <div class="chart-border">
         <div class="chart-background">
             <svg height="146" width="326">
-                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="146" x2="326" y2="146" style="stroke:#f1f0f0;stroke-width:2" />
+                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="146" x2="326" y2="146" style="stroke:var(--x-lighter);stroke-width:2" />
             </svg>
           </div>
         <div class="chart-bar-wrapper">
@@ -89,11 +89,11 @@
     <div class="chart-border">
         <div class="chart-background">
             <svg height="146" width="326">
-                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="146" x2="326" y2="146" style="stroke:#f1f0f0;stroke-width:2" />
+                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="146" x2="326" y2="146" style="stroke:var(--x-lighter);stroke-width:2" />
             </svg>
           </div>
         <div class="chart-bar-wrapper">
@@ -130,11 +130,11 @@
     <div class="chart-border">
         <div class="chart-background">
             <svg height="146" width="326">
-                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:#f1f0f0;stroke-width:2" />
-                <line x1="0" y1="146" x2="326" y2="146" style="stroke:#f1f0f0;stroke-width:2" />
+                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:var(--x-lighter);stroke-width:2" />
+                <line x1="0" y1="146" x2="326" y2="146" style="stroke:var(--x-lighter);stroke-width:2" />
             </svg>
           </div>
         <div class="chart-bar-wrapper">
@@ -223,7 +223,7 @@
                 <td>
                     <div class="table-inner-wrapper">
                         <span>Display category on YouTube</span>
-                        <span><div class="switch-container switch">
+                        <span><div class="switch-container switch" att-switch-name="displayCategory">
     <input type="checkbox" class="hidden-checkbox">
     <div class="switch-track">
         <div class="switch-head"></div>
@@ -242,7 +242,7 @@
                 <td>
                     <div class="table-inner-wrapper">
                         <span>Notify when time is running low</span>
-                        <span><div class="switch-container switch">
+                        <span><div class="switch-container switch" att-switch-name="lowTimeNotifications">
     <input type="checkbox" class="hidden-checkbox">
     <div class="switch-track">
         <div class="switch-head"></div>
@@ -255,7 +255,7 @@
                 <td>
                     <div class="table-inner-wrapper">
                         <span>Warn only</span>
-                        <span><div class="switch-container switch">
+                        <span><div class="switch-container switch" att-switch-name="warnOnly">
     <input type="checkbox" class="hidden-checkbox">
     <div class="switch-track">
         <div class="switch-head"></div>
@@ -272,8 +272,21 @@
             <tr>
                 <td>
                     <div class="table-inner-wrapper">
+                        <span>Dark appearance</span>
+                        <span><div class="switch-container switch" att-switch-name="isDark">
+    <input type="checkbox" class="hidden-checkbox">
+    <div class="switch-track">
+        <div class="switch-head"></div>
+    </div>
+</div></span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="table-inner-wrapper">
                         <span>Pause extension</span>
-                        <span><div class="switch-container switch">
+                        <span><div class="switch-container switch" att-switch-name="isExtensionPaused">
     <input type="checkbox" class="hidden-checkbox">
     <div class="switch-track">
         <div class="switch-head"></div>
