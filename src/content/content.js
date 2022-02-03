@@ -1,12 +1,16 @@
 import { intervalTimer } from './helpers/intervalTimer';
 
-import { listenForNewURL } from './api/listenForNewURL';
 import { injectCategory, checkCategory } from './category/extractCategory';
 import { videoListeners } from './video/videoListeners';
-import { videoSaveProgressListener } from './video/videoSaveProgressListener';
+import {
+  sendToDB,
+  videoSaveProgressListener,
+} from './video/videoSaveProgressListener';
 import { listenForFirstVideo } from './api/listenForFirstVideo';
 import { notification } from './notifications/notification';
 import { injectCategoryString } from './inject/injectCategoryString';
+import { getDate } from './helpers/getDate';
+import { checkTimeRemaining } from './api/checkTimeRemaining';
 
 let video = document.getElementsByTagName('video')[0] || null;
 const hook = document.querySelector('#count');
@@ -24,6 +28,11 @@ listenForFirstVideo((foundVideo) => {
   // interval with play / pause ability
   const timer = new intervalTimer(() => {
     console.log(timer.time++);
+
+    if (timer.time === 60) {
+      sendToDB(timer.time, getDate(), checkCategory());
+      timer.time = 0;
+    }
   }, 1000);
 
   // listen for play / pause
@@ -34,5 +43,9 @@ listenForFirstVideo((foundVideo) => {
 
   setTimeout(() => {
     injectCategoryString();
+
+    const videoCategory = checkCategory();
+
+    checkTimeRemaining(videoCategory);
   }, 1000);
 });

@@ -140,6 +140,23 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         settingValue: setting,
       },
     });
+  } else if (request.type === 'checkTimeRemaining') {
+    getAllWatched('day', (res) => {
+      checkTimeRemainingForCategory(
+        request.body.category,
+        res.categoryObject[request.body.category],
+        'day',
+        (isTimeLeft, timeRemaining) => {
+          sendResponse({
+            status: 200,
+            data: {
+              isTimeLeft: isTimeLeft,
+              timeRemaining: timeRemaining,
+            },
+          });
+        }
+      );
+    });
   } else {
     sendResponse({
       status: 404,

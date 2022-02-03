@@ -5,7 +5,20 @@ export function injectCategoryString() {
 
   if (elem === null) return;
 
-  const paragraph = elem.getElementsByTagName('yt-formatted-string')[0];
+  const dot = document.createElement('span');
+  dot.id = 'dot';
+  dot.classList.add('style-scope');
+  dot.classList.add('ytd-video-primary-info-renderer');
 
-  paragraph.textContent += ` - ${checkCategory()}`;
+  var span = elem.querySelector('.ytt-cateogry') || null;
+
+  if (span === null) {
+    span = document.createElement('span');
+    span.classList.add('ytt-cateogry');
+
+    elem.appendChild(dot);
+    elem.appendChild(span);
+  }
+
+  span.textContent = `${checkCategory()}`;
 }

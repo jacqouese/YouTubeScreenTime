@@ -57,10 +57,49 @@
     });
   }
 
+  function checkTimeRemaining(category) {
+    chrome.runtime.sendMessage({
+      for: 'background',
+      type: 'checkTimeRemaining',
+      body: {
+        category: category,
+        timeframe: 'day'
+      }
+    }, res => {
+      console.log(`${res.data.timeRemaining} seconds left`);
+
+      if (res.data.isTimeLeft === false) {
+        console.log('%cRestriction trigger!!!', 'color: red');
+        mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
+      } else if (res.data.timeRemaining !== null && res.data.timeRemaining < 300) {
+        mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+      }
+    });
+  }
+
   function getDate() {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     return date;
+  }
+
+  function injectCategoryString() {
+    const elem = document.querySelector('#info-strings') || null;
+    if (elem === null) return;
+    const dot = document.createElement('span');
+    dot.id = 'dot';
+    dot.classList.add('style-scope');
+    dot.classList.add('ytd-video-primary-info-renderer');
+    var span = elem.querySelector('.ytt-cateogry') || null;
+
+    if (span === null) {
+      span = document.createElement('span');
+      span.classList.add('ytt-cateogry');
+      elem.appendChild(dot);
+      elem.appendChild(span);
+    }
+
+    span.textContent = `${checkCategory()}`;
   }
 
   function sendToDB(time, date, category) {
@@ -85,7 +124,6 @@
       }
     });
   }
-
   function videoSaveProgressListener(video, timer, category) {
     document.addEventListener('transitionend', () => {
       // pause timer if no video detected
@@ -99,9 +137,16 @@
     }); // when url changes
 
     chrome.runtime.onMessage.addListener(req => {
+      if (req.type === 'newURL') {
+        setTimeout(() => {
+          injectCategoryString();
+        }, 1000);
+      }
+
       if (req.type === 'newURL' && timer.time != 0) {
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
+        timer.pause();
       }
     }); // when user closes tab
 
@@ -165,13 +210,6 @@
     };
   }
 
-  function injectCategoryString() {
-    const elem = document.querySelector('#info-strings') || null;
-    if (elem === null) return;
-    const paragraph = elem.getElementsByTagName('yt-formatted-string')[0];
-    paragraph.textContent += ` - ${checkCategory()}`;
-  }
-
   let video = document.getElementsByTagName('video')[0] || null;
   const hook = document.querySelector('#count');
   listenForFirstVideo(foundVideo => {
@@ -186,6 +224,11 @@
 
     const timer = new intervalTimer(() => {
       console.log(timer.time++);
+
+      if (timer.time === 60) {
+        sendToDB(timer.time, getDate(), checkCategory());
+        timer.time = 0;
+      }
     }, 1000); // listen for play / pause
 
     videoListeners(video, timer); // listen when to save progress to database
@@ -193,6 +236,8 @@
     videoSaveProgressListener(video, timer, checkCategory());
     setTimeout(() => {
       injectCategoryString();
+      const videoCategory = checkCategory();
+      checkTimeRemaining(videoCategory);
     }, 1000);
   });
 

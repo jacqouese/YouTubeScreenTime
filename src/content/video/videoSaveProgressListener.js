@@ -1,8 +1,9 @@
-import { showNoTimeLeftPage } from '../api/restrictions/showNoTimeLeftPage';
+import { checkTimeRemaining } from '../api/checkTimeRemaining';
 import { checkCategory } from '../category/extractCategory';
 import { getDate } from '../helpers/getDate';
+import { injectCategoryString } from '../inject/injectCategoryString';
 
-function sendToDB(time, date, category) {
+export function sendToDB(time, date, category) {
   if (category === undefined || time === 0) return;
   console.log('progress saved under', category);
   chrome.runtime.sendMessage(
@@ -50,9 +51,16 @@ export function videoSaveProgressListener(video, timer, category) {
 
   // when url changes
   chrome.runtime.onMessage.addListener((req) => {
+    if (req.type === 'newURL') {
+      setTimeout(() => {
+        injectCategoryString();
+      }, 1000);
+    }
+
     if (req.type === 'newURL' && timer.time != 0) {
       sendToDB(timer.time, getDate(), checkCategory());
       timer.time = 0;
+      timer.pause();
     }
   });
 
