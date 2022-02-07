@@ -11,6 +11,7 @@ import { notification } from './notifications/notification';
 import { injectCategoryString } from './inject/injectCategoryString';
 import { getDate } from './helpers/getDate';
 import { checkTimeRemaining } from './api/checkTimeRemaining';
+import { listenForSettingChanges } from './settings/listenForSettingChanges';
 
 let video = document.getElementsByTagName('video')[0] || null;
 const hook = document.querySelector('#count');
@@ -24,6 +25,9 @@ listenForFirstVideo((foundVideo) => {
 
   // get category from YouTube
   chrome.storage.sync.set({ currentCategory: checkCategory() });
+
+  // get settings from popup
+  listenForSettingChanges();
 
   // interval with play / pause ability
   const timer = new intervalTimer(() => {
@@ -42,10 +46,14 @@ listenForFirstVideo((foundVideo) => {
   videoSaveProgressListener(video, timer, checkCategory());
 
   setTimeout(() => {
-    injectCategoryString();
+    if (window.ytData.settings.displayCategory == 'true') {
+      injectCategoryString();
+    }
 
     const videoCategory = checkCategory();
 
-    checkTimeRemaining(videoCategory);
+    if (window.ytData.settings.lowTimeNotifications == 'true') {
+      checkTimeRemaining(videoCategory);
+    }
   }, 1000);
 });

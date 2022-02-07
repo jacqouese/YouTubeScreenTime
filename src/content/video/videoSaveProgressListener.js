@@ -28,10 +28,12 @@ export function sendToDB(time, date, category) {
         res.data.timeRemaining !== null &&
         res.data.timeRemaining < 300
       ) {
-        mainNotification.createSimpleNotification(
-          `Less than 5 min for ${category}`,
-          `The time limit you set for ${category} has almost run out.`
-        );
+        if (window.ytData.settings.lowTimeNotifications == 'true') {
+          mainNotification.createSimpleNotification(
+            `Less than 5 min for ${category}`,
+            `The time limit you set for ${category} has almost run out.`
+          );
+        }
       }
     }
   );
@@ -52,9 +54,11 @@ export function videoSaveProgressListener(video, timer, category) {
   // when url changes
   chrome.runtime.onMessage.addListener((req) => {
     if (req.type === 'newURL') {
-      setTimeout(() => {
-        injectCategoryString();
-      }, 1000);
+      if (window.ytData.settings.displayCategory == 'true') {
+        setTimeout(() => {
+          injectCategoryString();
+        }, 1000);
+      }
     }
 
     if (req.type === 'newURL' && timer.time != 0) {

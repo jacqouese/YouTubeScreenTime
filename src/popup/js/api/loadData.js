@@ -9,7 +9,18 @@ export function loadData(callback) {
   window.ytData.settings = {};
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request);
+    if (request.type === 'settingChange') {
+      window.ytData[request.body.settingName] = request.body.settingValue;
+
+      // dark mode
+      if (request.body.settingName === 'isDark') {
+        if (request.body.settingValue == true) {
+          document.body.classList.add('dark');
+        } else {
+          document.body.classList.remove('dark');
+        }
+      }
+    }
   });
 
   // request total for each period

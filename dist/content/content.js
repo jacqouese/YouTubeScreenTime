@@ -120,7 +120,9 @@
         console.log('%cRestriction trigger!!!', 'color: red');
         mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
       } else if (res.data.timeRemaining !== null && res.data.timeRemaining < 300) {
-        mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+        if (window.ytData.settings.lowTimeNotifications == 'true') {
+          mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+        }
       }
     });
   }
@@ -138,9 +140,11 @@
 
     chrome.runtime.onMessage.addListener(req => {
       if (req.type === 'newURL') {
-        setTimeout(() => {
-          injectCategoryString();
-        }, 1000);
+        if (window.ytData.settings.displayCategory == 'true') {
+          setTimeout(() => {
+            injectCategoryString();
+          }, 1000);
+        }
       }
 
       if (req.type === 'newURL' && timer.time != 0) {
@@ -210,6 +214,33 @@
     };
   }
 
+  function listenForSettingChanges() {
+    window.ytData = {};
+    window.ytData.settings = {}; // get settings after launching
+
+    function getUserSettings(settingName, callback) {
+      chrome.extension.sendMessage({
+        type: 'getUserSettings',
+        body: {
+          settingName: settingName
+        }
+      }, res => {
+        if (res.status !== 200 && res.status !== 201 || !res.status) return console.warn('something went wrong!', res.status);
+        callback(res);
+      });
+    }
+
+    getUserSettings('displayCategory', res => {
+      window.ytData.settings.displayCategory = res.data.settingValue;
+    });
+    getUserSettings('lowTimeNotifications', res => {
+      window.ytData.settings.lowTimeNotifications = res.data.settingValue;
+    });
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      window.ytData.settings[request.body.settingName] = request.body.settingValue;
+    });
+  }
+
   let video = document.getElementsByTagName('video')[0] || null;
   const hook = document.querySelector('#count');
   listenForFirstVideo(foundVideo => {
@@ -220,7 +251,9 @@
 
     chrome.storage.sync.set({
       currentCategory: checkCategory()
-    }); // interval with play / pause ability
+    }); // get settings from popup
+
+    listenForSettingChanges(); // interval with play / pause ability
 
     const timer = new intervalTimer(() => {
       console.log(timer.time++);
@@ -235,9 +268,15 @@
 
     videoSaveProgressListener(video, timer, checkCategory());
     setTimeout(() => {
-      injectCategoryString();
+      if (window.ytData.settings.displayCategory == 'true') {
+        injectCategoryString();
+      }
+
       const videoCategory = checkCategory();
-      checkTimeRemaining(videoCategory);
+
+      if (window.ytData.settings.lowTimeNotifications == 'true') {
+        checkTimeRemaining(videoCategory);
+      }
     }, 1000);
   });
 
