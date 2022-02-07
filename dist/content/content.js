@@ -256,7 +256,7 @@
     listenForSettingChanges(); // interval with play / pause ability
 
     const timer = new intervalTimer(() => {
-      console.log(timer.time++);
+      console.log(timer.time++); // autosave every 60 seconds
 
       if (timer.time === 60) {
         sendToDB(timer.time, getDate(), checkCategory());
@@ -267,17 +267,20 @@
     videoListeners(video, timer); // listen when to save progress to database
 
     videoSaveProgressListener(video, timer, checkCategory());
-    setTimeout(() => {
-      if (window.ytData.settings.displayCategory == 'true') {
-        injectCategoryString();
-      }
 
-      const videoCategory = checkCategory();
+    window.onfocus = () => {
+      setTimeout(() => {
+        if (window.ytData.settings.displayCategory == 'true') {
+          injectCategoryString();
+        }
 
-      if (window.ytData.settings.lowTimeNotifications == 'true') {
-        checkTimeRemaining(videoCategory);
-      }
-    }, 1000);
+        const videoCategory = checkCategory();
+
+        if (window.ytData.settings.lowTimeNotifications == 'true') {
+          checkTimeRemaining(videoCategory);
+        }
+      }, 1000);
+    };
   });
 
 })));

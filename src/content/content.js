@@ -33,6 +33,7 @@ listenForFirstVideo((foundVideo) => {
   const timer = new intervalTimer(() => {
     console.log(timer.time++);
 
+    // autosave every 60 seconds
     if (timer.time === 60) {
       sendToDB(timer.time, getDate(), checkCategory());
       timer.time = 0;
@@ -45,15 +46,17 @@ listenForFirstVideo((foundVideo) => {
   // listen when to save progress to database
   videoSaveProgressListener(video, timer, checkCategory());
 
-  setTimeout(() => {
-    if (window.ytData.settings.displayCategory == 'true') {
-      injectCategoryString();
-    }
+  window.onfocus = () => {
+    setTimeout(() => {
+      if (window.ytData.settings.displayCategory == 'true') {
+        injectCategoryString();
+      }
 
-    const videoCategory = checkCategory();
+      const videoCategory = checkCategory();
 
-    if (window.ytData.settings.lowTimeNotifications == 'true') {
-      checkTimeRemaining(videoCategory);
-    }
-  }, 1000);
+      if (window.ytData.settings.lowTimeNotifications == 'true') {
+        checkTimeRemaining(videoCategory);
+      }
+    }, 1000);
+  };
 });
