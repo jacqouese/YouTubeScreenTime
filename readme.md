@@ -23,10 +23,6 @@ Track your time spend on YouTube by category.
 
 ## Overview
 
-> Stats<br /> <img src="https://drive.google.com/uc?export=view&id=1xQxAvKI16_8QYbp_QG9-Wib6Fzqq13qz" alt="img"> <br />
-
-> Restrict<br /> <img src="https://drive.google.com/uc?export=view&id=1d4QTKeO-X3WEwvjx1ZV4Q_FdC9jbtYNX" alt="img"> <br />
-
-> Settings<br /> <img src="https://drive.google.com/uc?export=view&id=1ZEdLGoLjDab6G4d5iJgfIV_aDk1wx4-C" alt="img">
+<img src="https://drive.google.com/uc?export=view&id=1dcGOetUsZLVPqS1OkCz0PgaQ8VKBZrkq" alt="img"> <br />
 
 > Notification when time running low<br /> <img src="https://drive.google.com/uc?export=view&id=11UJ0v-CQEni3hNb48Okhz4fZ-Uqs3gUI" alt="img">
