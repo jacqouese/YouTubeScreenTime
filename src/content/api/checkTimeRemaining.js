@@ -10,7 +10,7 @@ export function checkTimeRemaining(category) {
     },
     (res) => {
       console.log(`${res.data.timeRemaining} seconds left`);
-      if (res.data.isTimeLeft === false) {
+      if (res.data.timeRemaining !== null && res.data.isTimeLeft === false) {
         console.log('%cRestriction trigger!!!', 'color: red');
         mainNotification.createSimpleNotification(
           `Time for ${category} has run out`,
