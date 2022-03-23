@@ -50,6 +50,11 @@ export function getAllWatched(period, callback) {
           }
         });
 
+        for (let i = 0; i < categoryObject.length; i++) {
+          const element = array[i];
+          
+        }
+
         const data = {
           totalTime: total,
           categoryObject: categoryObject,

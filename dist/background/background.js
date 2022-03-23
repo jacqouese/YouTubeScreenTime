@@ -214,6 +214,11 @@
               total += elem.time_in_sec;
             }
           });
+
+          for (let i = 0; i < categoryObject.length; i++) {
+            const element = array[i];
+          }
+
           const data = {
             totalTime: total,
             categoryObject: categoryObject,

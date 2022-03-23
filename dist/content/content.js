@@ -68,7 +68,7 @@
     }, res => {
       console.log(`${res.data.timeRemaining} seconds left`);
 
-      if (res.data.isTimeLeft === false) {
+      if (res.data.timeRemaining !== null && res.data.isTimeLeft === false) {
         console.log('%cRestriction trigger!!!', 'color: red');
         mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
       } else if (res.data.timeRemaining !== null && res.data.timeRemaining < 300) {
