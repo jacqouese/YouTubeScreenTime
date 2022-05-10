@@ -16,12 +16,15 @@ export function detailedTableLogic(period) {
     console.warn('invalid period given');
   }
 
-  const formatedProgressValues = [];
-  const formatedProgressValuesTemp = [];
+  let formatedProgressValues = [];
+  let formatedProgressValuesTemp = [];
   for (const [key, value] of Object.entries(periodObject)) {
     formatedProgressValues.push([key, value]);
     formatedProgressValuesTemp.push(value);
   }
+
+  formatedProgressValues = formatedProgressValues.sort().reverse();
+  formatedProgressValuesTemp = formatedProgressValuesTemp.sort().reverse();
 
   var minValue = Math.min(...formatedProgressValuesTemp);
   var maxValue = Math.max(...formatedProgressValuesTemp);
