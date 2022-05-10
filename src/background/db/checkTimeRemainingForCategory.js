@@ -9,10 +9,9 @@ export function checkTimeRemainingForCategory(
   queryDB('restrictions', 'category', (store) => {
     var request = store.index('category').getAll([category]);
     request.onsuccess = () => {
-      const remaining = request.result[0].time_in_sec - time;
+      const remaining = request.result[0].time_in_sec - time || null;
 
-      if (!request.result) return callback(true, null);
-      if (request.result.length < 1) return callback(true, null);
+      if (remaining === null) return callback(true, null);
 
       if (request.result[0].timeframe !== timeframe)
         return callback(true, remaining);
