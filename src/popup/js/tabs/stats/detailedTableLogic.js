@@ -19,20 +19,32 @@ export function detailedTableLogic(period) {
   let formatedProgressValues = [];
   let formatedProgressValuesTemp = [];
   for (const [key, value] of Object.entries(periodObject)) {
-    formatedProgressValues.push([key, value]);
-    formatedProgressValuesTemp.push(value);
+    // convert obj to array
+    formatedProgressValues.push([key, value]); // 2d array
+    formatedProgressValuesTemp.push(value); // 1d array
   }
 
-  formatedProgressValues = formatedProgressValues.sort().reverse();
-  formatedProgressValuesTemp = formatedProgressValuesTemp.sort().reverse();
+  formatedProgressValues = formatedProgressValues.sort(sortRules).reverse();
+  formatedProgressValuesTemp = formatedProgressValuesTemp.sort();
+
+  function sortRules(a, b) {
+    if (a[1] === b[1]) {
+      return 0;
+    } else {
+      return a[1] < b[1] ? -1 : 1;
+    }
+  }
 
   var minValue = Math.min(...formatedProgressValuesTemp);
   var maxValue = Math.max(...formatedProgressValuesTemp);
 
   if ((minValue = maxValue)) minValue = 0; // prevent division by 0
 
-  formatedProgressValuesTemp.forEach((number, i) => {
-    const formatedValue = ((number - minValue) / (maxValue - minValue)) * 100;
+  formatedProgressValues.forEach((innerArray, i) => {
+    if (innerArray[1] < 60) return; // if shorter than 1 min
+
+    const formatedValue =
+      ((innerArray[1] - minValue) / (maxValue - minValue)) * 100;
     var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
 
     const HTMLinsert = `
@@ -41,7 +53,7 @@ export function detailedTableLogic(period) {
     <div class="detailed-elem">
       <div class="detailed-color-box"></div>
       <div class="detailed-category">
-        ${formatedProgressValues[i][0]}
+        ${innerArray[0]}
         <div class="progress-container">
           <div class="progress" att-progress="${formatedValue}"></div>
           ${userFriendlyTime}
