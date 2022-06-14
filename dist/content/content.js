@@ -46,6 +46,8 @@
   function videoListeners(video, timer) {
     video.addEventListener('playing', () => {
       // prevent starting multiple timeouts
+      console.log('video is playing');
+
       if (timer.isResumed === false) {
         console.log('resumed');
         timer.resume();
@@ -166,12 +168,12 @@
   // listen for first video after opening YouTube
   function listenForFirstVideo(callback) {
     chrome.runtime.onMessage.addListener(function listenForFirstVideoInner() {
-      const video = document.getElementsByTagName('video')[0] || null; // when the video has been found, remove listener and run callback
+      let video = document.getElementsByTagName('video')[0] || null; // when the video has been found, remove listener and run callback
 
       if (video !== null) {
+        const correctVideoTag = document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
         chrome.runtime.onMessage.removeListener(listenForFirstVideoInner);
-        console.log('video found');
-        callback(video);
+        callback(correctVideoTag);
       }
     });
   }
@@ -241,7 +243,7 @@
     });
   }
 
-  let video = document.getElementsByTagName('video')[0] || null;
+  let video = document.getElementsByTagName('video')[-1] || null;
   const hook = document.querySelector('#count');
   listenForFirstVideo(foundVideo => {
     console.log('video found');
