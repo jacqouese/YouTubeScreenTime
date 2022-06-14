@@ -1,45 +1,47 @@
 <section class="main-tabs-tab-content active" id="tab-content-stats">
-    <div class="top-stats">
-      <div class="top-stats-elem">
-        <div><h1 id="top-stats-day">-</h1> <p class="percent">13%</p></div>
-        <h2>Day</h2>
+  <div class="top-stats">
+    <div class="top-stats-elem">
+      <div>
+        <h1 id="top-stats-day">-</h1>
+        <p class="percent">13%</p>
       </div>
-      <div class="top-stats-elem">
-        <div><h1 id="top-stats-week">-</h1> <p class="percent">23%</p></div>
-        <h2>Week</h2>
+      <h2>Day</h2>
+    </div>
+    <div class="top-stats-elem">
+      <div>
+        <h1 id="top-stats-week">-</h1>
+        <p class="percent">23%</p>
       </div>
-      <div class="top-stats-elem">
-        <div><h1 id="top-stats-month">-</h1> <p class="percent percent-down">-7%</p></div>
-        <h2>Month</h2>
+      <h2>Week</h2>
+    </div>
+    <div class="top-stats-elem">
+      <div>
+        <h1 id="top-stats-month">-</h1>
+        <p class="percent percent-down">-7%</p>
       </div>
+      <h2>Month</h2>
     </div>
-    <div>
-      @@include('../../tabs/index.html', {
-        "tab1": "Day",
-        "tab2": "Week",
-        "tab3": "Month",
-        "tabId": "chart-tabs"
-      })
-      @@include('./chart/index.html', {
-        "type": "day",
-        "active": "active"
-      })
-      @@include('./chart/index.html', {
-        "type": "week",
-        "active": ""
-      })
-      @@include('./chart/index.html', {
-        "type": "month",
-        "active": ""
-      })
+  </div>
+  <div>
+    @@include('../../tabs/index.html', {
+    "tab1": "Day",
+    "tab2": "Week",
+    "tab3": "Month",
+    "tabId": "chart-tabs"
+    })
+    @@include('./chart/index.html', {
+    "type": "day",
+    "active": "active"
+    })
+
+  </div>
+  <div class="detailed-table">
+    <div class="detailed-table-inner">
+      <table id="detailed-table-table">
+        <tr id="insert-table">
+          <td></td>
+        </tr>
+      </table>
     </div>
-    <div class="detailed-table">
-        <div class="detailed-table-inner">
-          <table id="detailed-table-table">
-            <tr id="insert-table">
-              <td></td>
-            </tr>
-          </table>
-        </div>
-    </div>
+  </div>
 </section>

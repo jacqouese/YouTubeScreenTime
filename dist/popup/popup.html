@@ -21,22 +21,31 @@
     <hr>
   </div>
         <section class="main-tabs-tab-content active" id="tab-content-stats">
-    <div class="top-stats">
-      <div class="top-stats-elem">
-        <div><h1 id="top-stats-day">-</h1> <p class="percent">13%</p></div>
-        <h2>Day</h2>
+  <div class="top-stats">
+    <div class="top-stats-elem">
+      <div>
+        <h1 id="top-stats-day">-</h1>
+        <p class="percent">13%</p>
       </div>
-      <div class="top-stats-elem">
-        <div><h1 id="top-stats-week">-</h1> <p class="percent">23%</p></div>
-        <h2>Week</h2>
-      </div>
-      <div class="top-stats-elem">
-        <div><h1 id="top-stats-month">-</h1> <p class="percent percent-down">-7%</p></div>
-        <h2>Month</h2>
-      </div>
+      <h2>Day</h2>
     </div>
-    <div>
-      <div class="tabs" id='chart-tabs'>
+    <div class="top-stats-elem">
+      <div>
+        <h1 id="top-stats-week">-</h1>
+        <p class="percent">23%</p>
+      </div>
+      <h2>Week</h2>
+    </div>
+    <div class="top-stats-elem">
+      <div>
+        <h1 id="top-stats-month">-</h1>
+        <p class="percent percent-down">-7%</p>
+      </div>
+      <h2>Month</h2>
+    </div>
+  </div>
+  <div>
+    <div class="tabs" id='chart-tabs'>
     <div class="tabs-elements">
       <p class="active">Day</p>
       <p>Week</p>
@@ -44,139 +53,24 @@
     </div>
     <hr>
   </div>
-      <div class="chart-tabs-tab-content active" id="tab-content-day">
+    <div class="chart-tabs-tab-content active" id="tab-content-day">
     <div class="chart-border">
-        <div class="chart-background">
-            <svg height="146" width="326">
-                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="146" x2="326" y2="146" style="stroke:var(--x-lighter);stroke-width:2" />
-            </svg>
-          </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="1"></div>
-            <p>Mon</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="2"></div>
-            <p>Tue</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="3"></div>
-            <p>Wed</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="4"></div>
-            <p>Thu</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="5"></div>
-            <p>Fri</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="6"></div>
-            <p>Sat</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="7"></div>
-            <p>Sun</p>
+        <div>
+            <canvas id="myChart"></canvas>
         </div>
     </div>
 </div>
-      <div class="chart-tabs-tab-content " id="tab-content-week">
-    <div class="chart-border">
-        <div class="chart-background">
-            <svg height="146" width="326">
-                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="146" x2="326" y2="146" style="stroke:var(--x-lighter);stroke-width:2" />
-            </svg>
-          </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="1"></div>
-            <p>Mon</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="2"></div>
-            <p>Tue</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="3"></div>
-            <p>Wed</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="4"></div>
-            <p>Thu</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="5"></div>
-            <p>Fri</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="6"></div>
-            <p>Sat</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="7"></div>
-            <p>Sun</p>
-        </div>
+
+  </div>
+  <div class="detailed-table">
+    <div class="detailed-table-inner">
+      <table id="detailed-table-table">
+        <tr id="insert-table">
+          <td></td>
+        </tr>
+      </table>
     </div>
-</div>
-      <div class="chart-tabs-tab-content " id="tab-content-month">
-    <div class="chart-border">
-        <div class="chart-background">
-            <svg height="146" width="326">
-                <line x1="0" y1="29.2" x2="326" y2="29.2" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="58.4" x2="326" y2="58.4" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="87.6" x2="326" y2="87.6" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="116.8" x2="326" y2="116.8" style="stroke:var(--x-lighter);stroke-width:2" />
-                <line x1="0" y1="146" x2="326" y2="146" style="stroke:var(--x-lighter);stroke-width:2" />
-            </svg>
-          </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="1"></div>
-            <p>Mon</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="2"></div>
-            <p>Tue</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="3"></div>
-            <p>Wed</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="4"></div>
-            <p>Thu</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="5"></div>
-            <p>Fri</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="6"></div>
-            <p>Sat</p>
-        </div>
-        <div class="chart-bar-wrapper">
-            <div class="chart-bar" att-day="7"></div>
-            <p>Sun</p>
-        </div>
-    </div>
-</div>
-    </div>
-    <div class="detailed-table">
-        <div class="detailed-table-inner">
-          <table id="detailed-table-table">
-            <tr id="insert-table">
-              <td></td>
-            </tr>
-          </table>
-        </div>
-    </div>
+  </div>
 </section>
         <section class="main-tabs-tab-content" id="tab-content-restrict">
     <div class="my-restrictions">
