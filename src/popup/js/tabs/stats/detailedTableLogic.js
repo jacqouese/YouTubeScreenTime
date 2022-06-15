@@ -16,6 +16,19 @@ export function detailedTableLogic(period) {
         console.warn('invalid period given');
     }
 
+    if (Object.keys(periodObject).length === 0) {
+        detailedTable.innerHTML = `
+        <tr>
+            <td>
+                <div class="detailed-elem">
+                    No history
+                </div>
+            </td>
+        </tr>`;
+
+        return;
+    }
+
     let formatedProgressValues = [];
     let formatedProgressValuesTemp = [];
     for (const [key, value] of Object.entries(periodObject)) {

@@ -17488,6 +17488,18 @@
       console.warn('invalid period given');
     }
 
+    if (Object.keys(periodObject).length === 0) {
+      detailedTable.innerHTML = `
+        <tr>
+            <td>
+                <div class="detailed-elem">
+                    No history
+                </div>
+            </td>
+        </tr>`;
+      return;
+    }
+
     let formatedProgressValues = [];
     let formatedProgressValuesTemp = [];
 
@@ -17576,8 +17588,8 @@
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const period = tab.innerHTML.toLowerCase();
-        detailedTableLogic(period);
-        chartLogic();
+        detailedTableLogic(period); // chartLogic();
+
         tabs.forEach(tabInner => {
           tabInner.classList.remove('active');
         }); // append active class to active element
