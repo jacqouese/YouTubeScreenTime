@@ -1,42 +1,38 @@
-import youtubeCategories from '../../../data/youtubeCategories';
 import { secondsToHms } from '../../helpers/secondsToHms';
 
 function restrictPupup(restriction) {
-  const createPopup = () => {
-    document.querySelector('.popup-section').classList.add('show');
-  };
+    const createPopup = () => {
+        document.querySelector('.popup-section').classList.add('show');
+    };
 
-  const destroyPupup = () => {
-    document.querySelector('.popup-section').classList.remove('show');
-  };
+    const destroyPupup = () => {
+        document.querySelector('.popup-section').classList.remove('show');
+    };
 
-  // inject category name
-  document
-    .querySelector('.popup-section')
-    .querySelector('#restriction-name').textContent = restriction;
+    // inject category name
+    document
+        .querySelector('.popup-section')
+        .querySelector('#restriction-name').textContent = restriction;
 
-  createPopup();
+    createPopup();
 }
 
-export function restrictTable() {
-  const myRestrictions = window.ytData.allRestrictions;
-  const restrictionList = youtubeCategories;
+export function restrictTable(myRestrictions, restrictionList) {
+    const restrictedTable = document.querySelector('#table-restricted');
 
-  const restrictedTable = document.querySelector('#table-restricted');
+    restrictedTable.innerHTML = '';
 
-  restrictedTable.innerHTML = '';
+    myRestrictions.forEach((restriction) => {
+        // remove duplicates from table by removing already added restrictions
+        if (restrictionList.includes(restriction.category)) {
+            const index = restrictionList.indexOf(restriction.category);
 
-  myRestrictions.forEach((restriction) => {
-    // remove duplicates from table by removing already added restrictions
-    if (restrictionList.includes(restriction.category)) {
-      const index = restrictionList.indexOf(restriction.category);
+            if (index > -1) restrictionList.splice(index, 1);
+        }
 
-      if (index > -1) restrictionList.splice(index, 1);
-    }
-
-    // populate table
-    const formatedTime = secondsToHms(restriction.time_in_sec);
-    const HTMLinsert = `
+        // populate table
+        const formatedTime = secondsToHms(restriction.time_in_sec);
+        const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
@@ -47,15 +43,18 @@ export function restrictTable() {
             </td>
         </tr>`;
 
-    restrictedTable.innerHTML += HTMLinsert;
-  });
+        restrictedTable.innerHTML += HTMLinsert;
+    });
 
-  const listTable = document.querySelector('#table-restrict-list');
+    const listTable = document.querySelector('#table-restrict-list');
 
-  listTable.innerHTML = '';
+    listTable.innerHTML = '';
 
-  restrictionList.forEach((elem) => {
-    const HTMLinsert = `
+    restrictionList.forEach((elem) => {
+        // do not show already restricted items
+        if (elem in myRestrictions) return;
+
+        const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
@@ -65,16 +64,16 @@ export function restrictTable() {
             </td>
         </tr>`;
 
-    listTable.innerHTML += HTMLinsert;
-  });
-
-  listTable.querySelectorAll('td').forEach((elem) => {
-    elem.addEventListener('click', () => {
-      const restrictionName = elem
-        .querySelector('.restriction-name')
-        .getAttribute('att-name');
-      console.log(restrictionName);
-      restrictPupup(restrictionName);
+        listTable.innerHTML += HTMLinsert;
     });
-  });
+
+    listTable.querySelectorAll('td').forEach((elem) => {
+        elem.addEventListener('click', () => {
+            const restrictionName = elem
+                .querySelector('.restriction-name')
+                .getAttribute('att-name');
+            console.log(restrictionName);
+            restrictPupup(restrictionName);
+        });
+    });
 }

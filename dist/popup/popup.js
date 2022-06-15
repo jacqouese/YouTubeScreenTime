@@ -54,6 +54,31 @@
     });
   }
 
+  const globalState = {
+    restrictedItems: {
+      state: [],
+      subscribers: [],
+
+      setState(state) {
+        this.state = state;
+        this.subscribers.forEach(elem => {
+          elem();
+        });
+      }
+
+    }
+  };
+  const updater = (callback, state) => {
+    callback();
+
+    if (!(state in globalState)) {
+      console.warn(`updater: State "${state}" does not exist. Callback will not be subscribed to any changes`);
+      return;
+    }
+
+    globalState[state].subscribers.push(callback);
+  };
+
   function loadData(callback) {
     // initialize global object
     window.ytData = {};
@@ -87,6 +112,7 @@
     });
     requestAllRestricions(res => {
       window.ytData.allRestrictions = res.data.restrictions;
+      globalState.restrictedItems.setState(res.data.restrictions);
     }); // load settings
 
     getUserSettings('displayCategory', res => {
@@ -17613,7 +17639,7 @@
       }
     }, function (res) {
       if (res.status === 200) {
-        callback();
+        typeof callback === 'function' && callback();
         return console.log('restriction added');
       }
 
@@ -17630,7 +17656,7 @@
       }
     }, function (res) {
       if (res.status !== 200) return console.warn('Some error occured');
-      callback();
+      typeof callback === 'function' && callback();
     });
   }
 
@@ -17639,8 +17665,6 @@
     const seconds = +h * 60 * 60 + +m * 60 + +s;
     return seconds;
   }
-
-  const youtubeCategories = ['Film & Animation', 'Autos & Vehicles', 'Music', 'Pets & Animals', 'Sports', 'Travel & Events', 'Gaming', 'People & Blogs', 'Comedy', 'Entertainment', 'News & Politics', 'Howto & Style', 'Education', 'Science & Technology', 'Nonprofits & Activism'];
 
   function restrictPupup(restriction) {
     const createPopup = () => {
@@ -17652,9 +17676,7 @@
     createPopup();
   }
 
-  function restrictTable() {
-    const myRestrictions = window.ytData.allRestrictions;
-    const restrictionList = youtubeCategories;
+  function restrictTable(myRestrictions, restrictionList) {
     const restrictedTable = document.querySelector('#table-restricted');
     restrictedTable.innerHTML = '';
     myRestrictions.forEach(restriction => {
@@ -17681,6 +17703,8 @@
     const listTable = document.querySelector('#table-restrict-list');
     listTable.innerHTML = '';
     restrictionList.forEach(elem => {
+      // do not show already restricted items
+      if (elem in myRestrictions) return;
       const HTMLinsert = `
         <tr>
             <td>
@@ -17700,6 +17724,8 @@
       });
     });
   }
+
+  const youtubeCategories = ['Film & Animation', 'Autos & Vehicles', 'Music', 'Pets & Animals', 'Sports', 'Travel & Events', 'Gaming', 'People & Blogs', 'Comedy', 'Entertainment', 'News & Politics', 'Howto & Style', 'Education', 'Science & Technology', 'Nonprofits & Activism'];
 
   function timeInputs() {
     // limit max hours to 999
@@ -17726,7 +17752,9 @@
       const seconds = hmsToSeconds(hours, minutes, 0); // convert hours, minutes, seconds to seconds
 
       addRestriction(restriction, seconds, () => {
-        main();
+        requestAllRestricions(res => {
+          globalState.restrictedItems.setState(res.data.restrictions);
+        });
       }); // add restriction to database
 
       document.querySelector('.popup-section').classList.remove('show'); // hide popup
@@ -17741,9 +17769,11 @@
     const buttons = document.querySelectorAll('.delete-restriction');
     buttons.forEach(button => {
       const restrictionCategory = button.getAttribute('att-restriction');
-      button.addEventListener('click', () => {
-        deleteRestriction(restrictionCategory, () => {
-          main();
+      button.addEventListener('click', function buttonListen() {
+        console.log('about to remove');
+        deleteRestriction(restrictionCategory);
+        requestAllRestricions(res => {
+          globalState.restrictedItems.setState(res.data.restrictions);
         });
       });
     });
@@ -17759,10 +17789,12 @@
   }
 
   function restrict() {
-    restrictTable();
+    updater(() => {
+      restrictTable(globalState.restrictedItems.state, youtubeCategories);
+      handleDeleteButton();
+    }, 'restrictedItems');
     timeInputs();
     handleButtons();
-    handleDeleteButton();
     handleBackButton();
   }
 
