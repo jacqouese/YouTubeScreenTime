@@ -7,11 +7,11 @@ import {
     videoSaveProgressListener,
 } from './video/videoSaveProgressListener';
 import { listenForFirstVideo } from './api/listenForFirstVideo';
-import { notification } from './notifications/notification';
 import { injectCategoryString } from './inject/injectCategoryString';
 import { getDate } from './helpers/getDate';
 import { checkTimeRemaining } from './api/checkTimeRemaining';
 import { listenForSettingChanges } from './settings/listenForSettingChanges';
+import { notificationService } from './service/notificationService';
 
 let video = document.getElementsByTagName('video')[-1] || null;
 const hook = document.querySelector('#count');
@@ -21,7 +21,7 @@ listenForFirstVideo((foundVideo) => {
     video = foundVideo;
 
     // initialize notification
-    globalThis.mainNotification = new notification();
+    globalThis.mainNotification = new notificationService();
 
     // get category from YouTube
     chrome.storage.sync.set({ currentCategory: checkCategory() });

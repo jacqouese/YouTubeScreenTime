@@ -1,14 +1,14 @@
 export function injectCategory(category) {
-  // get video category by injecting JS
+    // get video category by injecting JS
 
-  setTimeout(() => {
-    console.log(
-      JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'],
-      'fromext'
-    );
-  }, 5000);
+    setTimeout(() => {
+        console.log(
+            JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'],
+            'fromext'
+        );
+    }, 5000);
 
-  const injectedCode = `
+    const injectedCode = `
         setTimeout(() => {
           if (document.querySelector('#ytt-category')) {
             if (JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'] !== ${category}) {
@@ -28,23 +28,23 @@ export function injectCategory(category) {
         }, 2000); 
       `;
 
-  var previousScript = document.querySelector('.ytt-script');
-  if (previousScript) {
-    previousScript.parentNode.removeChild(previousScript);
-  }
+    var previousScript = document.querySelector('.ytt-script');
+    if (previousScript) {
+        previousScript.parentNode.removeChild(previousScript);
+    }
 
-  var script = document.createElement('script');
-  script.textContent = injectedCode;
-  script.classList.add('ytt-script');
-  script.setAttribute('defer', '');
-  document.body.appendChild(script);
+    var script = document.createElement('script');
+    script.textContent = injectedCode;
+    script.classList.add('ytt-script');
+    script.setAttribute('defer', '');
+    document.body.appendChild(script);
 }
 export function checkCategory() {
-  // retrive video category
-  const categoryScript = document.getElementById('scriptTag');
+    // retrive video category
+    const categoryScript = document.getElementById('scriptTag');
 
-  if (!categoryScript) return;
+    if (!categoryScript) return;
 
-  console.log(JSON.parse(categoryScript.innerHTML)['genre']);
-  return JSON.parse(categoryScript.innerHTML)['genre'];
+    // console.log(JSON.parse(categoryScript.innerHTML)['genre']);
+    return JSON.parse(categoryScript.innerHTML)['genre'];
 }

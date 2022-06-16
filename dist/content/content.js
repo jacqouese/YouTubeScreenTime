@@ -38,8 +38,8 @@
   function checkCategory() {
     // retrive video category
     const categoryScript = document.getElementById('scriptTag');
-    if (!categoryScript) return;
-    console.log(JSON.parse(categoryScript.innerHTML)['genre']);
+    if (!categoryScript) return; // console.log(JSON.parse(categoryScript.innerHTML)['genre']);
+
     return JSON.parse(categoryScript.innerHTML)['genre'];
   }
 
@@ -68,13 +68,16 @@
         timeframe: 'day'
       }
     }, res => {
+      if (res.data.timeRemaining === null) return console.log('no restrictions found:', category);
       console.log(`${res.data.timeRemaining} seconds left`);
 
-      if (res.data.timeRemaining !== null && res.data.isTimeLeft === false) {
-        console.log('%cRestriction trigger!!!', 'color: red');
-        mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
-      } else if (res.data.timeRemaining !== null && res.data.timeRemaining < 300) {
-        mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+      if (res.data.timeRemaining <= 0) {
+        console.log(`%cRestriction trigger: ${category}`, 'color: red');
+        return mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
+      }
+
+      if (res.data.timeRemaining < 300) {
+        return mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
       }
     });
   }
@@ -109,7 +112,7 @@
     console.log('progress saved under', category);
     chrome.runtime.sendMessage({
       for: 'background',
-      type: 'saveRequest',
+      type: 'watchtime/create',
       body: {
         time: time,
         date: date,
@@ -120,10 +123,10 @@
 
       if (res.data.isTimeLeft === false) {
         console.log('%cRestriction trigger!!!', 'color: red');
-        mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
+        mainNotification.createNoTimeNotification(category);
       } else if (res.data.timeRemaining !== null && res.data.timeRemaining < 300) {
         if (window.ytData.settings.lowTimeNotifications == 'true') {
-          mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+          mainNotification.createLowTimeNotification(category);
         }
       }
     });
@@ -178,7 +181,34 @@
     });
   }
 
-  function notification() {
+  function listenForSettingChanges() {
+    window.ytData = {};
+    window.ytData.settings = {}; // get settings after launching
+
+    function getUserSettings(settingName, callback) {
+      chrome.extension.sendMessage({
+        type: 'settings/get',
+        body: {
+          settingName: settingName
+        }
+      }, res => {
+        if (res.status !== 200 && res.status !== 201 || !res.status) return console.warn('something went wrong!', res.status);
+        callback(res);
+      });
+    }
+
+    getUserSettings('displayCategory', res => {
+      window.ytData.settings.displayCategory = res.data.settingValue;
+    });
+    getUserSettings('lowTimeNotifications', res => {
+      window.ytData.settings.lowTimeNotifications = res.data.settingValue;
+    });
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      window.ytData.settings[request.body.settingName] = request.body.settingValue;
+    });
+  }
+
+  function notificationService() {
     const mainContainer = document.createElement('div');
     mainContainer.id = 'ytt-notification-contianer';
     document.body.appendChild(mainContainer);
@@ -210,37 +240,15 @@
       });
       simpleNotification.innerHTML = html;
       simpleNotification.appendChild(button);
-      setTimeout(() => {
-        this.dismissNotificationById(notificationId);
-      }, 10000);
     };
-  }
 
-  function listenForSettingChanges() {
-    window.ytData = {};
-    window.ytData.settings = {}; // get settings after launching
+    this.createNoTimeNotification = category => {
+      this.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
+    };
 
-    function getUserSettings(settingName, callback) {
-      chrome.extension.sendMessage({
-        type: 'getUserSettings',
-        body: {
-          settingName: settingName
-        }
-      }, res => {
-        if (res.status !== 200 && res.status !== 201 || !res.status) return console.warn('something went wrong!', res.status);
-        callback(res);
-      });
-    }
-
-    getUserSettings('displayCategory', res => {
-      window.ytData.settings.displayCategory = res.data.settingValue;
-    });
-    getUserSettings('lowTimeNotifications', res => {
-      window.ytData.settings.lowTimeNotifications = res.data.settingValue;
-    });
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      window.ytData.settings[request.body.settingName] = request.body.settingValue;
-    });
+    this.createLowTimeNotification = category => {
+      this.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+    };
   }
 
   let video = document.getElementsByTagName('video')[-1] || null;
@@ -249,7 +257,7 @@
     console.log('video found');
     video = foundVideo; // initialize notification
 
-    globalThis.mainNotification = new notification(); // get category from YouTube
+    globalThis.mainNotification = new notificationService(); // get category from YouTube
 
     chrome.storage.sync.set({
       currentCategory: checkCategory()

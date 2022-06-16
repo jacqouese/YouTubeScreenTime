@@ -36,17 +36,24 @@ const router = (request, sendResponse) => {
 
     route('checkTimeRemaining', () => {
         watchtime.getAllWatched('day', (res) => {
+            const category = request.body.category;
+            const time = res.categoryObject[request.body.category];
             restrictions.checkTimeRemainingForCategory(
-                request.body.category,
-                res.categoryObject[request.body.category],
-                'day',
+                { category: category, time: time, timeframe: 'day' },
                 (isTimeLeft, timeRemaining) => {
-                    sendResponse({
-                        status: 200,
-                        data: {
-                            isTimeLeft: isTimeLeft,
-                            timeRemaining: timeRemaining,
-                        },
+                    restrictions.checkTimeRemainingForAll(time, (res) => {
+                        let finalRemaining = timeRemaining;
+                        if (res !== null) {
+                            finalRemaining =
+                                res < timeRemaining ? res : timeRemaining;
+                        }
+
+                        sendResponse({
+                            status: 200,
+                            data: {
+                                timeRemaining: finalRemaining,
+                            },
+                        });
                     });
                 }
             );

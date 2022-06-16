@@ -53,11 +53,10 @@ class Restrictions extends DBModel {
         });
     }
 
-    checkTimeRemainingForCategory(category, time, timeframe, callback) {
+    checkTimeRemainingForCategory({ category, time, timeframe }, callback) {
         super.query(this.tableName, 'category', (store) => {
             var request = store.index('category').getAll([category]);
             request.onsuccess = () => {
-                console.log(request);
                 if (request.result.length === 0) {
                     return callback(true, null); // restriction for given category does not exist
                 }
@@ -71,6 +70,37 @@ class Restrictions extends DBModel {
                     return callback(true, remaining);
 
                 return callback(false, remaining);
+            };
+        });
+    }
+
+    checkTimeRemainingForAll(time, callback) {
+        super.query(this.tableName, 'category', (store) => {
+            var request = store.index('category').getAll(['all']);
+            request.onsuccess = () => {
+                if (request.result.length === 0) return callback(null);
+
+                const remaining = request.result[0].time_in_sec - time;
+
+                return callback(remaining);
+            };
+        });
+    }
+
+    checkTimeRemainingForCategoryRestructure(
+        category,
+        time,
+        timeframe,
+        callback
+    ) {
+        super.query(this.tableName, 'category', (store) => {
+            var request = store.index('category').getAll([category]);
+            request.onsuccess = () => {
+                if (request.result.length === 0) return null;
+
+                const remaining = request.result[0].time_in_sec - time;
+
+                return remaining;
             };
         });
     }

@@ -103,13 +103,15 @@
         });
       }
 
-      checkTimeRemainingForCategory(category, time, timeframe, callback) {
+      checkTimeRemainingForCategory({
+        category,
+        time,
+        timeframe
+      }, callback) {
         super.query(this.tableName, 'category', store => {
           var request = store.index('category').getAll([category]);
 
           request.onsuccess = () => {
-            console.log(request);
-
             if (request.result.length === 0) {
               return callback(true, null); // restriction for given category does not exist
             }
@@ -118,6 +120,30 @@
             if (request.result[0].timeframe !== timeframe) return callback(true, remaining);
             if (request.result[0].time_in_sec > time) return callback(true, remaining);
             return callback(false, remaining);
+          };
+        });
+      }
+
+      checkTimeRemainingForAll(time, callback) {
+        super.query(this.tableName, 'category', store => {
+          var request = store.index('category').getAll(['all']);
+
+          request.onsuccess = () => {
+            if (request.result.length === 0) return callback(null);
+            const remaining = request.result[0].time_in_sec - time;
+            return callback(remaining);
+          };
+        });
+      }
+
+      checkTimeRemainingForCategoryRestructure(category, time, timeframe, callback) {
+        super.query(this.tableName, 'category', store => {
+          var request = store.index('category').getAll([category]);
+
+          request.onsuccess = () => {
+            if (request.result.length === 0) return null;
+            const remaining = request.result[0].time_in_sec - time;
+            return remaining;
           };
         });
       }
@@ -403,13 +429,26 @@
       create(request, sendResponse) {
         watchtime.addWatched(request.body.category, request.body.date, request.body.time, () => {
           watchtime.getAllWatched('day', res => {
-            restrictions.checkTimeRemainingForCategory(request.body.category, res.categoryObject[request.body.category], 'day', (isTimeLeft, timeRemaining) => {
-              sendResponse({
-                status: 200,
-                data: {
-                  isTimeLeft: isTimeLeft,
-                  timeRemaining: timeRemaining
+            const category = request.body.category;
+            const time = res.categoryObject[request.body.category];
+            restrictions.checkTimeRemainingForCategory({
+              category: category,
+              time: time,
+              timeframe: 'day'
+            }, (isTimeLeft, timeRemaining) => {
+              restrictions.checkTimeRemainingForAll(time, res => {
+                let finalRemaining = timeRemaining;
+
+                if (res !== null) {
+                  finalRemaining = res < timeRemaining ? res : timeRemaining;
                 }
+
+                sendResponse({
+                  status: 200,
+                  data: {
+                    timeRemaining: finalRemaining
+                  }
+                });
               });
             });
           });
@@ -444,13 +483,26 @@
       });
       route('checkTimeRemaining', () => {
         watchtime.getAllWatched('day', res => {
-          restrictions.checkTimeRemainingForCategory(request.body.category, res.categoryObject[request.body.category], 'day', (isTimeLeft, timeRemaining) => {
-            sendResponse({
-              status: 200,
-              data: {
-                isTimeLeft: isTimeLeft,
-                timeRemaining: timeRemaining
+          const category = request.body.category;
+          const time = res.categoryObject[request.body.category];
+          restrictions.checkTimeRemainingForCategory({
+            category: category,
+            time: time,
+            timeframe: 'day'
+          }, (isTimeLeft, timeRemaining) => {
+            restrictions.checkTimeRemainingForAll(time, res => {
+              let finalRemaining = timeRemaining;
+
+              if (res !== null) {
+                finalRemaining = res < timeRemaining ? res : timeRemaining;
               }
+
+              sendResponse({
+                status: 200,
+                data: {
+                  timeRemaining: finalRemaining
+                }
+              });
             });
           });
         });
