@@ -296,11 +296,6 @@
                 total += elem.time_in_sec;
               }
             });
-
-            for (let i = 0; i < categoryObject.length; i++) {
-              const element = array[i];
-            }
-
             const data = {
               totalTime: total,
               categoryObject: categoryObject,
@@ -314,46 +309,17 @@
 
     class WatchtimeController {
       index(request, sendResponse) {
-        // watch time data request from popup
-        if (request.body.period === 'day') {
-          getAllWatched('day', res => {
-            sendResponse({
-              status: 200,
-              data: {
-                time: res.totalTime,
-                categoryObject: res.categoryObject,
-                dateObject: res.dateObject
-              }
-            });
-          });
-        } else if (request.body.period === 'week') {
-          getAllWatched('week', res => {
-            sendResponse({
-              status: 200,
-              data: {
-                time: res.totalTime,
-                categoryObject: res.categoryObject,
-                dateObject: res.dateObject
-              }
-            });
-          });
-        } else if (request.body.period === 'month') {
-          getAllWatched('month', res => {
-            sendResponse({
-              status: 200,
-              data: {
-                time: res.totalTime,
-                categoryObject: res.categoryObject,
-                dateObject: res.dateObject
-              }
-            });
-          });
-        } else {
+        const requestPeriod = request.body.period || null;
+        getAllWatched(requestPeriod, res => {
           sendResponse({
-            status: 404,
-            error: `period invalid or not given: ${request.body.period}`
+            status: 200,
+            data: {
+              time: res.totalTime,
+              categoryObject: res.categoryObject,
+              dateObject: res.dateObject
+            }
           });
-        }
+        });
       }
 
       create(request, sendResponse) {
