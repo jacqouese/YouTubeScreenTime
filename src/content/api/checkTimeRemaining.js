@@ -14,19 +14,18 @@ export function checkTimeRemaining(category) {
 
             console.log(`${res.data.timeRemaining} seconds left`);
 
+            // user paused notifications
+            if (window.ytData.settings.disableNotifications == 'true') return;
+
             if (res.data.timeRemaining <= 0) {
-                console.log(`%cRestriction trigger: ${category}`, 'color: red');
-                return mainNotification.createSimpleNotification(
-                    `Time for ${category} has run out`,
-                    `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`
-                );
+                return mainNotification.createNoTimeNotification(category);
             }
 
-            if (res.data.timeRemaining < 300) {
-                return mainNotification.createSimpleNotification(
-                    `Less than 5 min for ${category}`,
-                    `The time limit you set for ${category} has almost run out.`
-                );
+            if (
+                res.data.timeRemaining < 300 &&
+                window.ytData.settings.lowTimeNotifications == 'true'
+            ) {
+                return mainNotification.createLowTimeNotification(category);
             }
         }
     );

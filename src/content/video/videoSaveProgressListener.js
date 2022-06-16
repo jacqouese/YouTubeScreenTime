@@ -17,18 +17,17 @@ export function sendToDB(time, date, category) {
             },
         },
         (res) => {
-            console.log(`${res.data.timeRemaining} seconds left`);
-            if (res.data.isTimeLeft === false) {
-                console.log('%cRestriction trigger!!!', 'color: red');
-                mainNotification.createNoTimeNotification(category);
-            } else if (
-                res.data.timeRemaining !== null &&
-                res.data.timeRemaining < 300
-            ) {
-                if (window.ytData.settings.lowTimeNotifications == 'true') {
-                    mainNotification.createLowTimeNotification(category);
-                }
-            }
+            // console.log(`${res.data.timeRemaining} seconds left`);
+            // if (res.data.isTimeLeft === false) {
+            //     mainNotification.createNoTimeNotification(category);
+            // } else if (
+            //     res.data.timeRemaining !== null &&
+            //     res.data.timeRemaining < 300
+            // ) {
+            //     if (window.ytData.settings.lowTimeNotifications == 'true') {
+            //         mainNotification.createLowTimeNotification(category);
+            //     }
+            // }
         }
     );
 }
@@ -39,7 +38,12 @@ export function videoSaveProgressListener(video, timer, category) {
         if (video.src === '') {
             if (timer.isResumed === true) {
                 timer.pause();
-                sendToDB(timer.time, getDate(), checkCategory());
+                sendToDB(
+                    timer.time,
+                    getDate(),
+                    checkCategory(),
+                    alreadyShownNotification
+                );
                 timer.time = 0;
             }
         }
@@ -67,8 +71,6 @@ export function videoSaveProgressListener(video, timer, category) {
         if (timer.time != 0) {
             sendToDB(timer.time, getDate(), checkCategory());
             timer.time = 0;
-
-            return 'you sure?';
         }
     };
 }

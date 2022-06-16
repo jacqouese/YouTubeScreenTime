@@ -32,12 +32,17 @@ export function restrictTable(myRestrictions, restrictionList) {
 
         // populate table
         const formatedTime = secondsToHms(restriction.time_in_sec);
+        const periodObject =
+            window.ytData.dayTotalCategory.categoryObject[
+                restriction.category
+            ] || null;
+        const formatedWatchtime = secondsToHms(periodObject);
         const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
                     <span class="longer">${restriction.category}</span>
-                    <span>${formatedTime} / ${restriction.timeframe}</span>
+                    <span>${formatedWatchtime} / ${formatedTime}</span>
                     <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>

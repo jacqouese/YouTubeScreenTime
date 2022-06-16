@@ -23,6 +23,10 @@ export function listenForSettingChanges() {
         window.ytData.settings.lowTimeNotifications = res.data.settingValue;
     });
 
+    getUserSettings('disableNotifications', (res) => {
+        window.ytData.settings.disableNotifications = res.data.settingValue;
+    });
+
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         window.ytData.settings[request.body.settingName] =
             request.body.settingValue;

@@ -69,15 +69,16 @@
       }
     }, res => {
       if (res.data.timeRemaining === null) return console.log('no restrictions found:', category);
-      console.log(`${res.data.timeRemaining} seconds left`);
+      console.log(`${res.data.timeRemaining} seconds left`); // user paused notifications
+
+      if (window.ytData.settings.disableNotifications == 'true') return;
 
       if (res.data.timeRemaining <= 0) {
-        console.log(`%cRestriction trigger: ${category}`, 'color: red');
-        return mainNotification.createSimpleNotification(`Time for ${category} has run out`, `The time limit you set for ${category} has run out. Check YouTube ScreenTime extension for more details.`);
+        return mainNotification.createNoTimeNotification(category);
       }
 
-      if (res.data.timeRemaining < 300) {
-        return mainNotification.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+      if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
+        return mainNotification.createLowTimeNotification(category);
       }
     });
   }
@@ -118,17 +119,17 @@
         date: date,
         category: category
       }
-    }, res => {
-      console.log(`${res.data.timeRemaining} seconds left`);
-
-      if (res.data.isTimeLeft === false) {
-        console.log('%cRestriction trigger!!!', 'color: red');
-        mainNotification.createNoTimeNotification(category);
-      } else if (res.data.timeRemaining !== null && res.data.timeRemaining < 300) {
-        if (window.ytData.settings.lowTimeNotifications == 'true') {
-          mainNotification.createLowTimeNotification(category);
-        }
-      }
+    }, res => {// console.log(`${res.data.timeRemaining} seconds left`);
+      // if (res.data.isTimeLeft === false) {
+      //     mainNotification.createNoTimeNotification(category);
+      // } else if (
+      //     res.data.timeRemaining !== null &&
+      //     res.data.timeRemaining < 300
+      // ) {
+      //     if (window.ytData.settings.lowTimeNotifications == 'true') {
+      //         mainNotification.createLowTimeNotification(category);
+      //     }
+      // }
     });
   }
   function videoSaveProgressListener(video, timer, category) {
@@ -137,7 +138,7 @@
       if (video.src === '') {
         if (timer.isResumed === true) {
           timer.pause();
-          sendToDB(timer.time, getDate(), checkCategory());
+          sendToDB(timer.time, getDate(), checkCategory(), alreadyShownNotification);
           timer.time = 0;
         }
       }
@@ -163,7 +164,6 @@
       if (timer.time != 0) {
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
-        return 'you sure?';
       }
     };
   }
@@ -202,6 +202,9 @@
     });
     getUserSettings('lowTimeNotifications', res => {
       window.ytData.settings.lowTimeNotifications = res.data.settingValue;
+    });
+    getUserSettings('disableNotifications', res => {
+      window.ytData.settings.disableNotifications = res.data.settingValue;
     });
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       window.ytData.settings[request.body.settingName] = request.body.settingValue;
@@ -263,7 +266,10 @@
       currentCategory: checkCategory()
     }); // get settings from popup
 
-    listenForSettingChanges(); // interval with play / pause ability
+    listenForSettingChanges();
+    setTimeout(() => {
+      checkTimeRemaining(checkCategory());
+    }, 1000); // interval with play / pause ability
 
     const timer = new intervalTimer(() => {
       console.log(timer.time++); // autosave every 60 seconds
@@ -271,6 +277,7 @@
       if (timer.time === 60) {
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
+        checkTimeRemaining(checkCategory());
       }
     }, 1000);
     timer.pause(); // listen for play / pause
@@ -283,12 +290,6 @@
       setTimeout(() => {
         if (window.ytData.settings.displayCategory == 'true') {
           injectCategoryString();
-        }
-
-        const videoCategory = checkCategory();
-
-        if (window.ytData.settings.lowTimeNotifications == 'true') {
-          checkTimeRemaining(videoCategory);
         }
       }, 1000);
     };

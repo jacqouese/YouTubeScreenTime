@@ -29,6 +29,10 @@ listenForFirstVideo((foundVideo) => {
     // get settings from popup
     listenForSettingChanges();
 
+    setTimeout(() => {
+        checkTimeRemaining(checkCategory());
+    }, 1000);
+
     // interval with play / pause ability
     const timer = new intervalTimer(() => {
         console.log(timer.time++);
@@ -37,6 +41,8 @@ listenForFirstVideo((foundVideo) => {
         if (timer.time === 60) {
             sendToDB(timer.time, getDate(), checkCategory());
             timer.time = 0;
+
+            checkTimeRemaining(checkCategory());
         }
     }, 1000);
     timer.pause();
@@ -51,12 +57,6 @@ listenForFirstVideo((foundVideo) => {
         setTimeout(() => {
             if (window.ytData.settings.displayCategory == 'true') {
                 injectCategoryString();
-            }
-
-            const videoCategory = checkCategory();
-
-            if (window.ytData.settings.lowTimeNotifications == 'true') {
-                checkTimeRemaining(videoCategory);
             }
         }, 1000);
     };
