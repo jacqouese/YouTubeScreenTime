@@ -272,7 +272,8 @@
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
       }
-    }, 1000); // listen for play / pause
+    }, 1000);
+    timer.pause(); // listen for play / pause
 
     videoListeners(video, timer); // listen when to save progress to database
 

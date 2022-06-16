@@ -39,6 +39,7 @@ listenForFirstVideo((foundVideo) => {
             timer.time = 0;
         }
     }, 1000);
+    timer.pause();
 
     // listen for play / pause
     videoListeners(video, timer);
