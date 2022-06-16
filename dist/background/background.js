@@ -421,25 +421,25 @@
     var watchtimeController = new WatchtimeController();
 
     const router = (request, sendResponse) => {
-      route('saveRequest', () => {
+      route('watchtime/create', () => {
         watchtimeController.create(request, sendResponse);
       });
-      route('dataRequest', () => {
+      route('watchtime/get', () => {
         watchtimeController.index(request, sendResponse);
       });
-      route('addRestriction', () => {
+      route('restriction/create', () => {
         restrictionsController.create(request, sendResponse);
       });
-      route('getAllRestrictions', () => {
+      route('restriction/get', () => {
         restrictionsController.index(request, sendResponse);
       });
-      route('deleteRestriction', () => {
+      route('restriction/delete', () => {
         restrictionsController.delete(request, sendResponse);
       });
-      route('setUserSettings', () => {
+      route('settings/update', () => {
         settingsController.update(request, sendResponse);
       });
-      route('getUserSettings', () => {
+      route('settings/get', () => {
         settingsController.index(request, sendResponse);
       });
       route('checkTimeRemaining', () => {

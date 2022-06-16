@@ -1,13 +1,13 @@
 export function deleteRestriction(restriction, callback) {
     chrome.extension.sendMessage(
         {
-            type: 'deleteRestriction',
+            type: 'restriction/delete',
             body: { restriction: restriction },
         },
         function (res) {
-            if (res.status !== 200) return console.warn('Some error occured');
+            if (res.error) return console.error('Error in: restriction/delete');
 
-            typeof callback === 'function' && callback();
+            typeof callback === 'function' && callback(res);
         }
     );
 }
