@@ -1,11 +1,8 @@
-import { addRestriction } from '../db/addRestriction';
-import { checkForRestriction } from '../db/checkForRestriction';
-import { deleteRestriction } from '../db/deleteRestriction';
-import { getAllRestrictions } from '../db/getAllRestrictions';
+import restrictions from '../db/restrictions';
 
 class RestrictionsController {
     index(request, sendResponse) {
-        getAllRestrictions((res) => {
+        restrictions.getAllRestrictions((res) => {
             sendResponse({
                 status: 200,
                 data: {
@@ -16,11 +13,13 @@ class RestrictionsController {
     }
 
     create(request, sendResponse) {
-        checkForRestriction(
+        restrictions.checkForRestriction(
             request.body.restriction,
             () => {
-                console.log('here');
-                addRestriction(request.body.restriction, request.body.time);
+                restrictions.addRestriction(
+                    request.body.restriction,
+                    request.body.time
+                );
                 sendResponse({
                     status: 200,
                     data: {
@@ -29,7 +28,6 @@ class RestrictionsController {
                 });
             },
             () => {
-                console.log('here');
                 sendResponse({
                     status: 403,
                     error: 'restriction for this category already exists',
@@ -39,7 +37,7 @@ class RestrictionsController {
     }
 
     delete(request, sendResponse) {
-        deleteRestriction(request.body.restriction);
+        restrictions.deleteRestriction(request.body.restriction);
         sendResponse({
             status: 200,
         });

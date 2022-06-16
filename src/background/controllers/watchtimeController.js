@@ -1,10 +1,11 @@
-import { getAllWatched } from '../db/getAllWatched';
+import restrictions from '../db/restrictions';
+import watchtime from '../db/watchtime';
 
 class WatchtimeController {
     index(request, sendResponse) {
         const requestPeriod = request.body.period || null;
 
-        getAllWatched(requestPeriod, (res) => {
+        watchtime.getAllWatched(requestPeriod, (res) => {
             sendResponse({
                 status: 200,
                 data: {
@@ -17,13 +18,13 @@ class WatchtimeController {
     }
 
     create(request, sendResponse) {
-        handleDB(
+        watchtime.addWatched(
             request.body.category,
             request.body.date,
             request.body.time,
             () => {
-                getAllWatched('day', (res) => {
-                    checkTimeRemainingForCategory(
+                watchtime.getAllWatched('day', (res) => {
+                    restrictions.checkTimeRemainingForCategory(
                         request.body.category,
                         res.categoryObject[request.body.category],
                         'day',

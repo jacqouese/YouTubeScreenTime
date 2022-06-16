@@ -1,8 +1,8 @@
 import restrictionsController from './controllers/restrictionsController';
 import settingsController from './controllers/settingsController';
 import watchtimeController from './controllers/watchtimeController';
-import { checkTimeRemainingForCategory } from './db/checkTimeRemainingForCategory';
-import { getAllWatched } from './db/getAllWatched';
+import restrictions from './db/restrictions';
+import watchtime from './db/watchtime';
 import route from './route';
 
 const router = (request, sendResponse) => {
@@ -11,7 +11,6 @@ const router = (request, sendResponse) => {
     });
 
     route('dataRequest', () => {
-        console.log('ive been called');
         watchtimeController.index(request, sendResponse);
     });
 
@@ -36,8 +35,8 @@ const router = (request, sendResponse) => {
     });
 
     route('checkTimeRemaining', () => {
-        getAllWatched('day', (res) => {
-            checkTimeRemainingForCategory(
+        watchtime.getAllWatched('day', (res) => {
+            restrictions.checkTimeRemainingForCategory(
                 request.body.category,
                 res.categoryObject[request.body.category],
                 'day',

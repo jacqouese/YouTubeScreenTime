@@ -1,10 +1,8 @@
+import settings from '../localStorage/settings';
+
 class SettingsController {
     index(request, sendResponse) {
-        const setting = localStorage.getItem(request.body.settingName);
-
-        if (setting === null) {
-            localStorage.setItem(request.body.settingName, false);
-        }
+        const setting = settings.getSettingValue(request.body.settingName);
 
         sendResponse({
             status: 200,
@@ -16,7 +14,7 @@ class SettingsController {
     }
 
     update(request, sendResponse) {
-        localStorage.setItem(
+        settings.updateSettingValue(
             request.body.settingName,
             request.body.settingValue
         );
