@@ -1,4 +1,3 @@
-import restrictions from '../db/restrictions';
 import watchtime from '../db/watchtime';
 
 class WatchtimeController {
@@ -21,9 +20,7 @@ class WatchtimeController {
         watchtime.addWatched(request.body.category, request.body.date, request.body.time, () => {
             sendResponse({
                 status: 200,
-                data: {
-                    timeRemaining: finalRemaining,
-                },
+                data: {},
             });
         });
     }

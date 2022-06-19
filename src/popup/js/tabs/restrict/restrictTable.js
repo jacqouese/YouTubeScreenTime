@@ -1,3 +1,4 @@
+import youtubeCategoryIcons from '../../../data/youtubeCategoryIcons';
 import { secondsToHms } from '../../helpers/secondsToHms';
 
 function restrictPupup(restriction) {
@@ -10,9 +11,7 @@ function restrictPupup(restriction) {
     };
 
     // inject category name
-    document
-        .querySelector('.popup-section')
-        .querySelector('#restriction-name').textContent = restriction;
+    document.querySelector('.popup-section').querySelector('#restriction-name').textContent = restriction;
 
     createPopup();
 }
@@ -32,18 +31,17 @@ export function restrictTable(myRestrictions, restrictionList) {
 
         // populate table
         const formatedTime = secondsToHms(restriction.time_in_sec);
-        const periodObject =
-            window.ytData.dayTotalCategory.categoryObject[
-                restriction.category
-            ] || null;
+        const periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
         const formatedWatchtime = secondsToHms(periodObject);
         const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="longer">${restriction.category}</span>
+                    <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
                     <span>${formatedWatchtime} / ${formatedTime}</span>
-                    <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
+                    <span class="delete-restriction" att-restriction="${
+                        restriction.category
+                    }"><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>
         </tr>`;
@@ -63,7 +61,7 @@ export function restrictTable(myRestrictions, restrictionList) {
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="restriction-name" att-name="${elem}">${elem}</span>
+                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons[elem]} ${elem}</span>
                     <span>></span>
                 </div>
             </td>
@@ -74,9 +72,7 @@ export function restrictTable(myRestrictions, restrictionList) {
 
     listTable.querySelectorAll('td').forEach((elem) => {
         elem.addEventListener('click', () => {
-            const restrictionName = elem
-                .querySelector('.restriction-name')
-                .getAttribute('att-name');
+            const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
             console.log(restrictionName);
             restrictPupup(restrictionName);
         });

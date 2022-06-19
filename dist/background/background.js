@@ -355,6 +355,7 @@
             time: time,
             timeframe: 'day'
           }, (isTimeLeft, timeRemaining) => {
+            console.log(timeRemaining);
             restrictions.checkTimeRemainingForAll(time, res => {
               let finalRemaining = timeRemaining;
 
@@ -459,9 +460,7 @@
         watchtime.addWatched(request.body.category, request.body.date, request.body.time, () => {
           sendResponse({
             status: 200,
-            data: {
-              timeRemaining: finalRemaining
-            }
+            data: {}
           });
         });
       }

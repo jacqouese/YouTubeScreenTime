@@ -164,7 +164,7 @@ hr {
 .top-stats {
   display: flex;
   justify-content: space-between;
-  padding: 0 10px;
+  padding-left: 10px;
 }
 
 .top-stats h2 {
@@ -175,6 +175,7 @@ hr {
 
 .top-stats-elem {
   width: 28%;
+  max-width: fit-content;
 }
 
 .top-stats-elem div {
@@ -302,10 +303,9 @@ td {
   margin-top: 30px;
 }
 
-.restrict-list-table-container {
-  max-height: 300px;
+.restrict-inner {
+  max-height: 78vh;
   overflow-y: scroll;
-  scrollbar-color: yellow red;
 }
 
 .table-restrict .table-inner-wrapper {

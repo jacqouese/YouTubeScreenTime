@@ -48,6 +48,7 @@ class RestrictionsController {
             restrictions.checkTimeRemainingForCategory(
                 { category: category, time: time, timeframe: 'day' },
                 (isTimeLeft, timeRemaining) => {
+                    console.log(timeRemaining);
                     restrictions.checkTimeRemainingForAll(time, (res) => {
                         let finalRemaining = timeRemaining;
                         if (res !== null) {

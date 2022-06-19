@@ -17662,6 +17662,25 @@
       return seconds;
     }
 
+    const youtubeCategoryIcons = {
+      All: '📖',
+      'Film & Animation': '🎬',
+      'Autos & Vehicles': '🚗',
+      Music: '🎶',
+      'Pets & Animals': '🐾',
+      Sports: '⚽',
+      'Travel & Events': '🧳',
+      Gaming: '🎮',
+      'People & Blogs': '📹',
+      Comedy: '📺',
+      Entertainment: '🖥️',
+      'News & Politics': '📰',
+      'Howto & Style': '🧥',
+      Education: '🧮',
+      'Science & Technology': '🔬',
+      'Nonprofits & Activism': '🫂'
+    };
+
     function restrictPupup(restriction) {
       const createPopup = () => {
         document.querySelector('.popup-section').classList.add('show');
@@ -17690,7 +17709,7 @@
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="longer">${restriction.category}</span>
+                    <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
                     <span>${formatedWatchtime} / ${formatedTime}</span>
                     <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
@@ -17707,7 +17726,7 @@
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="restriction-name" att-name="${elem}">${elem}</span>
+                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons[elem]} ${elem}</span>
                     <span>></span>
                 </div>
             </td>
@@ -17723,7 +17742,7 @@
       });
     }
 
-    const youtubeCategories = ['all', 'Film & Animation', 'Autos & Vehicles', 'Music', 'Pets & Animals', 'Sports', 'Travel & Events', 'Gaming', 'People & Blogs', 'Comedy', 'Entertainment', 'News & Politics', 'Howto & Style', 'Education', 'Science & Technology', 'Nonprofits & Activism'];
+    const youtubeCategories = ['All', 'Film & Animation', 'Autos & Vehicles', 'Music', 'Pets & Animals', 'Sports', 'Travel & Events', 'Gaming', 'People & Blogs', 'Comedy', 'Entertainment', 'News & Politics', 'Howto & Style', 'Education', 'Science & Technology', 'Nonprofits & Activism'];
 
     function timeInputs() {
       // limit max hours to 999

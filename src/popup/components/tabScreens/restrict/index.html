@@ -1,17 +1,19 @@
 <section class="main-tabs-tab-content" id="tab-content-restrict">
-    <div class="my-restrictions">
-        <h5>My restrictions</h5>
-        <table class="table-restrict" id="table-restricted">
-            <!-- populated by js -->
-        </table>
-    </div>
-    <div class="restrict-list">
-        <h5>Restrict</h5>
-        <div class="restrict-list-table-container">
-            <table class="table-restrict" id="table-restrict-list">
+    <div class="restrict-inner">
+        <div class="my-restrictions">
+            <h5>My restrictions</h5>
+            <table class="table-restrict" id="table-restricted">
                 <!-- populated by js -->
             </table>
         </div>
+        <div class="restrict-list">
+            <h5>Restrict</h5>
+            <div class="restrict-list-table-container">
+                <table class="table-restrict" id="table-restrict-list">
+                    <!-- populated by js -->
+                </table>
+            </div>
+        </div>
+        @@include('./addRestriction/index.html')
     </div>
-    @@include('./addRestriction/index.html')
 </section>

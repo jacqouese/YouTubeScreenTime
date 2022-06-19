@@ -1,5 +1,5 @@
 const youtubeCategories = [
-    'all',
+    'All',
     'Film & Animation',
     'Autos & Vehicles',
     'Music',
