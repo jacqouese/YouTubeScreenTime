@@ -43,6 +43,25 @@
     return JSON.parse(categoryScript.innerHTML)['genre'];
   }
 
+  function injectCategoryString() {
+    const elem = document.querySelector('#info-strings') || null;
+    if (elem === null) return;
+    const dot = document.createElement('span');
+    dot.id = 'dot';
+    dot.classList.add('style-scope');
+    dot.classList.add('ytd-video-primary-info-renderer');
+    var span = elem.querySelector('.ytt-cateogry') || null;
+
+    if (span === null) {
+      span = document.createElement('span');
+      span.classList.add('ytt-cateogry');
+      elem.appendChild(dot);
+      elem.appendChild(span);
+    }
+
+    span.textContent = `${checkCategory()}`;
+  }
+
   function videoListeners(video, timer) {
     video.addEventListener('playing', () => {
       // prevent starting multiple timeouts
@@ -70,7 +89,7 @@
   function checkTimeRemaining(category) {
     chrome.runtime.sendMessage({
       for: 'background',
-      type: 'checkTimeRemaining',
+      type: 'restrictions/timeremaining',
       body: {
         category: category,
         timeframe: 'day'
@@ -95,25 +114,6 @@
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     return date;
-  }
-
-  function injectCategoryString() {
-    const elem = document.querySelector('#info-strings') || null;
-    if (elem === null) return;
-    const dot = document.createElement('span');
-    dot.id = 'dot';
-    dot.classList.add('style-scope');
-    dot.classList.add('ytd-video-primary-info-renderer');
-    var span = elem.querySelector('.ytt-cateogry') || null;
-
-    if (span === null) {
-      span = document.createElement('span');
-      span.classList.add('ytt-cateogry');
-      elem.appendChild(dot);
-      elem.appendChild(span);
-    }
-
-    span.textContent = `${checkCategory()}`;
   }
 
   function sendToDB(time, date, category) {
@@ -220,6 +220,14 @@
       if (request.type === 'settingChange') {
         window.ytData.settings[request.body.settingName] = request.body.settingValue;
       }
+
+      if (request.type === 'newURL') {
+        setTimeout(() => {
+          if (window.ytData.settings.displayCategory == 'true') {
+            injectCategoryString();
+          }
+        }, 1000);
+      }
     });
   }
 
@@ -297,14 +305,6 @@
     videoListeners(video, timer); // listen when to save progress to database
 
     videoSaveProgressListener(video, timer, checkCategory());
-
-    window.onfocus = () => {
-      setTimeout(() => {
-        if (window.ytData.settings.displayCategory == 'true') {
-          injectCategoryString();
-        }
-      }, 1000);
-    };
   });
 
 })));

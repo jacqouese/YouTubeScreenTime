@@ -1,3 +1,5 @@
+import { injectCategoryString } from '../inject/injectCategoryString';
+
 export function listenForSettingChanges() {
     window.ytData = {};
     window.ytData.settings = {};
@@ -28,6 +30,13 @@ export function listenForSettingChanges() {
         console.log('got message', request);
         if (request.type === 'settingChange') {
             window.ytData.settings[request.body.settingName] = request.body.settingValue;
+        }
+        if (request.type === 'newURL') {
+            setTimeout(() => {
+                if (window.ytData.settings.displayCategory == 'true') {
+                    injectCategoryString();
+                }
+            }, 1000);
         }
     });
 }

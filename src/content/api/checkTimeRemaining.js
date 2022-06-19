@@ -2,15 +2,14 @@ export function checkTimeRemaining(category) {
     chrome.runtime.sendMessage(
         {
             for: 'background',
-            type: 'checkTimeRemaining',
+            type: 'restrictions/timeremaining',
             body: {
                 category: category,
                 timeframe: 'day',
             },
         },
         (res) => {
-            if (res.data.timeRemaining === null)
-                return console.log('no restrictions found:', category);
+            if (res.data.timeRemaining === null) return console.log('no restrictions found:', category);
 
             console.log(`${res.data.timeRemaining} seconds left`);
 
@@ -21,10 +20,7 @@ export function checkTimeRemaining(category) {
                 return mainNotification.createNoTimeNotification(category);
             }
 
-            if (
-                res.data.timeRemaining < 300 &&
-                window.ytData.settings.lowTimeNotifications == 'true'
-            ) {
+            if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
                 return mainNotification.createLowTimeNotification(category);
             }
         }

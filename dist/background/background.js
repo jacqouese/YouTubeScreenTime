@@ -152,109 +152,6 @@
 
     var restrictions = new Restrictions();
 
-    class RestrictionsController {
-      index(request, sendResponse) {
-        restrictions.getAllRestrictions(res => {
-          sendResponse({
-            status: 200,
-            data: {
-              restrictions: res
-            }
-          });
-        });
-      }
-
-      create(request, sendResponse) {
-        restrictions.checkForRestriction(request.body.restriction, () => {
-          restrictions.addRestriction(request.body.restriction, request.body.time);
-          sendResponse({
-            status: 200,
-            data: {
-              ok: 'ok'
-            }
-          });
-        }, () => {
-          sendResponse({
-            status: 403,
-            error: 'restriction for this category already exists'
-          });
-        });
-      }
-
-      delete(request, sendResponse) {
-        restrictions.deleteRestriction(request.body.restriction);
-        sendResponse({
-          status: 200
-        });
-      }
-
-    }
-
-    var restrictionsController = new RestrictionsController();
-
-    class Settings {
-      getSettingValue(settingName) {
-        const setting = localStorage.getItem(settingName); // if setting does not already exist - create it
-
-        if (setting === null) {
-          localStorage.setItem(settingName, false);
-        }
-
-        return setting;
-      }
-
-      updateSettingValue(settingName, settingValue) {
-        localStorage.setItem(settingName, settingValue);
-      }
-
-    }
-
-    var settings = new Settings();
-
-    class SettingsController {
-      index(request, sendResponse) {
-        const setting = settings.getSettingValue(request.body.settingName);
-        sendResponse({
-          status: 200,
-          data: {
-            settingName: request.body.settingName,
-            settingValue: setting
-          }
-        });
-      }
-
-      update(request, sendResponse) {
-        settings.updateSettingValue(request.body.settingName, request.body.settingValue);
-        sendResponse({
-          status: 201,
-          message: 'setting added successfully'
-        }); // notify content about setting change
-
-        chrome.tabs.query({}, tabs => {
-          for (var i = 0; i < tabs.length; ++i) {
-            chrome.tabs.sendMessage(tabs[i].id, {
-              type: 'settingChange',
-              body: {
-                settingName: request.body.settingName,
-                settingValue: request.body.settingValue
-              }
-            });
-          }
-        }); // notify popup about setting change
-
-        chrome.extension.sendMessage({
-          type: 'settingChange',
-          body: {
-            settingName: request.body.settingName,
-            settingValue: request.body.settingValue
-          }
-        });
-      }
-
-    }
-
-    var settingsController = new SettingsController();
-
     function prepareDateObject(dateBound) {
       const object = {};
       dateBound.forEach(singleDate => {
@@ -413,77 +310,43 @@
 
     var watchtime = new Watchtime();
 
-    class WatchtimeController {
+    class RestrictionsController {
       index(request, sendResponse) {
-        const requestPeriod = request.body.period || null;
-        watchtime.getAllWatched(requestPeriod, res => {
+        restrictions.getAllRestrictions(res => {
           sendResponse({
             status: 200,
             data: {
-              time: res.totalTime,
-              categoryObject: res.categoryObject,
-              dateObject: res.dateObject
+              restrictions: res
             }
           });
         });
       }
 
       create(request, sendResponse) {
-        watchtime.addWatched(request.body.category, request.body.date, request.body.time, () => {
-          watchtime.getAllWatched('day', res => {
-            const category = request.body.category;
-            const time = res.categoryObject[request.body.category];
-            restrictions.checkTimeRemainingForCategory({
-              category: category,
-              time: time,
-              timeframe: 'day'
-            }, (isTimeLeft, timeRemaining) => {
-              restrictions.checkTimeRemainingForAll(time, res => {
-                let finalRemaining = timeRemaining;
-
-                if (res !== null) {
-                  finalRemaining = res < timeRemaining ? res : timeRemaining;
-                }
-
-                sendResponse({
-                  status: 200,
-                  data: {
-                    timeRemaining: finalRemaining
-                  }
-                });
-              });
-            });
+        restrictions.checkForRestriction(request.body.restriction, () => {
+          restrictions.addRestriction(request.body.restriction, request.body.time);
+          sendResponse({
+            status: 200,
+            data: {
+              ok: 'ok'
+            }
+          });
+        }, () => {
+          sendResponse({
+            status: 403,
+            error: 'restriction for this category already exists'
           });
         });
       }
 
-    }
+      delete(request, sendResponse) {
+        restrictions.deleteRestriction(request.body.restriction);
+        sendResponse({
+          status: 200
+        });
+      }
 
-    var watchtimeController = new WatchtimeController();
-
-    const router = (request, sendResponse) => {
-      route('watchtime/create', () => {
-        watchtimeController.create(request, sendResponse);
-      });
-      route('watchtime/get', () => {
-        watchtimeController.index(request, sendResponse);
-      });
-      route('restriction/create', () => {
-        restrictionsController.create(request, sendResponse);
-      });
-      route('restriction/get', () => {
-        restrictionsController.index(request, sendResponse);
-      });
-      route('restriction/delete', () => {
-        restrictionsController.delete(request, sendResponse);
-      });
-      route('settings/update', () => {
-        settingsController.update(request, sendResponse);
-      });
-      route('settings/get', () => {
-        settingsController.index(request, sendResponse);
-      });
-      route('checkTimeRemaining', () => {
+      indexTimeRemaining(request, sendResponse) {
         watchtime.getAllWatched('day', res => {
           const category = request.body.category;
           const time = res.categoryObject[request.body.category];
@@ -508,6 +371,129 @@
             });
           });
         });
+      }
+
+    }
+
+    var restrictionsController = new RestrictionsController();
+
+    class Settings {
+      getSettingValue(settingName) {
+        const setting = localStorage.getItem(settingName); // if setting does not already exist - create it
+
+        if (setting === null) {
+          localStorage.setItem(settingName, false);
+        }
+
+        return setting;
+      }
+
+      updateSettingValue(settingName, settingValue) {
+        localStorage.setItem(settingName, settingValue);
+      }
+
+    }
+
+    var settings = new Settings();
+
+    class SettingsController {
+      index(request, sendResponse) {
+        const setting = settings.getSettingValue(request.body.settingName);
+        sendResponse({
+          status: 200,
+          data: {
+            settingName: request.body.settingName,
+            settingValue: setting
+          }
+        });
+      }
+
+      update(request, sendResponse) {
+        settings.updateSettingValue(request.body.settingName, request.body.settingValue);
+        sendResponse({
+          status: 201,
+          message: 'setting added successfully'
+        }); // notify content about setting change
+
+        chrome.tabs.query({}, tabs => {
+          for (var i = 0; i < tabs.length; ++i) {
+            chrome.tabs.sendMessage(tabs[i].id, {
+              type: 'settingChange',
+              body: {
+                settingName: request.body.settingName,
+                settingValue: request.body.settingValue
+              }
+            });
+          }
+        }); // notify popup about setting change
+
+        chrome.extension.sendMessage({
+          type: 'settingChange',
+          body: {
+            settingName: request.body.settingName,
+            settingValue: request.body.settingValue
+          }
+        });
+      }
+
+    }
+
+    var settingsController = new SettingsController();
+
+    class WatchtimeController {
+      index(request, sendResponse) {
+        const requestPeriod = request.body.period || null;
+        watchtime.getAllWatched(requestPeriod, res => {
+          sendResponse({
+            status: 200,
+            data: {
+              time: res.totalTime,
+              categoryObject: res.categoryObject,
+              dateObject: res.dateObject
+            }
+          });
+        });
+      }
+
+      create(request, sendResponse) {
+        watchtime.addWatched(request.body.category, request.body.date, request.body.time, () => {
+          sendResponse({
+            status: 200,
+            data: {
+              timeRemaining: finalRemaining
+            }
+          });
+        });
+      }
+
+    }
+
+    var watchtimeController = new WatchtimeController();
+
+    const router = (request, sendResponse) => {
+      route('watchtime/create', () => {
+        watchtimeController.create(request, sendResponse);
+      });
+      route('watchtime/get', () => {
+        watchtimeController.index(request, sendResponse);
+      });
+      route('restriction/create', () => {
+        restrictionsController.create(request, sendResponse);
+      });
+      route('restriction/get', () => {
+        restrictionsController.index(request, sendResponse);
+      });
+      route('restriction/delete', () => {
+        restrictionsController.delete(request, sendResponse);
+      });
+      route('restrictions/timeremaining', () => {
+        restrictionsController.indexTimeRemaining(request, sendResponse);
+      });
+      route('settings/update', () => {
+        settingsController.update(request, sendResponse);
+      });
+      route('settings/get', () => {
+        settingsController.index(request, sendResponse);
       });
     };
 

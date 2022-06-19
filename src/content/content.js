@@ -2,10 +2,7 @@ import { intervalTimer } from './helpers/intervalTimer';
 
 import { injectCategory, checkCategory } from './category/extractCategory';
 import { videoListeners } from './video/videoListeners';
-import {
-    sendToDB,
-    videoSaveProgressListener,
-} from './video/videoSaveProgressListener';
+import { sendToDB, videoSaveProgressListener } from './video/videoSaveProgressListener';
 import { listenForFirstVideo } from './api/listenForFirstVideo';
 import { injectCategoryString } from './inject/injectCategoryString';
 import { getDate } from './helpers/getDate';
@@ -52,12 +49,4 @@ listenForFirstVideo((foundVideo) => {
 
     // listen when to save progress to database
     videoSaveProgressListener(video, timer, checkCategory());
-
-    window.onfocus = () => {
-        setTimeout(() => {
-            if (window.ytData.settings.displayCategory == 'true') {
-                injectCategoryString();
-            }
-        }, 1000);
-    };
 });

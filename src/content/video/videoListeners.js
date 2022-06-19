@@ -1,3 +1,5 @@
+import { injectCategoryString } from '../inject/injectCategoryString';
+
 export function videoListeners(video, timer) {
     video.addEventListener('playing', () => {
         // prevent starting multiple timeouts

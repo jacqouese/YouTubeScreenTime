@@ -26,38 +26,16 @@ const router = (request, sendResponse) => {
         restrictionsController.delete(request, sendResponse);
     });
 
+    route('restrictions/timeremaining', () => {
+        restrictionsController.indexTimeRemaining(request, sendResponse);
+    });
+
     route('settings/update', () => {
         settingsController.update(request, sendResponse);
     });
 
     route('settings/get', () => {
         settingsController.index(request, sendResponse);
-    });
-
-    route('checkTimeRemaining', () => {
-        watchtime.getAllWatched('day', (res) => {
-            const category = request.body.category;
-            const time = res.categoryObject[request.body.category];
-            restrictions.checkTimeRemainingForCategory(
-                { category: category, time: time, timeframe: 'day' },
-                (isTimeLeft, timeRemaining) => {
-                    restrictions.checkTimeRemainingForAll(time, (res) => {
-                        let finalRemaining = timeRemaining;
-                        if (res !== null) {
-                            finalRemaining =
-                                res < timeRemaining ? res : timeRemaining;
-                        }
-
-                        sendResponse({
-                            status: 200,
-                            data: {
-                                timeRemaining: finalRemaining,
-                            },
-                        });
-                    });
-                }
-            );
-        });
     });
 };
 
