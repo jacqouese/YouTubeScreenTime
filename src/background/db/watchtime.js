@@ -12,6 +12,7 @@ class Watchtime extends DBModel {
         super.query(this.tableName, 'date, category', (store) => {
             // check what period was requested
             var bound = determineBound(period);
+            var compareBound = determineBound('last' + period);
 
             var request = store.index('date').getAll();
 
@@ -19,6 +20,7 @@ class Watchtime extends DBModel {
                 if (request.result.length === 0) return;
 
                 var total = 0;
+                var previousWeekTotal = 0;
                 var categoryObject = {};
                 var dateObject = prepareDateObject(bound);
                 request.result.forEach((elem) => {
@@ -26,9 +28,7 @@ class Watchtime extends DBModel {
                         // insert data into category object
                         if (elem.category in categoryObject) {
                             // if the category already is in array
-                            categoryObject[elem.category] =
-                                categoryObject[elem.category] +
-                                elem.time_in_sec;
+                            categoryObject[elem.category] = categoryObject[elem.category] + elem.time_in_sec;
                         } else {
                             // if the category is not in array already
                             categoryObject[elem.category] = elem.time_in_sec;
@@ -37,20 +37,29 @@ class Watchtime extends DBModel {
                         // insert data into date object
                         if (elem.category in dateObject[elem.date]) {
                             dateObject[elem.date][elem.category] =
-                                dateObject[elem.date][elem.category] +
-                                elem.time_in_sec;
+                                dateObject[elem.date][elem.category] + elem.time_in_sec;
                         } else {
-                            dateObject[elem.date][elem.category] =
-                                elem.time_in_sec;
+                            dateObject[elem.date][elem.category] = elem.time_in_sec;
                         }
                         total += elem.time_in_sec;
                     }
+                    if (compareBound.includes(elem.date)) {
+                        previousWeekTotal += elem.time_in_sec;
+                    }
                 });
+
+                const determinePercentChange = () => {
+                    if (total === 0 || previousWeekTotal === 0) return 0;
+                    return Math.round(((total - previousWeekTotal) / previousWeekTotal) * 100);
+                };
+
+                const percentChange = determinePercentChange();
 
                 const data = {
                     totalTime: total,
                     categoryObject: categoryObject,
                     dateObject: dateObject,
+                    percentChange: percentChange,
                 };
 
                 callback(data);
@@ -62,16 +71,9 @@ class Watchtime extends DBModel {
         super.query(this.tableName, 'date, category', (store) => {
             var today = new Date();
 
-            var date =
-                today.getFullYear() +
-                '-' +
-                (today.getMonth() + 1) +
-                '-' +
-                today.getDate();
+            var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-            var request = store
-                .index('date, category')
-                .getAll([date, category]);
+            var request = store.index('date, category').getAll([date, category]);
 
             request.onsuccess = () => {
                 if (request.result.length > 0) {

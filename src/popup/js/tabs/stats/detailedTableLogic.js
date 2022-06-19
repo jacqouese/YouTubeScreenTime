@@ -1,3 +1,4 @@
+import youtubeCategoryIcons from '../../../data/youtubeCategoryIcons';
 import { secondsToHms } from '../../helpers/secondsToHms';
 
 // populate detailed table on stats page with data
@@ -56,15 +57,16 @@ export function detailedTableLogic(period) {
     formatedProgressValues.forEach((innerArray, i) => {
         if (innerArray[1] < 60) return; // if shorter than 1 min
 
-        const formatedValue =
-            ((innerArray[1] - minValue) / (maxValue - minValue)) * 100;
+        const formatedValue = ((innerArray[1] - minValue) / (maxValue - minValue)) * 100;
         var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
-
+        youtubeCategoryIcons;
         const HTMLinsert = `
     <tr>
     <td>
     <div class="detailed-elem">
-      <div class="detailed-color-box"></div>
+      <div class="detailed-color-box">
+        ${youtubeCategoryIcons[innerArray[0]]}
+      </div>
       <div class="detailed-category">
         ${innerArray[0]}
         <div class="progress-container">
@@ -86,9 +88,7 @@ export function detailedTableLogic(period) {
 
         setTimeout(() => {
             bar.style.width = `${value}%`;
-            bar.style.transition = `all ${
-                ((i + 1) / (i + 2)) * 3
-            }s cubic-bezier(0.23, 0.76, 0.735, 0.955)`;
+            bar.style.transition = `all ${((i + 1) / (i + 2)) * 3}s cubic-bezier(0.23, 0.76, 0.735, 0.955)`;
         }, 50);
     });
 }

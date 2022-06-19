@@ -11,6 +11,7 @@ class WatchtimeController {
                     time: res.totalTime,
                     categoryObject: res.categoryObject,
                     dateObject: res.dateObject,
+                    percentChange: res.percentChange,
                 },
             });
         });

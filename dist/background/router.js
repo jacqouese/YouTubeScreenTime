@@ -196,6 +196,45 @@
       return arrayOfDays;
     }
 
+    function getLastDayBound() {
+      var today = new Date();
+      var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate() - 1);
+      return [date];
+    }
+
+    function getLastMonthBound() {
+      var arrayOfDays = [];
+      var curr = new Date(); // get current date
+
+      const daysInMonth = new Date(curr.getFullYear(), curr.getMonth(), 0).getDate(); // returns how many days the current month has
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        var tempDate = new Date(curr.setDate(i));
+        var dateDateFormated = tempDate.getFullYear() + '-' + tempDate.getMonth() + '-' + tempDate.getDate();
+        arrayOfDays.push(dateDateFormated);
+      }
+
+      return arrayOfDays;
+    }
+
+    function getLastWeekBound() {
+      var arrayOfDays = [];
+      var curr = new Date(); // get current date
+
+      const tempDate = new Date();
+      tempDate.setDate( // initially first day of the current week
+      curr.getDate() - curr.getDay() + (curr.getDay() == 0 ? -13 : -6) // make Sunday the last day
+      );
+
+      for (let i = 0; i <= 6; i++) {
+        var dateDateFormated = tempDate.getFullYear() + '-' + (tempDate.getMonth() + 1) + '-' + tempDate.getDate();
+        arrayOfDays.push(dateDateFormated);
+        tempDate.setDate(tempDate.getDate() + 1);
+      }
+
+      return arrayOfDays;
+    }
+
     function determineBound(period) {
       if (period === 'day') {
         return getCurrentDayBound();
@@ -207,6 +246,18 @@
 
       if (period === 'month') {
         return getCurrentMonthBound();
+      }
+
+      if (period === 'lastday') {
+        return getLastDayBound();
+      }
+
+      if (period === 'lastweek') {
+        return getLastWeekBound();
+      }
+
+      if (period === 'lastmonth') {
+        return getLastMonthBound();
       }
 
       return console.error('invalid period given, valid period values include: day, week, month');
@@ -222,11 +273,13 @@
         super.query(this.tableName, 'date, category', store => {
           // check what period was requested
           var bound = determineBound(period);
+          var compareBound = determineBound('last' + period);
           var request = store.index('date').getAll();
 
           request.onsuccess = () => {
             if (request.result.length === 0) return;
             var total = 0;
+            var previousWeekTotal = 0;
             var categoryObject = {};
             var dateObject = prepareDateObject(bound);
             request.result.forEach(elem => {
@@ -249,11 +302,23 @@
 
                 total += elem.time_in_sec;
               }
+
+              if (compareBound.includes(elem.date)) {
+                previousWeekTotal += elem.time_in_sec;
+              }
             });
+
+            const determinePercentChange = () => {
+              if (total === 0 || previousWeekTotal === 0) return 0;
+              return Math.round((total - previousWeekTotal) / previousWeekTotal * 100);
+            };
+
+            const percentChange = determinePercentChange();
             const data = {
               totalTime: total,
               categoryObject: categoryObject,
-              dateObject: dateObject
+              dateObject: dateObject,
+              percentChange: percentChange
             };
             callback(data);
           };

@@ -100,14 +100,23 @@
       requestTotal('day', res => {
         window.ytData.dayTotalCategory = res.data;
         document.querySelector('#top-stats-day').innerHTML = secondsToHms(res.data.time);
+        const percent = document.querySelector('#top-stats-day-percent');
+        percent.innerHTML = res.data.percentChange + '%';
+        if (res.data.percentChange < 0) percent.classList.add('percent-down');
       });
       requestTotal('week', res => {
         window.ytData.weekTotalCategory = res.data;
         document.querySelector('#top-stats-week').innerHTML = secondsToHms(res.data.time);
+        const percent = document.querySelector('#top-stats-week-percent');
+        percent.innerHTML = res.data.percentChange + '%';
+        if (res.data.percentChange < 0) percent.classList.add('percent-down');
       });
       requestTotal('month', res => {
         window.ytData.monthTotalCategory = res.data;
         document.querySelector('#top-stats-month').innerHTML = secondsToHms(res.data.time);
+        const percent = document.querySelector('#top-stats-month-percent');
+        percent.innerHTML = res.data.percentChange + '%';
+        if (res.data.percentChange < 0) percent.classList.add('percent-down');
         callback();
       });
       requestAllRestricions(res => {
@@ -17481,7 +17490,20 @@
         options: {
           scales: {
             y: {
-              beginAtZero: true
+              beginAtZero: true,
+              ticks: {
+                // Include a dollar sign in the ticks
+                callback: function (value, index, ticks) {
+                  if (value === 0) return 0;
+
+                  if (ticks[ticks.length - 1].value >= 60) {
+                    console.log('here');
+                    return `${Math.floor(value / 60)}:${('0' + value % 60).slice(-2)}`;
+                  }
+
+                  return value;
+                }
+              }
             }
           },
           plugins: {
@@ -17490,13 +17512,38 @@
             },
             tooltip: {
               callbacks: {
-                label: item => `${item.formattedValue} min`
+                label: item => {
+                  if (item.formattedValue >= 60) {
+                    return `${Math.floor(item.formattedValue / 60)} h ${item.formattedValue % 60} min`;
+                  }
+
+                  return `${item.formattedValue} min`;
+                }
               }
             }
           }
         }
       });
     }
+
+    const youtubeCategoryIcons = {
+      All: '📖',
+      'Film & Animation': '🎬',
+      'Autos & Vehicles': '🚗',
+      Music: '🎶',
+      'Pets & Animals': '🐾',
+      Sports: '⚽',
+      'Travel & Events': '🧳',
+      Gaming: '🎮',
+      'People & Blogs': '📹',
+      Comedy: '📺',
+      Entertainment: '🖥️',
+      'News & Politics': '📰',
+      'Howto & Style': '🧥',
+      Education: '🧮',
+      'Science & Technology': '🔬',
+      'Nonprofits & Activism': '🫂'
+    };
 
     function detailedTableLogic(period) {
       const detailedTable = document.querySelector('#detailed-table-table');
@@ -17560,7 +17607,9 @@
     <tr>
     <td>
     <div class="detailed-elem">
-      <div class="detailed-color-box"></div>
+      <div class="detailed-color-box">
+        ${youtubeCategoryIcons[innerArray[0]]}
+      </div>
       <div class="detailed-category">
         ${innerArray[0]}
         <div class="progress-container">
@@ -17661,25 +17710,6 @@
       const seconds = +h * 60 * 60 + +m * 60 + +s;
       return seconds;
     }
-
-    const youtubeCategoryIcons = {
-      All: '📖',
-      'Film & Animation': '🎬',
-      'Autos & Vehicles': '🚗',
-      Music: '🎶',
-      'Pets & Animals': '🐾',
-      Sports: '⚽',
-      'Travel & Events': '🧳',
-      Gaming: '🎮',
-      'People & Blogs': '📹',
-      Comedy: '📺',
-      Entertainment: '🖥️',
-      'News & Politics': '📰',
-      'Howto & Style': '🧥',
-      Education: '🧮',
-      'Science & Technology': '🔬',
-      'Nonprofits & Activism': '🫂'
-    };
 
     function restrictPupup(restriction) {
       const createPopup = () => {

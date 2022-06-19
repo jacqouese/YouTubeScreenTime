@@ -34,9 +34,7 @@ export function chartLogic() {
             datasets: [
                 {
                     label: false,
-                    data: formatHeights(
-                        window.ytData.weekTotalCategory.dateObject
-                    ),
+                    data: formatHeights(window.ytData.weekTotalCategory.dateObject),
                     backgroundColor: '#45b1d5',
                     borderWidth: 0,
                     borderRadius: 5,
@@ -47,6 +45,18 @@ export function chartLogic() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    ticks: {
+                        // Include a dollar sign in the ticks
+                        callback: function (value, index, ticks) {
+                            if (value === 0) return 0;
+                            if (ticks[ticks.length - 1].value >= 60) {
+                                console.log('here');
+                                return `${Math.floor(value / 60)}:${('0' + (value % 60)).slice(-2)}`;
+                            }
+
+                            return value;
+                        },
+                    },
                 },
             },
             plugins: {
@@ -55,7 +65,12 @@ export function chartLogic() {
                 },
                 tooltip: {
                     callbacks: {
-                        label: (item) => `${item.formattedValue} min`,
+                        label: (item) => {
+                            if (item.formattedValue >= 60) {
+                                return `${Math.floor(item.formattedValue / 60)} h ${item.formattedValue % 60} min`;
+                            }
+                            return `${item.formattedValue} min`;
+                        },
                     },
                 },
             },

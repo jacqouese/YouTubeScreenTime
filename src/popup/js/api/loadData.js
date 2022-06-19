@@ -27,23 +27,26 @@ export function loadData(callback) {
     // request total for each period
     requestTotal('day', (res) => {
         window.ytData.dayTotalCategory = res.data;
-        document.querySelector('#top-stats-day').innerHTML = secondsToHms(
-            res.data.time
-        );
+        document.querySelector('#top-stats-day').innerHTML = secondsToHms(res.data.time);
+        const percent = document.querySelector('#top-stats-day-percent');
+        percent.innerHTML = res.data.percentChange + '%';
+        if (res.data.percentChange < 0) percent.classList.add('percent-down');
     });
 
     requestTotal('week', (res) => {
         window.ytData.weekTotalCategory = res.data;
-        document.querySelector('#top-stats-week').innerHTML = secondsToHms(
-            res.data.time
-        );
+        document.querySelector('#top-stats-week').innerHTML = secondsToHms(res.data.time);
+        const percent = document.querySelector('#top-stats-week-percent');
+        percent.innerHTML = res.data.percentChange + '%';
+        if (res.data.percentChange < 0) percent.classList.add('percent-down');
     });
 
     requestTotal('month', (res) => {
         window.ytData.monthTotalCategory = res.data;
-        document.querySelector('#top-stats-month').innerHTML = secondsToHms(
-            res.data.time
-        );
+        document.querySelector('#top-stats-month').innerHTML = secondsToHms(res.data.time);
+        const percent = document.querySelector('#top-stats-month-percent');
+        percent.innerHTML = res.data.percentChange + '%';
+        if (res.data.percentChange < 0) percent.classList.add('percent-down');
         callback();
     });
 

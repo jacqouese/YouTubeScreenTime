@@ -174,7 +174,7 @@ hr {
 }
 
 .top-stats-elem {
-  width: 28%;
+  width: 30%;
   max-width: fit-content;
 }
 
@@ -271,9 +271,12 @@ td {
 }
 
 .detailed-color-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 25px;
-  width: 20px;
-  background-color: var(--primary);
+  width: 25px;
+  font-size: 140%;
   border-radius: 2px;
 }
 
