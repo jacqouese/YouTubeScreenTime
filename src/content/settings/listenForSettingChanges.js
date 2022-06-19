@@ -4,15 +4,12 @@ export function listenForSettingChanges() {
 
     // get settings after launching
     function getUserSettings(settingName, callback) {
-        chrome.extension.sendMessage(
-            { type: 'settings/get', body: { settingName: settingName } },
-            (res) => {
-                if ((res.status !== 200 && res.status !== 201) || !res.status)
-                    return console.warn('something went wrong!', res.status);
+        chrome.extension.sendMessage({ type: 'settings/get', body: { settingName: settingName } }, (res) => {
+            if ((res.status !== 200 && res.status !== 201) || !res.status)
+                return console.warn('something went wrong!', res.status);
 
-                callback(res);
-            }
-        );
+            callback(res);
+        });
     }
 
     getUserSettings('displayCategory', (res) => {
@@ -28,7 +25,9 @@ export function listenForSettingChanges() {
     });
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        window.ytData.settings[request.body.settingName] =
-            request.body.settingValue;
+        console.log('got message', request);
+        if (request.type === 'settingChange') {
+            window.ytData.settings[request.body.settingName] = request.body.settingValue;
+        }
     });
 }

@@ -52,7 +52,15 @@
         console.log('resumed');
         timer.resume();
       }
-    });
+    }); // makes timer not start if video is opened in a new tab
+
+    if (video.readyState > 2) {
+      if (timer.isResumed === false) {
+        console.log('resumed');
+        timer.resume();
+      }
+    }
+
     video.addEventListener('pause', () => {
       timer.pause();
       console.log('paused');
@@ -207,7 +215,11 @@
       window.ytData.settings.disableNotifications = res.data.settingValue;
     });
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      window.ytData.settings[request.body.settingName] = request.body.settingValue;
+      console.log('got message', request);
+
+      if (request.type === 'settingChange') {
+        window.ytData.settings[request.body.settingName] = request.body.settingValue;
+      }
     });
   }
 
