@@ -183,7 +183,9 @@
       var curr = new Date(); // get current date
 
       const tempDate = new Date();
-      tempDate.setDate(curr.getDate() - curr.getDay() + 1); // initially first day of the current week
+      tempDate.setDate( // initially first day of the current week
+      curr.getDate() - curr.getDay() + (curr.getDay() == 0 ? -6 : 1) // make Sunday the last day
+      );
 
       for (let i = 0; i <= 6; i++) {
         var dateDateFormated = tempDate.getFullYear() + '-' + (tempDate.getMonth() + 1) + '-' + tempDate.getDate();

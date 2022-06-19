@@ -1,23 +1,27 @@
 // return days of the current week
 export function getCurrentWeekBound() {
-  var arrayOfDays = [];
-  var curr = new Date(); // get current date
+    var arrayOfDays = [];
+    var curr = new Date(); // get current date
 
-  const tempDate = new Date();
-  tempDate.setDate(curr.getDate() - curr.getDay() + 1); // initially first day of the current week
+    const tempDate = new Date();
 
-  for (let i = 0; i <= 6; i++) {
-    var dateDateFormated =
-      tempDate.getFullYear() +
-      '-' +
-      (tempDate.getMonth() + 1) +
-      '-' +
-      tempDate.getDate();
+    tempDate.setDate(
+        // initially first day of the current week
+        curr.getDate() - curr.getDay() + (curr.getDay() == 0 ? -6 : 1) // make Sunday the last day
+    );
 
-    arrayOfDays.push(dateDateFormated);
+    for (let i = 0; i <= 6; i++) {
+        var dateDateFormated =
+            tempDate.getFullYear() +
+            '-' +
+            (tempDate.getMonth() + 1) +
+            '-' +
+            tempDate.getDate();
 
-    tempDate.setDate(tempDate.getDate() + 1);
-  }
+        arrayOfDays.push(dateDateFormated);
 
-  return arrayOfDays;
+        tempDate.setDate(tempDate.getDate() + 1);
+    }
+
+    return arrayOfDays;
 }
