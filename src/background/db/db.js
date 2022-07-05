@@ -1,3 +1,5 @@
+import { upgradeDB } from './upgradeDB';
+
 class DBModel {
     constructor() {
         this.dbName = 'YouTubeScreenTime';

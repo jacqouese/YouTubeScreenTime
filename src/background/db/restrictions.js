@@ -63,11 +63,9 @@ class Restrictions extends DBModel {
 
                 const remaining = request.result[0].time_in_sec - time || null;
 
-                if (request.result[0].timeframe !== timeframe)
-                    return callback(true, remaining);
+                if (request.result[0].timeframe !== timeframe) return callback(true, remaining);
 
-                if (request.result[0].time_in_sec > time)
-                    return callback(true, remaining);
+                if (request.result[0].time_in_sec > time) return callback(true, remaining);
 
                 return callback(false, remaining);
             };
@@ -87,12 +85,7 @@ class Restrictions extends DBModel {
         });
     }
 
-    checkTimeRemainingForCategoryRestructure(
-        category,
-        time,
-        timeframe,
-        callback
-    ) {
+    checkTimeRemainingForCategoryRestructure(category, time, timeframe, callback) {
         super.query(this.tableName, 'category', (store) => {
             var request = store.index('category').getAll([category]);
             request.onsuccess = () => {
