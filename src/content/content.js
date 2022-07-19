@@ -1,10 +1,9 @@
 import { intervalTimer } from './helpers/intervalTimer';
 
-import { injectCategory, checkCategory } from './category/extractCategory';
+import { checkCategory } from './category/extractCategory';
 import { videoListeners } from './video/videoListeners';
 import { sendToDB, videoSaveProgressListener } from './video/videoSaveProgressListener';
 import { listenForFirstVideo } from './api/listenForFirstVideo';
-import { injectCategoryString } from './inject/injectCategoryString';
 import { getDate } from './helpers/getDate';
 import { checkTimeRemaining } from './api/checkTimeRemaining';
 import { listenForSettingChanges } from './settings/listenForSettingChanges';
@@ -13,7 +12,11 @@ import { notificationService } from './service/notificationService';
 let video = document.getElementsByTagName('video')[-1] || null;
 const hook = document.querySelector('#count');
 
+// get settings from popup
+listenForSettingChanges();
+
 listenForFirstVideo((foundVideo) => {
+    if (window.ytData.settings.isExtensionPaused == 'true') return;
     console.log('video found');
     video = foundVideo;
 
@@ -22,9 +25,6 @@ listenForFirstVideo((foundVideo) => {
 
     // get category from YouTube
     chrome.storage.sync.set({ currentCategory: checkCategory() });
-
-    // get settings from popup
-    listenForSettingChanges();
 
     setTimeout(() => {
         checkTimeRemaining(checkCategory());
@@ -38,7 +38,8 @@ listenForFirstVideo((foundVideo) => {
         if (timer.time === 60) {
             sendToDB(timer.time, getDate(), checkCategory());
             timer.time = 0;
-
+        }
+        if (timer.time === 0) {
             checkTimeRemaining(checkCategory());
         }
     }, 1000);

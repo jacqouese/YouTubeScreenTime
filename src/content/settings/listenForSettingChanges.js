@@ -26,6 +26,10 @@ export function listenForSettingChanges() {
         window.ytData.settings.disableNotifications = res.data.settingValue;
     });
 
+    getUserSettings('isExtensionPaused', (res) => {
+        window.ytData.settings.isExtensionPaused = res.data.settingValue;
+    });
+
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('got message', request);
         if (request.type === 'settingChange') {

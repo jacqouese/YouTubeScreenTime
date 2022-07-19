@@ -214,6 +214,9 @@
     getUserSettings('disableNotifications', res => {
       window.ytData.settings.disableNotifications = res.data.settingValue;
     });
+    getUserSettings('isExtensionPaused', res => {
+      window.ytData.settings.isExtensionPaused = res.data.settingValue;
+    });
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.log('got message', request);
 
@@ -275,8 +278,11 @@
   }
 
   let video = document.getElementsByTagName('video')[-1] || null;
-  const hook = document.querySelector('#count');
+  const hook = document.querySelector('#count'); // get settings from popup
+
+  listenForSettingChanges();
   listenForFirstVideo(foundVideo => {
+    if (window.ytData.settings.isExtensionPaused == 'true') return;
     console.log('video found');
     video = foundVideo; // initialize notification
 
@@ -284,9 +290,7 @@
 
     chrome.storage.sync.set({
       currentCategory: checkCategory()
-    }); // get settings from popup
-
-    listenForSettingChanges();
+    });
     setTimeout(() => {
       checkTimeRemaining(checkCategory());
     }, 1000); // interval with play / pause ability
@@ -297,6 +301,9 @@
       if (timer.time === 60) {
         sendToDB(timer.time, getDate(), checkCategory());
         timer.time = 0;
+      }
+
+      if (timer.time === 0) {
         checkTimeRemaining(checkCategory());
       }
     }, 1000);
