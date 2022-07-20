@@ -38,12 +38,7 @@ export function videoSaveProgressListener(video, timer, category) {
         if (video.src === '') {
             if (timer.isResumed === true) {
                 timer.pause();
-                sendToDB(
-                    timer.time,
-                    getDate(),
-                    checkCategory(),
-                    alreadyShownNotification
-                );
+                sendToDB(timer.time, getDate(), checkCategory(), alreadyShownNotification);
                 timer.time = 0;
             }
         }
@@ -53,9 +48,9 @@ export function videoSaveProgressListener(video, timer, category) {
     chrome.runtime.onMessage.addListener((req) => {
         if (req.type === 'newURL') {
             if (window.ytData.settings.displayCategory == 'true') {
-                setTimeout(() => {
-                    injectCategoryString();
-                }, 1000);
+                // setTimeout(() => {
+                //     injectCategoryString();
+                // }, 1000);
             }
         }
 

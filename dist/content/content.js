@@ -154,11 +154,7 @@
 
     chrome.runtime.onMessage.addListener(req => {
       if (req.type === 'newURL') {
-        if (window.ytData.settings.displayCategory == 'true') {
-          setTimeout(() => {
-            injectCategoryString();
-          }, 1000);
-        }
+        if (window.ytData.settings.displayCategory == 'true') ;
       }
 
       if (req.type === 'newURL' && timer.time != 0) {
@@ -277,6 +273,10 @@
     };
   }
 
+  function isVideoLoaded() {
+    return document.querySelector(`ytd-watch-flexy[video-id]`) || null;
+  }
+
   let video = document.getElementsByTagName('video')[-1] || null;
   const hook = document.querySelector('#count'); // get settings from popup
 
@@ -293,7 +293,21 @@
     });
     setTimeout(() => {
       checkTimeRemaining(checkCategory());
-    }, 1000); // interval with play / pause ability
+    }, 1000);
+
+    if (window.ytData.settings.displayCategory == 'true') {
+      let pageLoadInterval = null;
+
+      const waitUntilPageLoaded = () => {
+        if (isVideoLoaded() === null || video.readyState < 2) return;
+        clearInterval(pageLoadInterval);
+        pageLoadInterval = null;
+        injectCategoryString();
+      };
+
+      pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
+    } // interval with play / pause ability
+
 
     const timer = new intervalTimer(() => {
       console.log(timer.time++); // autosave every 60 seconds
