@@ -1,3 +1,5 @@
+import { cLog } from '../utils/utils';
+
 export function checkTimeRemaining(category) {
     chrome.runtime.sendMessage(
         {
@@ -9,9 +11,9 @@ export function checkTimeRemaining(category) {
             },
         },
         (res) => {
-            if (res.data.timeRemaining === null) return console.log('no restrictions found:', category);
+            if (res.data.timeRemaining === null) return cLog(`no restrictions found: ${category}`);
 
-            console.log(`${res.data.timeRemaining} seconds left`);
+            cLog(`${res.data.timeRemaining} seconds left`);
 
             // user paused notifications
             if (window.ytData.settings.disableNotifications == 'true') return;

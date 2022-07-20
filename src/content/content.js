@@ -8,7 +8,7 @@ import { getDate } from './helpers/getDate';
 import { checkTimeRemaining } from './api/checkTimeRemaining';
 import { listenForSettingChanges } from './settings/listenForSettingChanges';
 import { notificationService } from './service/notificationService';
-import { isVideoLoaded } from './utils/utils';
+import { cLog, isVideoLoaded } from './utils/utils';
 import { injectCategoryString } from './inject/injectCategoryString';
 
 let video = document.getElementsByTagName('video')[-1] || null;
@@ -19,7 +19,7 @@ listenForSettingChanges();
 
 listenForFirstVideo((foundVideo) => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;
-    console.log('video found');
+    cLog('video found');
     video = foundVideo;
 
     // initialize notification
@@ -46,7 +46,7 @@ listenForFirstVideo((foundVideo) => {
 
     // interval with play / pause ability
     const timer = new intervalTimer(() => {
-        console.log(timer.time++);
+        cLog(timer.time++);
 
         // autosave every 60 seconds
         if (timer.time === 60) {

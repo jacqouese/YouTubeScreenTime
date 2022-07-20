@@ -43,23 +43,11 @@
     return JSON.parse(categoryScript.innerHTML)['genre'];
   }
 
-  function injectCategoryString() {
-    const elem = document.querySelector('#info-strings') || null;
-    if (elem === null) return;
-    const dot = document.createElement('span');
-    dot.id = 'dot';
-    dot.classList.add('style-scope');
-    dot.classList.add('ytd-video-primary-info-renderer');
-    var span = elem.querySelector('.ytt-cateogry') || null;
-
-    if (span === null) {
-      span = document.createElement('span');
-      span.classList.add('ytt-cateogry');
-      elem.appendChild(dot);
-      elem.appendChild(span);
-    }
-
-    span.textContent = `${checkCategory()}`;
+  function isVideoLoaded() {
+    return document.querySelector(`ytd-watch-flexy[video-id]`) || null;
+  }
+  function cLog(value) {
+    console.log(value);
   }
 
   function videoListeners(video, timer) {
@@ -68,21 +56,21 @@
       console.log('video is playing');
 
       if (timer.isResumed === false) {
-        console.log('resumed');
+        cLog('resumed');
         timer.resume();
       }
     }); // makes timer not start if video is opened in a new tab
 
     if (video.readyState > 2) {
       if (timer.isResumed === false) {
-        console.log('resumed');
+        cLog('resumed');
         timer.resume();
       }
     }
 
     video.addEventListener('pause', () => {
       timer.pause();
-      console.log('paused');
+      cLog('paused');
     });
   }
 
@@ -95,8 +83,8 @@
         timeframe: 'day'
       }
     }, res => {
-      if (res.data.timeRemaining === null) return console.log('no restrictions found:', category);
-      console.log(`${res.data.timeRemaining} seconds left`); // user paused notifications
+      if (res.data.timeRemaining === null) return cLog(`no restrictions found: ${category}`);
+      cLog(`${res.data.timeRemaining} seconds left`); // user paused notifications
 
       if (window.ytData.settings.disableNotifications == 'true') return;
 
@@ -114,6 +102,25 @@
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     return date;
+  }
+
+  function injectCategoryString() {
+    const elem = document.querySelector('#info-strings') || null;
+    if (elem === null) return console.log('null on strings');
+    const dot = document.createElement('span');
+    dot.id = 'dot';
+    dot.classList.add('style-scope');
+    dot.classList.add('ytd-video-primary-info-renderer');
+    var span = elem.querySelector('.ytt-cateogry') || null;
+
+    if (span === null) {
+      span = document.createElement('span');
+      span.classList.add('ytt-cateogry');
+      elem.appendChild(dot);
+      elem.appendChild(span);
+    }
+
+    span.textContent = `${checkCategory()}`;
   }
 
   function sendToDB(time, date, category) {
@@ -273,17 +280,13 @@
     };
   }
 
-  function isVideoLoaded() {
-    return document.querySelector(`ytd-watch-flexy[video-id]`) || null;
-  }
-
   let video = document.getElementsByTagName('video')[-1] || null;
   const hook = document.querySelector('#count'); // get settings from popup
 
   listenForSettingChanges();
   listenForFirstVideo(foundVideo => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;
-    console.log('video found');
+    cLog('video found');
     video = foundVideo; // initialize notification
 
     globalThis.mainNotification = new notificationService(); // get category from YouTube
@@ -310,7 +313,7 @@
 
 
     const timer = new intervalTimer(() => {
-      console.log(timer.time++); // autosave every 60 seconds
+      cLog(timer.time++); // autosave every 60 seconds
 
       if (timer.time === 60) {
         sendToDB(timer.time, getDate(), checkCategory());

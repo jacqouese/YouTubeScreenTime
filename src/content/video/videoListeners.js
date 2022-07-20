@@ -1,11 +1,11 @@
-import { injectCategoryString } from '../inject/injectCategoryString';
+import { cLog } from '../utils/utils';
 
 export function videoListeners(video, timer) {
     video.addEventListener('playing', () => {
         // prevent starting multiple timeouts
         console.log('video is playing');
         if (timer.isResumed === false) {
-            console.log('resumed');
+            cLog('resumed');
             timer.resume();
         }
     });
@@ -13,13 +13,13 @@ export function videoListeners(video, timer) {
     // makes timer not start if video is opened in a new tab
     if (video.readyState > 2) {
         if (timer.isResumed === false) {
-            console.log('resumed');
+            cLog('resumed');
             timer.resume();
         }
     }
 
     video.addEventListener('pause', () => {
         timer.pause();
-        console.log('paused');
+        cLog('paused');
     });
 }
