@@ -155,19 +155,17 @@
           return callback(remaining);
         };
       });
-    }
+    } // checkTimeRemainingForCategoryRestructure(category, time, timeframe, callback) {
+    //     super.query(this.tableName, 'category', (store) => {
+    //         var request = store.index('category').getAll([category]);
+    //         request.onsuccess = () => {
+    //             if (request.result.length === 0) return null;
+    //             const remaining = request.result[0].time_in_sec - time;
+    //             return remaining;
+    //         };
+    //     });
+    // }
 
-    checkTimeRemainingForCategoryRestructure(category, time, timeframe, callback) {
-      super.query(this.tableName, 'category', store => {
-        var request = store.index('category').getAll([category]);
-
-        request.onsuccess = () => {
-          if (request.result.length === 0) return null;
-          const remaining = request.result[0].time_in_sec - time;
-          return remaining;
-        };
-      });
-    }
 
   }
 
