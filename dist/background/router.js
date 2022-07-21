@@ -147,7 +147,7 @@
 
     checkTimeRemainingForAll(time, callback) {
       super.query(this.tableName, 'category', store => {
-        var request = store.index('category').getAll(['all']);
+        var request = store.index('category').getAll(['All']);
 
         request.onsuccess = () => {
           if (request.result.length === 0) return callback(null);

@@ -19,11 +19,11 @@ export function checkTimeRemaining(category) {
             if (window.ytData.settings.disableNotifications == 'true') return;
 
             if (res.data.timeRemaining <= 0) {
-                return mainNotification.createNoTimeNotification(category);
+                return mainNotification.createNoTimeNotification(res.data.ifSpecific ? category : 'today');
             }
 
             if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
-                return mainNotification.createLowTimeNotification(category);
+                return mainNotification.createLowTimeNotification(res.data.ifSpecific ? category : 'today');
             }
         }
     );

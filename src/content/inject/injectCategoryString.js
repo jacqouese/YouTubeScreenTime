@@ -3,7 +3,7 @@ import { checkCategory } from '../category/extractCategory';
 export function injectCategoryString() {
     const elem = document.querySelector('#info-strings') || null;
 
-    if (elem === null) return console.log('null on strings');
+    if (elem === null) return;
 
     const dot = document.createElement('span');
     dot.id = 'dot';

@@ -89,11 +89,11 @@
       if (window.ytData.settings.disableNotifications == 'true') return;
 
       if (res.data.timeRemaining <= 0) {
-        return mainNotification.createNoTimeNotification(category);
+        return mainNotification.createNoTimeNotification(res.data.ifSpecific ? category : 'today');
       }
 
       if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
-        return mainNotification.createLowTimeNotification(category);
+        return mainNotification.createLowTimeNotification(res.data.ifSpecific ? category : 'today');
       }
     });
   }
@@ -106,7 +106,7 @@
 
   function injectCategoryString() {
     const elem = document.querySelector('#info-strings') || null;
-    if (elem === null) return console.log('null on strings');
+    if (elem === null) return;
     const dot = document.createElement('span');
     dot.id = 'dot';
     dot.classList.add('style-scope');

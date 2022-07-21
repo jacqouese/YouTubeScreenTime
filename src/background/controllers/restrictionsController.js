@@ -51,13 +51,16 @@ class RestrictionsController {
                     console.log(timeRemaining);
                     restrictions.checkTimeRemainingForAll(time, (res) => {
                         let finalRemaining = timeRemaining;
+                        let ifSpecific = true;
                         if (res !== null) {
-                            finalRemaining = res < timeRemaining ? res : timeRemaining;
+                            finalRemaining = res > timeRemaining ? res : timeRemaining;
+                            ifSpecific = res > timeRemaining ? false : true;
                         }
 
                         sendResponse({
                             status: 200,
                             data: {
+                                ifSpecific: ifSpecific,
                                 timeRemaining: finalRemaining,
                             },
                         });
