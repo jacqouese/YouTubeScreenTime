@@ -1,3 +1,4 @@
+import { globalState, setState } from '../state/state';
 import { cLog } from '../utils/utils';
 
 export function checkTimeRemaining(category) {
@@ -19,10 +20,14 @@ export function checkTimeRemaining(category) {
             if (window.ytData.settings.disableNotifications == 'true') return;
 
             if (res.data.timeRemaining <= 0) {
+                if (globalState.hasShownNotification.state === true) return;
+                setState('hasShownNotification', true);
                 return mainNotification.createNoTimeNotification(res.data.ifSpecific ? category : 'today');
             }
 
             if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
+                if (globalState.hasShownWarning.state === true) return;
+                setState('hasShownWarning', true);
                 return mainNotification.createLowTimeNotification(res.data.ifSpecific ? category : 'today');
             }
         }

@@ -17733,7 +17733,8 @@
 
 
         const formatedTime = secondsToHms(restriction.time_in_sec);
-        const periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
+        let periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
+        if (restriction.category === 'All') periodObject = window.ytData.dayTotalCategory.time || null;
         const formatedWatchtime = secondsToHms(periodObject);
         const HTMLinsert = `
         <tr>

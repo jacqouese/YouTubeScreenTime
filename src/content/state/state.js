@@ -1,15 +1,4 @@
-export const globalState = {
-    restrictedItems: {
-        state: [],
-        subscribers: [],
-        setState(state) {
-            this.state = state;
-            this.subscribers.forEach((elem) => {
-                elem();
-            });
-        },
-    },
-};
+export const globalState = {};
 
 export const updater = (callback, state) => {
     callback();
@@ -22,7 +11,6 @@ export const updater = (callback, state) => {
 };
 
 export const setState = (state, value) => {
-    console.log('state change', state, value);
     if (state in globalState) {
         globalState[state].setState(value);
     } else {

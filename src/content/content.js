@@ -10,6 +10,7 @@ import { listenForSettingChanges } from './settings/listenForSettingChanges';
 import { notificationService } from './service/notificationService';
 import { cLog, isVideoLoaded } from './utils/utils';
 import { injectCategoryString } from './inject/injectCategoryString';
+import { globalState, setState, updater } from './state/state';
 
 let video = document.getElementsByTagName('video')[-1] || null;
 const hook = document.querySelector('#count');
@@ -28,10 +29,6 @@ listenForFirstVideo((foundVideo) => {
     // get category from YouTube
     chrome.storage.sync.set({ currentCategory: checkCategory() });
 
-    setTimeout(() => {
-        checkTimeRemaining(checkCategory());
-    }, 1000);
-
     if (window.ytData.settings.displayCategory == 'true') {
         let pageLoadInterval = null;
         const waitUntilPageLoaded = () => {
@@ -43,7 +40,8 @@ listenForFirstVideo((foundVideo) => {
 
         pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
     }
-
+    setState('hasShownNotification', false);
+    setState('hasShownWarning', false);
     // interval with play / pause ability
     const timer = new intervalTimer(() => {
         cLog(timer.time++);
@@ -53,7 +51,7 @@ listenForFirstVideo((foundVideo) => {
             sendToDB(timer.time, getDate(), checkCategory());
             timer.time = 0;
         }
-        if (timer.time === 0) {
+        if (timer.time === 2) {
             checkTimeRemaining(checkCategory());
         }
     }, 1000);

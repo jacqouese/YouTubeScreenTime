@@ -74,6 +74,26 @@
     });
   }
 
+  const globalState = {};
+  const setState = (state, value) => {
+    if (state in globalState) {
+      globalState[state].setState(value);
+    } else {
+      globalState[state] = {
+        state: value,
+        subscribers: [],
+
+        setState(state) {
+          this.state = state;
+          this.subscribers.forEach(elem => {
+            elem();
+          });
+        }
+
+      };
+    }
+  };
+
   function checkTimeRemaining(category) {
     chrome.runtime.sendMessage({
       for: 'background',
@@ -89,10 +109,14 @@
       if (window.ytData.settings.disableNotifications == 'true') return;
 
       if (res.data.timeRemaining <= 0) {
+        if (globalState.hasShownNotification.state === true) return;
+        setState('hasShownNotification', true);
         return mainNotification.createNoTimeNotification(res.data.ifSpecific ? category : 'today');
       }
 
       if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
+        if (globalState.hasShownWarning.state === true) return;
+        setState('hasShownWarning', true);
         return mainNotification.createLowTimeNotification(res.data.ifSpecific ? category : 'today');
       }
     });
@@ -153,7 +177,7 @@
       if (video.src === '') {
         if (timer.isResumed === true) {
           timer.pause();
-          sendToDB(timer.time, getDate(), checkCategory(), alreadyShownNotification);
+          sendToDB(timer.time, getDate(), checkCategory());
           timer.time = 0;
         }
       }
@@ -161,6 +185,8 @@
 
     chrome.runtime.onMessage.addListener(req => {
       if (req.type === 'newURL') {
+        setState('hasShownNotification', false);
+
         if (window.ytData.settings.displayCategory == 'true') ;
       }
 
@@ -294,9 +320,6 @@
     chrome.storage.sync.set({
       currentCategory: checkCategory()
     });
-    setTimeout(() => {
-      checkTimeRemaining(checkCategory());
-    }, 1000);
 
     if (window.ytData.settings.displayCategory == 'true') {
       let pageLoadInterval = null;
@@ -309,8 +332,10 @@
       };
 
       pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
-    } // interval with play / pause ability
+    }
 
+    setState('hasShownNotification', false);
+    setState('hasShownWarning', false); // interval with play / pause ability
 
     const timer = new intervalTimer(() => {
       cLog(timer.time++); // autosave every 60 seconds
@@ -320,7 +345,7 @@
         timer.time = 0;
       }
 
-      if (timer.time === 0) {
+      if (timer.time === 2) {
         checkTimeRemaining(checkCategory());
       }
     }, 1000);

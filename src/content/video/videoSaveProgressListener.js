@@ -2,6 +2,7 @@ import { checkTimeRemaining } from '../api/checkTimeRemaining';
 import { checkCategory } from '../category/extractCategory';
 import { getDate } from '../helpers/getDate';
 import { injectCategoryString } from '../inject/injectCategoryString';
+import { setState } from '../state/state';
 
 export function sendToDB(time, date, category) {
     if (category === undefined || time === 0) return;
@@ -38,7 +39,7 @@ export function videoSaveProgressListener(video, timer, category) {
         if (video.src === '') {
             if (timer.isResumed === true) {
                 timer.pause();
-                sendToDB(timer.time, getDate(), checkCategory(), alreadyShownNotification);
+                sendToDB(timer.time, getDate(), checkCategory());
                 timer.time = 0;
             }
         }
@@ -47,6 +48,7 @@ export function videoSaveProgressListener(video, timer, category) {
     // when url changes
     chrome.runtime.onMessage.addListener((req) => {
         if (req.type === 'newURL') {
+            setState('hasShownNotification', false);
             if (window.ytData.settings.displayCategory == 'true') {
                 // setTimeout(() => {
                 //     injectCategoryString();
