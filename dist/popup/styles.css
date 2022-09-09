@@ -328,7 +328,7 @@ td {
 }
 
 .focus-tab {
-  margin-top: 60px;
+  margin-top: 50px;
 }
 
 .focus-whitelist {
@@ -339,6 +339,19 @@ td {
   position: absolute;
   max-width: 330px;
   bottom: 20px;
+}
+
+.whitelist-list-table-container {
+  max-height: 400px;
+  overflow-y: scroll; 
+}
+
+.whitelist-list-table-container table {
+  margin-top: 10px;
+}
+
+.whitelist-list-table-container tr {
+  cursor: pointer;
 }
 
 .settings-block {

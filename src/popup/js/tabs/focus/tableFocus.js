@@ -1,3 +1,5 @@
+import youtubeCategoryIcons from '../../../data/youtubeCategoryIcons';
+
 export function tableFocus(whitelisted, allCategories) {
     const focusTable = document.querySelector('#table-focus');
 
@@ -43,5 +45,34 @@ export function tableFocus(whitelisted, allCategories) {
         </tr>`;
 
         focusTable.innerHTML += HTMLinsert;
+    });
+
+    const popupWhitelistTable = document.querySelector('#table-whitelist');
+
+    popupWhitelistTable.innerHTML = '';
+
+    allCategories.forEach((elem) => {
+        // do not show already restricted items
+        if (elem in whitelisted) return;
+
+        const HTMLinsert = `
+        <tr>
+            <td>
+                <div class="table-inner-wrapper">
+                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons[elem]} ${elem}</span>
+                    <span>></span>
+                </div>
+            </td>
+        </tr>`;
+
+        popupWhitelistTable.innerHTML += HTMLinsert;
+    });
+
+    popupWhitelistTable.querySelectorAll('td').forEach((elem) => {
+        elem.addEventListener('click', () => {
+            const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
+
+            document.querySelector('.popup-section-whitelist').classList.remove('show');
+        });
     });
 }

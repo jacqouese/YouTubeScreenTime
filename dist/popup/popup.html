@@ -93,10 +93,11 @@
             </div>
         </div>
         <section class="popup-section">
-    <p class="back-btn">< back</p>
-    <h1>You're restricting: <span id="restriction-name"></span></h1>
+  <p class="back-btn">
+    < go back</p>
+      <h1>You're restricting: <span id="restriction-name"></span></h1>
 
-    <div class="tabs" id='restrict-tabs'>
+      <div class="tabs" id='restrict-tabs'>
   <div class="tabs-elements">
     <p class="active">Daily</p>
     <p></p>
@@ -106,14 +107,14 @@
   <hr>
 </div>
 
-    <div class="popup-inputs">
+      <div class="popup-inputs">
         <input type="number" class="time-input time-input-hours">
         hours
         <input type="number" class="time-input time-input-minutes">
         minutes
-    </div>
-    <button id="restrict-btn">Restrict</button>
-    </section>
+      </div>
+      <button id="restrict-btn">Restrict</button>
+</section>
     </div>
 </section>
       <section class="main-tabs-tab-content" id="tab-content-focus">
@@ -143,8 +144,17 @@
             <button id="whitelist-btn">Add to whitelist</button>
         </div>
         <section class="popup-section-whitelist">
-    <p class="back-btn" id="whitelist-back-btn">go back</p>
-    <h1>Choose a category to whitelist</h1>
+    <p class="back-btn" id="whitelist-back-btn">
+        < go back</p>
+            <h1>Choose a category to whitelist</h1>
+
+            <div>
+                <div class="whitelist-list-table-container">
+                    <table class="table-whitelist" id="table-whitelist">
+                        <!-- populated by js -->
+                    </table>
+                </div>
+            </div>
 
 
 </section>

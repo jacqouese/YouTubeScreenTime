@@ -17566,7 +17566,7 @@
       });
     }
 
-    const youtubeCategoryIcons$1 = {
+    const youtubeCategoryIcons = {
       All: '📖',
       'Film & Animation': '🎬',
       'Autos & Vehicles': '🚗',
@@ -17648,7 +17648,7 @@
     <td>
     <div class="detailed-elem">
       <div class="detailed-color-box">
-        ${youtubeCategoryIcons$1[innerArray[0]]}
+        ${youtubeCategoryIcons[innerArray[0]]}
       </div>
       <div class="detailed-category">
         ${innerArray[0]}
@@ -17789,7 +17789,7 @@
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="longer">${youtubeCategoryIcons$1[restriction.category]} ${restriction.category}</span>
+                    <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
                     <span>${formatedWatchtime} / ${formatedTime}</span>
                     <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
@@ -17806,7 +17806,7 @@
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons$1[elem]} ${elem}</span>
+                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons[elem]} ${elem}</span>
                     <span>></span>
                 </div>
             </td>
@@ -17937,6 +17937,28 @@
             </td>
         </tr>`;
         focusTable.innerHTML += HTMLinsert;
+      });
+      const popupWhitelistTable = document.querySelector('#table-whitelist');
+      popupWhitelistTable.innerHTML = '';
+      allCategories.forEach(elem => {
+        // do not show already restricted items
+        if (elem in whitelisted) return;
+        const HTMLinsert = `
+        <tr>
+            <td>
+                <div class="table-inner-wrapper">
+                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons[elem]} ${elem}</span>
+                    <span>></span>
+                </div>
+            </td>
+        </tr>`;
+        popupWhitelistTable.innerHTML += HTMLinsert;
+      });
+      popupWhitelistTable.querySelectorAll('td').forEach(elem => {
+        elem.addEventListener('click', () => {
+          const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
+          document.querySelector('.popup-section-whitelist').classList.remove('show');
+        });
       });
     }
 
