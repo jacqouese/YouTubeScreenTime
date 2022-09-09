@@ -1,4 +1,5 @@
 import youtubeCategoryIcons from '../../../data/youtubeCategoryIcons';
+import { dataRequest } from '../../services/dataRequest';
 
 export function tableFocus(whitelisted, allCategories) {
     const focusTable = document.querySelector('#table-focus');
@@ -24,19 +25,11 @@ export function tableFocus(whitelisted, allCategories) {
             if (index > -1) allCategories.splice(index, 1);
         }
 
-        // populate table
-        const formatedTime = secondsToHms(restriction.time_in_sec);
-
-        let periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
-        if (restriction.category === 'All') periodObject = window.ytData.dayTotalCategory.time || null;
-
-        const formatedWatchtime = secondsToHms(periodObject);
         const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
                     <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
-                    <span>${formatedWatchtime} / ${formatedTime}</span>
                     <span class="delete-restriction" att-restriction="${
                         restriction.category
                     }"><img src="./assets/remove.png" alt="x"></span>
@@ -70,7 +63,11 @@ export function tableFocus(whitelisted, allCategories) {
 
     popupWhitelistTable.querySelectorAll('td').forEach((elem) => {
         elem.addEventListener('click', () => {
-            const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
+            const category = elem.querySelector('.restriction-name').getAttribute('att-name');
+
+            dataRequest.call({ type: 'whitelist/create', body: { category: category } }, (res) => {
+                console.log(res);
+            });
 
             document.querySelector('.popup-section-whitelist').classList.remove('show');
         });

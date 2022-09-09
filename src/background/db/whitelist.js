@@ -18,6 +18,7 @@ class Whitelist extends DBModel {
 
     addWhitelist(category) {
         super.query(this.tableName, 'category', (store) => {
+            console.log(category);
             var request = store.index('category').get(category);
             request.onsuccess = () => {
                 store.put({

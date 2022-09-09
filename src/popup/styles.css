@@ -310,7 +310,7 @@ td {
   overflow-y: scroll;
 }
 
-.table-restrict .table-inner-wrapper {
+.table-inner-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -319,7 +319,7 @@ td {
   cursor: pointer;
 }
 
-.table-restrict img {
+.table-restrict img, .table-focus img {
   width: 15px;
 }
 

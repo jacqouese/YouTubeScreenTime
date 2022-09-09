@@ -589,6 +589,7 @@
 
       addWhitelist(category) {
         super.query(this.tableName, 'category', store => {
+          console.log(category);
           var request = store.index('category').get(category);
 
           request.onsuccess = () => {
@@ -616,7 +617,7 @@
       }
 
       create(request, sendResponse) {
-        whitelist.addWatched(request.body.category, request.body.date, request.body.time, () => {
+        whitelist.addWhitelist(request.body.category, () => {
           sendResponse({
             status: 200,
             data: {}

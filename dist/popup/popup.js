@@ -4,7 +4,7 @@
     (global = global || self, factory(global.popup = {}));
 }(this, (function (exports) { 'use strict';
 
-    function secondsToHms$1(d) {
+    function secondsToHms(d) {
       d = Number(d);
       var h = Math.floor(d / 3600);
       var m = Math.floor(d % 3600 / 60);
@@ -119,7 +119,7 @@
         }
       }, res => {
         window.ytData.dayTotalCategory = res.data;
-        document.querySelector('#top-stats-day').innerHTML = secondsToHms$1(res.data.time);
+        document.querySelector('#top-stats-day').innerHTML = secondsToHms(res.data.time);
         const percent = document.querySelector('#top-stats-day-percent');
         percent.innerHTML = res.data.percentChange + '%';
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
@@ -132,7 +132,7 @@
         }
       }, res => {
         window.ytData.weekTotalCategory = res.data;
-        document.querySelector('#top-stats-week').innerHTML = secondsToHms$1(res.data.time);
+        document.querySelector('#top-stats-week').innerHTML = secondsToHms(res.data.time);
         const percent = document.querySelector('#top-stats-week-percent');
         percent.innerHTML = res.data.percentChange + '%';
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
@@ -145,7 +145,7 @@
         }
       }, res => {
         window.ytData.monthTotalCategory = res.data;
-        document.querySelector('#top-stats-month').innerHTML = secondsToHms$1(res.data.time);
+        document.querySelector('#top-stats-month').innerHTML = secondsToHms(res.data.time);
         const percent = document.querySelector('#top-stats-month-percent');
         percent.innerHTML = res.data.percentChange + '%';
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
@@ -17642,7 +17642,7 @@
         if (innerArray[1] < 60) return; // if shorter than 1 min
 
         const formatedValue = (innerArray[1] - minValue) / (maxValue - minValue) * 100;
-        var userFriendlyTime = secondsToHms$1(formatedProgressValues[i][1]);
+        var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
         const HTMLinsert = `
     <tr>
     <td>
@@ -17781,10 +17781,10 @@
         } // populate table
 
 
-        const formatedTime = secondsToHms$1(restriction.time_in_sec);
+        const formatedTime = secondsToHms(restriction.time_in_sec);
         let periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
         if (restriction.category === 'All') periodObject = window.ytData.dayTotalCategory.time || null;
-        const formatedWatchtime = secondsToHms$1(periodObject);
+        const formatedWatchtime = secondsToHms(periodObject);
         const HTMLinsert = `
         <tr>
             <td>
@@ -17919,19 +17919,13 @@
         if (allCategories.includes(restriction.category)) {
           const index = allCategories.indexOf(restriction.category);
           if (index > -1) allCategories.splice(index, 1);
-        } // populate table
+        }
 
-
-        const formatedTime = secondsToHms(restriction.time_in_sec);
-        let periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
-        if (restriction.category === 'All') periodObject = window.ytData.dayTotalCategory.time || null;
-        const formatedWatchtime = secondsToHms(periodObject);
         const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
                     <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
-                    <span>${formatedWatchtime} / ${formatedTime}</span>
                     <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
             </td>
@@ -17956,7 +17950,15 @@
       });
       popupWhitelistTable.querySelectorAll('td').forEach(elem => {
         elem.addEventListener('click', () => {
-          const restrictionName = elem.querySelector('.restriction-name').getAttribute('att-name');
+          const category = elem.querySelector('.restriction-name').getAttribute('att-name');
+          dataRequest.call({
+            type: 'whitelist/create',
+            body: {
+              category: category
+            }
+          }, res => {
+            console.log(res);
+          });
           document.querySelector('.popup-section-whitelist').classList.remove('show');
         });
       });
