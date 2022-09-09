@@ -21,6 +21,17 @@ export function restrictTable(myRestrictions, restrictionList) {
 
     restrictedTable.innerHTML = '';
 
+    if (myRestrictions.length === 0) {
+        const HTMLinsert = `
+        <tr>
+            <td>
+                <span>No restrictions added</span>
+            </td>
+        </tr>`;
+
+        restrictedTable.innerHTML = HTMLinsert;
+    }
+
     myRestrictions.forEach((restriction) => {
         // remove duplicates from table by removing already added restrictions
         if (restrictionList.includes(restriction.category)) {

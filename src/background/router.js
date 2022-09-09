@@ -1,8 +1,7 @@
 import restrictionsController from './controllers/restrictionsController';
 import settingsController from './controllers/settingsController';
 import watchtimeController from './controllers/watchtimeController';
-import restrictions from './db/restrictions';
-import watchtime from './db/watchtime';
+import whitelistController from './controllers/whitelistController';
 import route from './route';
 
 const router = (request, sendResponse) => {
@@ -28,6 +27,14 @@ const router = (request, sendResponse) => {
 
     route('restrictions/timeremaining', () => {
         restrictionsController.indexTimeRemaining(request, sendResponse);
+    });
+
+    route('whitelist/get', () => {
+        whitelistController.index(request, sendResponse);
+    });
+
+    route('whitelist/create', () => {
+        whitelistController.create(request, sendResponse);
     });
 
     route('settings/update', () => {

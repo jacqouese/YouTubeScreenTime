@@ -1,0 +1,24 @@
+<section class="main-tabs-tab-content" id="tab-content-focus">
+    <div class="focus-inner">
+        <div class="focus-tab">
+            <table class="table-restrict">
+                <tr>
+                    <td>
+                        <div class="table-inner-wrapper">
+                            <span>Focus mode</span>
+                            <span>@@include('../settings/switch/index.html', {"switch-name": "Focus mode",})</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div class="focus-whitelist">
+                <h5>Whitelisted categories</h5>
+                <table class="table-focus" id="table-focus">
+                    <!-- populated by js -->
+                </table>
+            </div>
+            <button id="whitelist-btn">Add to whitelist</button>
+        </div>
+        @@include('./addWhitelist/index.html')
+    </div>
+</section>

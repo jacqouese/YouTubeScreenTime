@@ -297,8 +297,7 @@ td {
   border-radius: 2px;
 }
 
-/* restrict */
-.my-restrictions {
+.my-restrictions{
   margin-top: 30px;
 }
 
@@ -326,6 +325,20 @@ td {
 
 #table-restricted div span.longer {
   width: 40%;
+}
+
+.focus-tab {
+  margin-top: 60px;
+}
+
+.focus-whitelist {
+  margin-top: 40px;
+}
+
+#whitelist-btn {
+  position: absolute;
+  max-width: 330px;
+  bottom: 20px;
 }
 
 .settings-block {
@@ -369,4 +382,19 @@ input::-webkit-inner-spin-button {
 
 .popup-section button {
   margin-top: 230px;
+}
+
+.popup-section-whitelist {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 80%;
+  padding: 10px 20px;
+  background-color: var(--bg);
+}
+
+.popup-section-whitelist.show {
+  display: block;
 }

@@ -7,14 +7,13 @@ function handleMainTabs() {
     const tabs = Array.from(tabsElement.children[0].children);
 
     tabs.forEach((tab) => {
-        const tabContents = document.querySelectorAll(
-            `.${tabsElement.id}-tab-content`
-        );
-        // determine tab id
+        const tabContents = document.querySelectorAll(`.${tabsElement.id}-tab-content`);
+
         let tabContent = tab.innerHTML;
         tabContent = tabContent.toLowerCase();
         const tabId = `tab-content-${tabContent}`;
         const tabContentCurrent = document.querySelector(`#${tabId}`);
+        console.log(tabContentCurrent);
 
         tab.addEventListener('click', () => {
             // remove active class from all elements
@@ -32,16 +31,12 @@ function handleMainTabs() {
     });
 }
 
-// handle detailed category content
 function handleDetailedCategoryTabs() {
-    const tabs = Array.from(
-        document.querySelector('#chart-tabs').children[0].children
-    );
+    const tabs = Array.from(document.querySelector('#chart-tabs').children[0].children);
     tabs.forEach((tab) => {
         tab.addEventListener('click', () => {
             const period = tab.innerHTML.toLowerCase();
             detailedTableLogic(period);
-            // chartLogic();
 
             tabs.forEach((tabInner) => {
                 tabInner.classList.remove('active');

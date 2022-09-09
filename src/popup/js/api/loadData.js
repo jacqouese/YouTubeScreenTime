@@ -3,6 +3,7 @@ import { secondsToHms } from '../helpers/secondsToHms';
 import { requestAllRestricions } from './requestAllRestrictions';
 import { getUserSettings } from './getUserSettings';
 import { globalState, setState, updater } from '../state/state';
+import { dataRequest } from '../services/dataRequest';
 
 export function loadData(callback) {
     // initialize global object
@@ -25,7 +26,7 @@ export function loadData(callback) {
     });
 
     // request total for each period
-    requestTotal('day', (res) => {
+    dataRequest.call({ type: 'watchtime/get', body: { period: 'day', category: 'all' } }, (res) => {
         window.ytData.dayTotalCategory = res.data;
         document.querySelector('#top-stats-day').innerHTML = secondsToHms(res.data.time);
         const percent = document.querySelector('#top-stats-day-percent');
@@ -33,7 +34,7 @@ export function loadData(callback) {
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
     });
 
-    requestTotal('week', (res) => {
+    dataRequest.call({ type: 'watchtime/get', body: { period: 'week', category: 'all' } }, (res) => {
         window.ytData.weekTotalCategory = res.data;
         document.querySelector('#top-stats-week').innerHTML = secondsToHms(res.data.time);
         const percent = document.querySelector('#top-stats-week-percent');
@@ -41,7 +42,7 @@ export function loadData(callback) {
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
     });
 
-    requestTotal('month', (res) => {
+    dataRequest.call({ type: 'watchtime/get', body: { period: 'month', category: 'all' } }, (res) => {
         window.ytData.monthTotalCategory = res.data;
         document.querySelector('#top-stats-month').innerHTML = secondsToHms(res.data.time);
         const percent = document.querySelector('#top-stats-month-percent');
@@ -50,9 +51,14 @@ export function loadData(callback) {
         callback();
     });
 
-    requestAllRestricions((res) => {
+    dataRequest.call({ type: 'restriction/get' }, (res) => {
         window.ytData.allRestrictions = res.data.restrictions;
         globalState.restrictedItems.setState(res.data.restrictions);
+    });
+
+    dataRequest.call({ type: 'whitelist/get' }, (res) => {
+        window.ytData.whitelistedItems = res.data.whitelist;
+        globalState.whitelistedItems.setState(res.data.whitelist);
     });
 
     // load settings

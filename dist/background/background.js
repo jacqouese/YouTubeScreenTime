@@ -32,13 +32,21 @@
       });
       index = store.createIndex('category', ['category'], {
         unique: true
+      }); // create whitelist table
+
+      store = db.createObjectStore('whitelist', {
+        keyPath: 'id',
+        autoIncrement: true
+      });
+      index = store.createIndex('category', ['category'], {
+        unique: true
       });
     }
 
     class DBModel {
       constructor() {
         this.dbName = 'YouTubeScreenTime';
-        this.dbVersion = 1;
+        this.dbVersion = 1.1;
       }
 
       query(tableName, tableIndex, callback) {
@@ -562,6 +570,64 @@
 
     var watchtimeController = new WatchtimeController();
 
+    class Whitelist extends DBModel {
+      constructor() {
+        super();
+        this.tableName = 'whitelist';
+      }
+
+      getWhitelist(callback) {
+        super.query(this.tableName, 'category', store => {
+          var request = store.index('category').getAll();
+
+          request.onsuccess = () => {
+            console.log(request.result);
+            callback(request.result);
+          };
+        });
+      }
+
+      addWhitelist(category) {
+        super.query(this.tableName, 'category', store => {
+          var request = store.index('category').get(category);
+
+          request.onsuccess = () => {
+            store.put({
+              category: category
+            });
+          };
+        });
+      }
+
+    }
+
+    var whitelist = new Whitelist();
+
+    class WhitelistController {
+      index(request, sendResponse) {
+        whitelist.getWhitelist(res => {
+          sendResponse({
+            status: 200,
+            data: {
+              whitelist: res
+            }
+          });
+        });
+      }
+
+      create(request, sendResponse) {
+        whitelist.addWatched(request.body.category, request.body.date, request.body.time, () => {
+          sendResponse({
+            status: 200,
+            data: {}
+          });
+        });
+      }
+
+    }
+
+    var whitelistController = new WhitelistController();
+
     const router = (request, sendResponse) => {
       route('watchtime/create', () => {
         watchtimeController.create(request, sendResponse);
@@ -580,6 +646,12 @@
       });
       route('restrictions/timeremaining', () => {
         restrictionsController.indexTimeRemaining(request, sendResponse);
+      });
+      route('whitelist/get', () => {
+        whitelistController.index(request, sendResponse);
+      });
+      route('whitelist/create', () => {
+        whitelistController.create(request, sendResponse);
       });
       route('settings/update', () => {
         settingsController.update(request, sendResponse);

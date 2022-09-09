@@ -4,21 +4,7 @@
     (global = global || self, factory(global.popup = {}));
 }(this, (function (exports) { 'use strict';
 
-    function requestTotal(period, callback) {
-      chrome.extension.sendMessage({
-        type: 'watchtime/get',
-        body: {
-          period: period,
-          category: 'all'
-        }
-      }, function (res) {
-        console.log(period);
-        if (res.error) return console.error('Error in: watchtime/get');
-        typeof callback === 'function' && callback(res);
-      });
-    }
-
-    function secondsToHms(d) {
+    function secondsToHms$1(d) {
       d = Number(d);
       var h = Math.floor(d / 3600);
       var m = Math.floor(d % 3600 / 60);
@@ -66,6 +52,18 @@
           });
         }
 
+      },
+      whitelistedItems: {
+        state: [],
+        subscribers: [],
+
+        setState(state) {
+          this.state = state;
+          this.subscribers.forEach(elem => {
+            elem();
+          });
+        }
+
       }
     };
     const updater = (callback, state) => {
@@ -78,6 +76,22 @@
 
       globalState[state].subscribers.push(callback);
     };
+
+    class dataRequest {
+      static call({
+        type,
+        body
+      }, callback) {
+        chrome.extension.sendMessage({
+          type: type,
+          body: body
+        }, res => {
+          if (res.error) return console.error('Error in: ' + type, res.error);
+          typeof callback === 'function' && callback(res);
+        });
+      }
+
+    }
 
     function loadData(callback) {
       // initialize global object
@@ -97,31 +111,57 @@
         }
       }); // request total for each period
 
-      requestTotal('day', res => {
+      dataRequest.call({
+        type: 'watchtime/get',
+        body: {
+          period: 'day',
+          category: 'all'
+        }
+      }, res => {
         window.ytData.dayTotalCategory = res.data;
-        document.querySelector('#top-stats-day').innerHTML = secondsToHms(res.data.time);
+        document.querySelector('#top-stats-day').innerHTML = secondsToHms$1(res.data.time);
         const percent = document.querySelector('#top-stats-day-percent');
         percent.innerHTML = res.data.percentChange + '%';
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
       });
-      requestTotal('week', res => {
+      dataRequest.call({
+        type: 'watchtime/get',
+        body: {
+          period: 'week',
+          category: 'all'
+        }
+      }, res => {
         window.ytData.weekTotalCategory = res.data;
-        document.querySelector('#top-stats-week').innerHTML = secondsToHms(res.data.time);
+        document.querySelector('#top-stats-week').innerHTML = secondsToHms$1(res.data.time);
         const percent = document.querySelector('#top-stats-week-percent');
         percent.innerHTML = res.data.percentChange + '%';
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
       });
-      requestTotal('month', res => {
+      dataRequest.call({
+        type: 'watchtime/get',
+        body: {
+          period: 'month',
+          category: 'all'
+        }
+      }, res => {
         window.ytData.monthTotalCategory = res.data;
-        document.querySelector('#top-stats-month').innerHTML = secondsToHms(res.data.time);
+        document.querySelector('#top-stats-month').innerHTML = secondsToHms$1(res.data.time);
         const percent = document.querySelector('#top-stats-month-percent');
         percent.innerHTML = res.data.percentChange + '%';
         if (res.data.percentChange < 0) percent.classList.add('percent-down');
         callback();
       });
-      requestAllRestricions(res => {
+      dataRequest.call({
+        type: 'restriction/get'
+      }, res => {
         window.ytData.allRestrictions = res.data.restrictions;
         globalState.restrictedItems.setState(res.data.restrictions);
+      });
+      dataRequest.call({
+        type: 'whitelist/get'
+      }, res => {
+        window.ytData.whitelistedItems = res.data.whitelist;
+        globalState.whitelistedItems.setState(res.data.whitelist);
       }); // load settings
 
       getUserSettings('displayCategory', res => {
@@ -17526,7 +17566,7 @@
       });
     }
 
-    const youtubeCategoryIcons = {
+    const youtubeCategoryIcons$1 = {
       All: '📖',
       'Film & Animation': '🎬',
       'Autos & Vehicles': '🚗',
@@ -17602,13 +17642,13 @@
         if (innerArray[1] < 60) return; // if shorter than 1 min
 
         const formatedValue = (innerArray[1] - minValue) / (maxValue - minValue) * 100;
-        var userFriendlyTime = secondsToHms(formatedProgressValues[i][1]);
+        var userFriendlyTime = secondsToHms$1(formatedProgressValues[i][1]);
         const HTMLinsert = `
     <tr>
     <td>
     <div class="detailed-elem">
       <div class="detailed-color-box">
-        ${youtubeCategoryIcons[innerArray[0]]}
+        ${youtubeCategoryIcons$1[innerArray[0]]}
       </div>
       <div class="detailed-category">
         ${innerArray[0]}
@@ -17636,12 +17676,12 @@
       const tabsElement = document.querySelector('#main-tabs');
       const tabs = Array.from(tabsElement.children[0].children);
       tabs.forEach(tab => {
-        const tabContents = document.querySelectorAll(`.${tabsElement.id}-tab-content`); // determine tab id
-
+        const tabContents = document.querySelectorAll(`.${tabsElement.id}-tab-content`);
         let tabContent = tab.innerHTML;
         tabContent = tabContent.toLowerCase();
         const tabId = `tab-content-${tabContent}`;
         const tabContentCurrent = document.querySelector(`#${tabId}`);
+        console.log(tabContentCurrent);
         tab.addEventListener('click', () => {
           // remove active class from all elements
           tabContents.forEach(tabContent => {
@@ -17655,16 +17695,14 @@
           tab.classList.add('active');
         });
       });
-    } // handle detailed category content
-
+    }
 
     function handleDetailedCategoryTabs() {
       const tabs = Array.from(document.querySelector('#chart-tabs').children[0].children);
       tabs.forEach(tab => {
         tab.addEventListener('click', () => {
           const period = tab.innerHTML.toLowerCase();
-          detailedTableLogic(period); // chartLogic();
-
+          detailedTableLogic(period);
           tabs.forEach(tabInner => {
             tabInner.classList.remove('active');
           }); // append active class to active element
@@ -17724,6 +17762,17 @@
     function restrictTable(myRestrictions, restrictionList) {
       const restrictedTable = document.querySelector('#table-restricted');
       restrictedTable.innerHTML = '';
+
+      if (myRestrictions.length === 0) {
+        const HTMLinsert = `
+        <tr>
+            <td>
+                <span>No restrictions added</span>
+            </td>
+        </tr>`;
+        restrictedTable.innerHTML = HTMLinsert;
+      }
+
       myRestrictions.forEach(restriction => {
         // remove duplicates from table by removing already added restrictions
         if (restrictionList.includes(restriction.category)) {
@@ -17732,15 +17781,15 @@
         } // populate table
 
 
-        const formatedTime = secondsToHms(restriction.time_in_sec);
+        const formatedTime = secondsToHms$1(restriction.time_in_sec);
         let periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
         if (restriction.category === 'All') periodObject = window.ytData.dayTotalCategory.time || null;
-        const formatedWatchtime = secondsToHms(periodObject);
+        const formatedWatchtime = secondsToHms$1(periodObject);
         const HTMLinsert = `
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
+                    <span class="longer">${youtubeCategoryIcons$1[restriction.category]} ${restriction.category}</span>
                     <span>${formatedWatchtime} / ${formatedTime}</span>
                     <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
                 </div>
@@ -17757,7 +17806,7 @@
         <tr>
             <td>
                 <div class="table-inner-wrapper">
-                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons[elem]} ${elem}</span>
+                    <span class="restriction-name" att-name="${elem}">${youtubeCategoryIcons$1[elem]} ${elem}</span>
                     <span>></span>
                 </div>
             </td>
@@ -17851,6 +17900,69 @@
       chartLogic();
     }
 
+    function tableFocus(whitelisted, allCategories) {
+      const focusTable = document.querySelector('#table-focus');
+      focusTable.innerHTML = '';
+
+      if (whitelisted.length === 0) {
+        const HTMLinsert = `
+        <tr>
+            <td>
+                <span>No whitelisted categories</span>
+            </td>
+        </tr>`;
+        focusTable.innerHTML = HTMLinsert;
+      }
+
+      whitelisted.forEach(restriction => {
+        // remove duplicates from table by removing already added restrictions
+        if (allCategories.includes(restriction.category)) {
+          const index = allCategories.indexOf(restriction.category);
+          if (index > -1) allCategories.splice(index, 1);
+        } // populate table
+
+
+        const formatedTime = secondsToHms(restriction.time_in_sec);
+        let periodObject = window.ytData.dayTotalCategory.categoryObject[restriction.category] || null;
+        if (restriction.category === 'All') periodObject = window.ytData.dayTotalCategory.time || null;
+        const formatedWatchtime = secondsToHms(periodObject);
+        const HTMLinsert = `
+        <tr>
+            <td>
+                <div class="table-inner-wrapper">
+                    <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
+                    <span>${formatedWatchtime} / ${formatedTime}</span>
+                    <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
+                </div>
+            </td>
+        </tr>`;
+        focusTable.innerHTML += HTMLinsert;
+      });
+    }
+
+    function handleWhitelistButton() {
+      const button = document.querySelector('#whitelist-btn');
+      button.addEventListener('click', () => {
+        document.querySelector('.popup-section-whitelist').classList.add('show');
+      });
+    }
+
+    function handlePopupBackButton() {
+      const button = document.querySelector('#whitelist-back-btn');
+      button.addEventListener('click', () => {
+        document.querySelector('.popup-section-whitelist').classList.remove('show');
+      });
+    }
+
+    function focus() {
+      updater(() => {
+        console.log(globalState);
+        tableFocus(globalState.whitelistedItems.state, youtubeCategories);
+      }, 'whitelistedItems');
+      handleWhitelistButton();
+      handlePopupBackButton();
+    }
+
     function main() {
       loadData(() => {
         // global elements logic
@@ -17859,6 +17971,7 @@
 
         stats();
         restrict();
+        focus();
       });
     }
     main();

@@ -5,17 +5,19 @@ import { tabLogic } from './js/globalLogic/tabLogic';
 
 import { restrict } from './js/tabs/restrict/restrict';
 import { stats } from './js/tabs/stats/stats';
+import { focus } from './js/tabs/focus/focus';
 
 export function main() {
-  loadData(() => {
-    // global elements logic
-    tabLogic();
-    switchLogic();
+    loadData(() => {
+        // global elements logic
+        tabLogic();
+        switchLogic();
 
-    // logic for each tab
-    stats();
-    restrict();
-  });
+        // logic for each tab
+        stats();
+        restrict();
+        focus();
+    });
 }
 
 main();

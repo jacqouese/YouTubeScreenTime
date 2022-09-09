@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <!-- Copyright © 2021 https://github.com/jacqouese All Rights Reserved. -->
 <html>
-  <head>
-    <meta charset='UTF-8' />
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <header>
-      <img src="./logo.png" alt="logo">
-      <h1>YouTube Screen Time</h1>
-    </header>
-    <main>
-      <div>
-        <div class="tabs" id='main-tabs'>
-    <div class="tabs-elements">
-      <p class="active">Stats</p>
-      <p>Restrict</p>
-      <p>Settings</p>
-    </div>
-    <hr>
+
+<head>
+  <meta charset='UTF-8' />
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header>
+    <img src="./logo.png" alt="logo">
+    <h1>YouTube Screen Time</h1>
+  </header>
+  <main>
+    <div>
+      <div class="tabs" id='main-tabs'>
+  <div class="tabs-elements">
+    <p class="active">Stats</p>
+    <p>Restrict</p>
+    <p>Focus</p>
+    <p>Settings</p>
   </div>
-        <section class="main-tabs-tab-content active" id="tab-content-stats">
+  <hr>
+</div>
+      <section class="main-tabs-tab-content active" id="tab-content-stats">
   <div class="top-stats">
     <div class="top-stats-elem">
       <div>
@@ -46,13 +49,14 @@
   </div>
   <div>
     <div class="tabs" id='chart-tabs'>
-    <div class="tabs-elements">
-      <p class="active">Day</p>
-      <p>Week</p>
-      <p>Month</p>
-    </div>
-    <hr>
+  <div class="tabs-elements">
+    <p class="active">Day</p>
+    <p>Week</p>
+    <p>Month</p>
+    <p>@@tab4</p>
   </div>
+  <hr>
+</div>
     <div class="chart-tabs-tab-content active" id="tab-content-day">
     <div class="chart-border">
         <div>
@@ -72,7 +76,7 @@
     </div>
   </div>
 </section>
-        <section class="main-tabs-tab-content" id="tab-content-restrict">
+      <section class="main-tabs-tab-content" id="tab-content-restrict">
     <div class="restrict-inner">
         <div class="my-restrictions">
             <h5>My restrictions</h5>
@@ -93,13 +97,14 @@
     <h1>You're restricting: <span id="restriction-name"></span></h1>
 
     <div class="tabs" id='restrict-tabs'>
-    <div class="tabs-elements">
-      <p class="active">Daily</p>
-      <p></p>
-      <p></p>
-    </div>
-    <hr>
+  <div class="tabs-elements">
+    <p class="active">Daily</p>
+    <p></p>
+    <p></p>
+    <p>@@tab4</p>
   </div>
+  <hr>
+</div>
 
     <div class="popup-inputs">
         <input type="number" class="time-input time-input-hours">
@@ -111,7 +116,41 @@
     </section>
     </div>
 </section>
-        <section class="main-tabs-tab-content" id="tab-content-settings">
+      <section class="main-tabs-tab-content" id="tab-content-focus">
+    <div class="focus-inner">
+        <div class="focus-tab">
+            <table class="table-restrict">
+                <tr>
+                    <td>
+                        <div class="table-inner-wrapper">
+                            <span>Focus mode</span>
+                            <span><div class="switch-container switch" att-switch-name="Focus mode">
+    <input type="checkbox" class="hidden-checkbox">
+    <div class="switch-track">
+        <div class="switch-head"></div>
+    </div>
+</div></span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div class="focus-whitelist">
+                <h5>Whitelisted categories</h5>
+                <table class="table-focus" id="table-focus">
+                    <!-- populated by js -->
+                </table>
+            </div>
+            <button id="whitelist-btn">Add to whitelist</button>
+        </div>
+        <section class="popup-section-whitelist">
+    <p class="back-btn" id="whitelist-back-btn">go back</p>
+    <h1>Choose a category to whitelist</h1>
+
+
+</section>
+    </div>
+</section>
+      <section class="main-tabs-tab-content" id="tab-content-settings">
     <div class="settings-block">
         <p class="small-sprint">
             Setting changes need page reload to take place
@@ -203,8 +242,9 @@
 
     </div>
 </section>
-      </div>
-    </main>
-  </body>
-  <script src="./popup.js"></script>
+    </div>
+  </main>
+</body>
+<script src="./popup.js"></script>
+
 </html>

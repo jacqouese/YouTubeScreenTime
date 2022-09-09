@@ -3,7 +3,7 @@ import { upgradeDB } from './upgradeDB';
 class DBModel {
     constructor() {
         this.dbName = 'YouTubeScreenTime';
-        this.dbVersion = 1;
+        this.dbVersion = 1.1;
     }
 
     query(tableName, tableIndex, callback) {

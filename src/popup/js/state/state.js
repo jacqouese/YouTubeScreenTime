@@ -9,6 +9,16 @@ export const globalState = {
             });
         },
     },
+    whitelistedItems: {
+        state: [],
+        subscribers: [],
+        setState(state) {
+            this.state = state;
+            this.subscribers.forEach((elem) => {
+                elem();
+            });
+        },
+    },
 };
 
 export const updater = (callback, state) => {

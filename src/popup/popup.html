@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <!-- Copyright © 2021 https://github.com/jacqouese All Rights Reserved. -->
 <html>
-  <head>
-    <meta charset='UTF-8' />
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <header>
-      <img src="./logo.png" alt="logo">
-      <h1>YouTube Screen Time</h1>
-    </header>
-    <main>
-      <div>
-        @@include('./components/tabs/index.html', {
-          "tab1": "Stats",
-          "tab2": "Restrict",
-          "tab3": "Settings",
-          "tabId": "main-tabs"
-        })
-        @@include('./components/tabScreens/stats/index.html')
-        @@include('./components/tabScreens/restrict/index.html')
-        @@include('./components/tabScreens/settings/index.html')
-      </div>
-    </main>
-  </body>
-  <script src="./popup.js"></script>
+
+<head>
+  <meta charset='UTF-8' />
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header>
+    <img src="./logo.png" alt="logo">
+    <h1>YouTube Screen Time</h1>
+  </header>
+  <main>
+    <div>
+      @@include('./components/tabs/index.html', {
+      "tab1": "Stats",
+      "tab2": "Restrict",
+      "tab3": "Focus",
+      "tab4": "Settings",
+      "tabId": "main-tabs"
+      })
+      @@include('./components/tabScreens/stats/index.html')
+      @@include('./components/tabScreens/restrict/index.html')
+      @@include('./components/tabScreens/focus/index.html')
+      @@include('./components/tabScreens/settings/index.html')
+    </div>
+  </main>
+</body>
+<script src="./popup.js"></script>
+
 </html>
