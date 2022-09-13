@@ -2,10 +2,7 @@ export function injectCategory(category) {
     // get video category by injecting JS
 
     setTimeout(() => {
-        console.log(
-            JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'],
-            'fromext'
-        );
+        console.log(JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'], 'fromext');
     }, 5000);
 
     const injectedCode = `
@@ -40,11 +37,11 @@ export function injectCategory(category) {
     document.body.appendChild(script);
 }
 export function checkCategory() {
-    // retrive video category
     const categoryScript = document.getElementById('scriptTag');
 
-    if (!categoryScript) return;
+    if (!categoryScript) return null;
 
-    // console.log(JSON.parse(categoryScript.innerHTML)['genre']);
-    return JSON.parse(categoryScript.innerHTML)['genre'];
+    const parsedCategory = JSON.parse(categoryScript.innerHTML)['genre'];
+
+    return parsedCategory;
 }

@@ -36,11 +36,10 @@
   }
 
   function checkCategory() {
-    // retrive video category
     const categoryScript = document.getElementById('scriptTag');
-    if (!categoryScript) return; // console.log(JSON.parse(categoryScript.innerHTML)['genre']);
-
-    return JSON.parse(categoryScript.innerHTML)['genre'];
+    if (!categoryScript) return null;
+    const parsedCategory = JSON.parse(categoryScript.innerHTML)['genre'];
+    return parsedCategory;
   }
 
   function isVideoLoaded() {
@@ -243,6 +242,9 @@
     getUserSettings('disableNotifications', res => {
       window.ytData.settings.disableNotifications = res.data.settingValue;
     });
+    getUserSettings('focusMode', res => {
+      window.ytData.settings.focusMode = res.data.settingValue;
+    });
     getUserSettings('isExtensionPaused', res => {
       window.ytData.settings.isExtensionPaused = res.data.settingValue;
     });
@@ -306,9 +308,21 @@
     };
   }
 
-  let video = document.getElementsByTagName('video')[-1] || null;
-  const hook = document.querySelector('#count'); // get settings from popup
+  function checkIfCanWatchInFocus(category, callback) {
+    chrome.runtime.sendMessage({
+      for: 'background',
+      type: 'whitelist/check',
+      body: {
+        category: category
+      }
+    }, res => {
+      if (res.data.canWatch === true) return callback(true);
+      return callback(false);
+    });
+  }
 
+  let video = document.getElementsByTagName('video')[-1] || null;
+  const hook = document.querySelector('#count');
   listenForSettingChanges();
   listenForFirstVideo(foundVideo => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;
@@ -347,6 +361,12 @@
 
       if (timer.time === 2) {
         checkTimeRemaining(checkCategory());
+
+        if (window.ytData.settings.focusMode == 'true') {
+          checkIfCanWatchInFocus(checkCategory(), res => {
+            if (res === false) console.log('not allowed in focus, redirecting...');
+          });
+        }
       }
     }, 1000);
     timer.pause(); // listen for play / pause

@@ -29,6 +29,17 @@ class WhitelistController {
             });
         });
     }
+
+    check(request, sendResponse) {
+        whitelist.checkIfCanWatch(request.body.category, (res) => {
+            sendResponse({
+                status: 200,
+                data: {
+                    canWatch: res,
+                },
+            });
+        });
+    }
 }
 
 export default new WhitelistController();

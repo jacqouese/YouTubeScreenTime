@@ -41,6 +41,18 @@ class Whitelist extends DBModel {
             };
         });
     }
+
+    checkIfCanWatch(category, callback) {
+        super.query(this.tableName, 'category', (store) => {
+            var request = store.index('category').getAll();
+            request.onsuccess = () => {
+                request.result.forEach((elem) => {
+                    if (elem.category === category) return callback(true);
+                });
+                return callback(false);
+            };
+        });
+    }
 }
 
 export default new Whitelist();

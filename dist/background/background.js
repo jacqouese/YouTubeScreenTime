@@ -615,6 +615,19 @@
         });
       }
 
+      checkIfCanWatch(category, callback) {
+        super.query(this.tableName, 'category', store => {
+          var request = store.index('category').getAll();
+
+          request.onsuccess = () => {
+            request.result.forEach(elem => {
+              if (elem.category === category) return callback(true);
+            });
+            return callback(false);
+          };
+        });
+      }
+
     }
 
     var whitelist = new Whitelist();
@@ -645,6 +658,17 @@
           sendResponse({
             status: 200,
             data: {}
+          });
+        });
+      }
+
+      check(request, sendResponse) {
+        whitelist.checkIfCanWatch(request.body.category, res => {
+          sendResponse({
+            status: 200,
+            data: {
+              canWatch: res
+            }
           });
         });
       }
@@ -680,6 +704,9 @@
       });
       route('whitelist/delete', () => {
         whitelistController.delete(request, sendResponse);
+      });
+      route('whitelist/check', () => {
+        whitelistController.check(request, sendResponse);
       });
       route('settings/update', () => {
         settingsController.update(request, sendResponse);

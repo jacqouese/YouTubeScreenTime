@@ -26,6 +26,10 @@ export function listenForSettingChanges() {
         window.ytData.settings.disableNotifications = res.data.settingValue;
     });
 
+    getUserSettings('focusMode', (res) => {
+        window.ytData.settings.focusMode = res.data.settingValue;
+    });
+
     getUserSettings('isExtensionPaused', (res) => {
         window.ytData.settings.isExtensionPaused = res.data.settingValue;
     });
