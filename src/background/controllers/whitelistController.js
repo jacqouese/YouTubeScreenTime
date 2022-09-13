@@ -20,6 +20,15 @@ class WhitelistController {
             });
         });
     }
+
+    delete(request, sendResponse) {
+        whitelist.deleteWhitelist(request.body.category, () => {
+            sendResponse({
+                status: 200,
+                data: {},
+            });
+        });
+    }
 }
 
 export default new WhitelistController();

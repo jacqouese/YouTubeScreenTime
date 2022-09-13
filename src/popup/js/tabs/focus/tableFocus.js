@@ -1,5 +1,6 @@
 import youtubeCategoryIcons from '../../../data/youtubeCategoryIcons';
 import { dataRequest } from '../../services/dataRequest';
+import { globalState } from '../../state/state';
 
 export function tableFocus(whitelisted, allCategories) {
     const focusTable = document.querySelector('#table-focus');
@@ -30,9 +31,10 @@ export function tableFocus(whitelisted, allCategories) {
             <td>
                 <div class="table-inner-wrapper">
                     <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
-                    <span class="delete-restriction" att-restriction="${
+                    <span class="delete-whitelist" att-restriction="${
                         restriction.category
-                    }"><img src="./assets/remove.png" alt="x"></span>
+                    }"><img src="./assets/remove.png" alt="x">
+                    </span>
                 </div>
             </td>
         </tr>`;
@@ -65,8 +67,11 @@ export function tableFocus(whitelisted, allCategories) {
         elem.addEventListener('click', () => {
             const category = elem.querySelector('.restriction-name').getAttribute('att-name');
 
-            dataRequest.call({ type: 'whitelist/create', body: { category: category } }, (res) => {
+            dataRequest.call({ type: 'whitelist/create', body: { category: category } });
+            dataRequest.call({ type: 'whitelist/get' }, (res) => {
                 console.log(res);
+                window.ytData.whitelistedItems = res.data.whitelist;
+                globalState.whitelistedItems.setState(res.data.whitelist);
             });
 
             document.querySelector('.popup-section-whitelist').classList.remove('show');

@@ -173,6 +173,9 @@
       getUserSettings('warnOnly', res => {
         window.ytData.settings.warnOnly = res.data.settingValue;
       });
+      getUserSettings('focusMode', res => {
+        window.ytData.settings.focusMode = res.data.settingValue;
+      });
       getUserSettings('isDark', res => {
         window.ytData.settings.isDark = res.data.settingValue;
 
@@ -17926,7 +17929,8 @@
             <td>
                 <div class="table-inner-wrapper">
                     <span class="longer">${youtubeCategoryIcons[restriction.category]} ${restriction.category}</span>
-                    <span class="delete-restriction" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x"></span>
+                    <span class="delete-whitelist" att-restriction="${restriction.category}"><img src="./assets/remove.png" alt="x">
+                    </span>
                 </div>
             </td>
         </tr>`;
@@ -17956,8 +17960,13 @@
             body: {
               category: category
             }
+          });
+          dataRequest.call({
+            type: 'whitelist/get'
           }, res => {
             console.log(res);
+            window.ytData.whitelistedItems = res.data.whitelist;
+            globalState.whitelistedItems.setState(res.data.whitelist);
           });
           document.querySelector('.popup-section-whitelist').classList.remove('show');
         });
@@ -17978,10 +17987,31 @@
       });
     }
 
+    function handleDeleteButton$1() {
+      const buttons = document.querySelectorAll('.delete-whitelist');
+      buttons.forEach(button => {
+        const restrictionCategory = button.getAttribute('att-restriction');
+        button.addEventListener('click', function buttonListen() {
+          dataRequest.call({
+            type: 'whitelist/delete',
+            body: {
+              category: restrictionCategory
+            }
+          });
+          dataRequest.call({
+            type: 'whitelist/get'
+          }, res => {
+            window.ytData.whitelistedItems = res.data.whitelist;
+            globalState.whitelistedItems.setState(res.data.whitelist);
+          });
+        });
+      });
+    }
+
     function focus() {
       updater(() => {
-        console.log(globalState);
         tableFocus(globalState.whitelistedItems.state, youtubeCategories);
+        handleDeleteButton$1();
       }, 'whitelistedItems');
       handleWhitelistButton();
       handlePopupBackButton();

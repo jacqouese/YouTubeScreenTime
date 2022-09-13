@@ -65,12 +65,19 @@ export function loadData(callback) {
     getUserSettings('displayCategory', (res) => {
         window.ytData.settings.displayCategory = res.data.settingValue;
     });
+
     getUserSettings('lowTimeNotifications', (res) => {
         window.ytData.settings.lowTimeNotifications = res.data.settingValue;
     });
+
     getUserSettings('warnOnly', (res) => {
         window.ytData.settings.warnOnly = res.data.settingValue;
     });
+
+    getUserSettings('focusMode', (res) => {
+        window.ytData.settings.focusMode = res.data.settingValue;
+    });
+
     getUserSettings('isDark', (res) => {
         window.ytData.settings.isDark = res.data.settingValue;
 
@@ -78,6 +85,7 @@ export function loadData(callback) {
             document.body.classList.add('dark');
         }
     });
+
     getUserSettings('isExtensionPaused', (res) => {
         window.ytData.settings.isExtensionPaused = res.data.settingValue;
     });

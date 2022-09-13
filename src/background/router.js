@@ -37,6 +37,10 @@ const router = (request, sendResponse) => {
         whitelistController.create(request, sendResponse);
     });
 
+    route('whitelist/delete', () => {
+        whitelistController.delete(request, sendResponse);
+    });
+
     route('settings/update', () => {
         settingsController.update(request, sendResponse);
     });

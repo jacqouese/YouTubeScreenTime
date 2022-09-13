@@ -27,6 +27,20 @@ class Whitelist extends DBModel {
             };
         });
     }
+
+    deleteWhitelist(category) {
+        super.query(this.tableName, 'category', (store) => {
+            var request = store.index('category').getAll();
+            request.onsuccess = () => {
+                console.log(request, category);
+                request.result.forEach((elem) => {
+                    if (elem.category === category) {
+                        store.delete(elem.id);
+                    }
+                });
+            };
+        });
+    }
 }
 
 export default new Whitelist();

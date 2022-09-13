@@ -600,6 +600,21 @@
         });
       }
 
+      deleteWhitelist(category) {
+        super.query(this.tableName, 'category', store => {
+          var request = store.index('category').getAll();
+
+          request.onsuccess = () => {
+            console.log(request, category);
+            request.result.forEach(elem => {
+              if (elem.category === category) {
+                store.delete(elem.id);
+              }
+            });
+          };
+        });
+      }
+
     }
 
     var whitelist = new Whitelist();
@@ -618,6 +633,15 @@
 
       create(request, sendResponse) {
         whitelist.addWhitelist(request.body.category, () => {
+          sendResponse({
+            status: 200,
+            data: {}
+          });
+        });
+      }
+
+      delete(request, sendResponse) {
+        whitelist.deleteWhitelist(request.body.category, () => {
           sendResponse({
             status: 200,
             data: {}
@@ -653,6 +677,9 @@
       });
       route('whitelist/create', () => {
         whitelistController.create(request, sendResponse);
+      });
+      route('whitelist/delete', () => {
+        whitelistController.delete(request, sendResponse);
       });
       route('settings/update', () => {
         settingsController.update(request, sendResponse);
