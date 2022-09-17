@@ -53,13 +53,18 @@ listenForFirstVideo((foundVideo) => {
             sendToDB(timer.time, getDate(), checkCategory());
             timer.time = 0;
         }
-        if (timer.time === 2) {
-            checkTimeRemaining(checkCategory());
+        if (timer.time === 1) {
             if (window.ytData.settings.focusMode == 'true') {
                 checkIfCanWatchInFocus(checkCategory(), (res) => {
-                    if (res === false) redirectService.redirectToFocusPage();
+                    if (res === false) {
+                        timer.pause();
+                        redirectService.redirectToFocusPage();
+                    }
                 });
             }
+        }
+        if (timer.time === 2) {
+            checkTimeRemaining(checkCategory());
         }
     }, 1000);
     timer.pause();

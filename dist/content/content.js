@@ -327,7 +327,7 @@
       mainContainer.className = 'ytt-redirected-container';
       const mainText = document.createElement('h1');
       mainText.textContent = "You're not allowed to watch this video in Focus Mode";
-      const subText = document.createElement('h2');
+      const subText = document.createElement('p');
       subText.textContent = 'check YouTube ScreenTime extension for more information';
       const button = document.createElement('button');
       button.textContent = 'Go to homepage';
@@ -381,14 +381,19 @@
         timer.time = 0;
       }
 
-      if (timer.time === 2) {
-        checkTimeRemaining(checkCategory());
-
+      if (timer.time === 1) {
         if (window.ytData.settings.focusMode == 'true') {
           checkIfCanWatchInFocus(checkCategory(), res => {
-            if (res === false) redirectService.redirectToFocusPage();
+            if (res === false) {
+              timer.pause();
+              redirectService.redirectToFocusPage();
+            }
           });
         }
+      }
+
+      if (timer.time === 2) {
+        checkTimeRemaining(checkCategory());
       }
     }, 1000);
     timer.pause(); // listen for play / pause

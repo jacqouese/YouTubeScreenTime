@@ -14,7 +14,7 @@
   z-index: 1000;
 }
 
-#ytt-notification-contianer button {
+#ytt-notification-contianer button, .ytt-redirected-container button {
   background-color: transparent;
   color: #4d9ade;
   padding: 0.5rem 0.1rem;
@@ -24,7 +24,7 @@
   cursor: pointer;
 }
 
-#ytt-notification-contianer button:hover {
+#ytt-notification-contianer button:hover, .ytt-redirected-container button:hover {
   background-color: #292929;
 }
 
@@ -78,9 +78,14 @@
 }
 
 .ytt-redirected-container {
-  margin-top: 100px;
+  margin-top: 20vh;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
 }
 
-.ytt-redirected-container h1, .ytt-redirected-container h2 {
+.ytt-redirected-container h1, .ytt-redirected-container p {
   color: white;
 }

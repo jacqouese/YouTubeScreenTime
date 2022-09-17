@@ -6,7 +6,7 @@ class redirectService {
         const mainText = document.createElement('h1');
         mainText.textContent = "You're not allowed to watch this video in Focus Mode";
 
-        const subText = document.createElement('h2');
+        const subText = document.createElement('p');
         subText.textContent = 'check YouTube ScreenTime extension for more information';
 
         const button = document.createElement('button');
