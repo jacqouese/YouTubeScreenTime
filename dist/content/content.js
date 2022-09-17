@@ -321,6 +321,13 @@
     });
   }
 
+  class redirectService {
+    static redirectToFocusPage() {
+      document.querySelector('#columns').innerHTML = '<div class="ytt-redirected-container"><h1>This video is not allowed in focus mode</h1><h2>check YouTube ScreenTime extension for more information</h2></div>';
+    }
+
+  }
+
   let video = document.getElementsByTagName('video')[-1] || null;
   const hook = document.querySelector('#count');
   listenForSettingChanges();
@@ -364,7 +371,7 @@
 
         if (window.ytData.settings.focusMode == 'true') {
           checkIfCanWatchInFocus(checkCategory(), res => {
-            if (res === false) console.log('not allowed in focus, redirecting...');
+            if (res === false) redirectService.redirectToFocusPage();
           });
         }
       }

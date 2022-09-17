@@ -76,3 +76,11 @@
   margin-bottom: 1rem;
   font-size: 120%;
 }
+
+.ytt-redirected-container {
+  margin-top: 100px;
+}
+
+.ytt-redirected-container h1, .ytt-redirected-container h2 {
+  color: white;
+}

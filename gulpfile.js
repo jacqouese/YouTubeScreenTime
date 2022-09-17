@@ -17,43 +17,40 @@ const contentJS = 'src/content';
 const css = 'src/**/*.css';
 
 function copyHTML() {
-  return src(html)
-    .pipe(
-      fileinclude({
-        prefix: '@@',
-        basepath: '@file',
-      })
-    )
-    .pipe(gulp.dest('dist/popup'));
+    return src(html)
+        .pipe(
+            fileinclude({
+                prefix: '@@',
+                basepath: '@file',
+            })
+        )
+        .pipe(gulp.dest('dist/popup'));
 }
 
 function copyJS() {
-  return src(['src/background/*.js'])
-    .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
-    .pipe(gulp.dest('dist/background'));
+    return src(['src/background/*.js'])
+        .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
+        .pipe(gulp.dest('dist/background'));
 }
 
 function copyPopupJS() {
-  return src(['src/popup/*.js'])
-    .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
-    .pipe(gulp.dest('dist/popup'));
+    return src(['src/popup/*.js'])
+        .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
+        .pipe(gulp.dest('dist/popup'));
 }
 
 function copyContentJS() {
-  return src(['src/content/*.js'])
-    .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
-    .pipe(gulp.dest('dist/content'));
+    return src(['src/content/*.js'])
+        .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
+        .pipe(gulp.dest('dist/content'));
 }
 
 function copyCSS() {
-  return src(css).pipe(gulp.dest('dist'));
+    return src(css).pipe(gulp.dest('dist'));
 }
 
 function watchTask() {
-  watch(
-    ['src/**/*.html', js, css],
-    parallel(copyHTML, copyJS, copyContentJS, copyPopupJS, copyCSS)
-  );
+    watch(['src/**/*.html', js, css], parallel(copyHTML, copyJS, copyContentJS, copyPopupJS, copyCSS));
 }
 
 exports.default = watchTask;

@@ -12,6 +12,7 @@ import { cLog, isVideoLoaded } from './utils/utils';
 import { injectCategoryString } from './inject/injectCategoryString';
 import { globalState, setState, updater } from './state/state';
 import { checkIfCanWatchInFocus } from './api/checkIfCanWatchInFocus';
+import redirectService from './service/redirectService';
 
 let video = document.getElementsByTagName('video')[-1] || null;
 const hook = document.querySelector('#count');
@@ -56,7 +57,7 @@ listenForFirstVideo((foundVideo) => {
             checkTimeRemaining(checkCategory());
             if (window.ytData.settings.focusMode == 'true') {
                 checkIfCanWatchInFocus(checkCategory(), (res) => {
-                    if (res === false) console.log('not allowed in focus, redirecting...');
+                    if (res === false) redirectService.redirectToFocusPage();
                 });
             }
         }
