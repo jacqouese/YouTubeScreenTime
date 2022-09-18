@@ -35,13 +35,6 @@
     resumeLoop();
   }
 
-  function checkCategory() {
-    const categoryScript = document.getElementById('scriptTag');
-    if (!categoryScript) return null;
-    const parsedCategory = JSON.parse(categoryScript.innerHTML)['genre'];
-    return parsedCategory;
-  }
-
   function isVideoLoaded() {
     return document.querySelector(`ytd-watch-flexy[video-id]`) || null;
   }
@@ -73,6 +66,79 @@
     });
   }
 
+  function getDate() {
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    return date;
+  }
+
+  class VideoCategoryService {
+    static injectCodeForExtractingCategory(category) {
+      // get video category by injecting JS
+      setTimeout(() => {
+        console.log(JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'], 'fromext');
+      }, 5000);
+      const injectedCode = `
+            setTimeout(() => {
+              if (document.querySelector('#ytt-category')) {
+                if (JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'] !== ${category}) {
+                  console.log(JSON.parse(document.getElementById('scriptTag').innerHTML)['genre']);
+                  document.querySelector('#ytt-category').innerHTML = JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'];
+                }
+              }
+              else {
+                const yttDiv = document.createElement('div');
+                    yttDiv.id = 'ytt-category'
+                    yttDiv.style.display = 'hidden';
+                    yttDiv.innerHTML =
+                      JSON.parse(document.getElementById('scriptTag').innerHTML)['genre'];
+    
+                    document.body.appendChild(yttDiv);
+              }
+            }, 2000); 
+          `;
+      var previousScript = document.querySelector('.ytt-script');
+
+      if (previousScript) {
+        previousScript.parentNode.removeChild(previousScript);
+      }
+
+      var script = document.createElement('script');
+      script.textContent = injectedCode;
+      script.classList.add('ytt-script');
+      script.setAttribute('defer', '');
+      document.body.appendChild(script);
+    }
+
+    static checkCurrentlyWatchedVideoCategory() {
+      const categoryScript = document.getElementById('scriptTag');
+      if (!categoryScript) return null;
+      const parsedCategory = JSON.parse(categoryScript.innerHTML)['genre'];
+      return parsedCategory;
+    }
+
+    static injectCategoryStringIntoYouTubePage() {
+      const elem = document.querySelector('#info-strings') || null;
+      if (elem === null) return;
+      const dot = document.createElement('span');
+      dot.id = 'dot';
+      dot.classList.add('style-scope');
+      dot.classList.add('ytd-video-primary-info-renderer');
+      var span = elem.querySelector('.ytt-cateogry') || null;
+
+      if (span === null) {
+        span = document.createElement('span');
+        span.classList.add('ytt-cateogry');
+        elem.appendChild(dot);
+        elem.appendChild(span);
+      }
+
+      const currentCategory = this.checkCurrentlyWatchedVideoCategory();
+      span.textContent = `${currentCategory}`;
+    }
+
+  }
+
   const globalState = {};
   const setState = (state, value) => {
     if (state in globalState) {
@@ -92,59 +158,6 @@
       };
     }
   };
-
-  function checkTimeRemaining(category) {
-    chrome.runtime.sendMessage({
-      for: 'background',
-      type: 'restrictions/timeremaining',
-      body: {
-        category: category,
-        timeframe: 'day'
-      }
-    }, res => {
-      if (res.data.timeRemaining === null) return cLog(`no restrictions found: ${category}`);
-      cLog(`${res.data.timeRemaining} seconds left`); // user paused notifications
-
-      if (window.ytData.settings.disableNotifications == 'true') return;
-
-      if (res.data.timeRemaining <= 0) {
-        if (globalState.hasShownNotification.state === true) return;
-        setState('hasShownNotification', true);
-        return mainNotification.createNoTimeNotification(res.data.ifSpecific ? category : 'today');
-      }
-
-      if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
-        if (globalState.hasShownWarning.state === true) return;
-        setState('hasShownWarning', true);
-        return mainNotification.createLowTimeNotification(res.data.ifSpecific ? category : 'today');
-      }
-    });
-  }
-
-  function getDate() {
-    var today = new Date();
-    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    return date;
-  }
-
-  function injectCategoryString() {
-    const elem = document.querySelector('#info-strings') || null;
-    if (elem === null) return;
-    const dot = document.createElement('span');
-    dot.id = 'dot';
-    dot.classList.add('style-scope');
-    dot.classList.add('ytd-video-primary-info-renderer');
-    var span = elem.querySelector('.ytt-cateogry') || null;
-
-    if (span === null) {
-      span = document.createElement('span');
-      span.classList.add('ytt-cateogry');
-      elem.appendChild(dot);
-      elem.appendChild(span);
-    }
-
-    span.textContent = `${checkCategory()}`;
-  }
 
   function sendToDB(time, date, category) {
     if (category === undefined || time === 0) return;
@@ -170,13 +183,13 @@
       // }
     });
   }
-  function videoSaveProgressListener(video, timer, category) {
+  function videoSaveProgressListener(video, timer) {
     document.addEventListener('transitionend', () => {
       // pause timer if no video detected
       if (video.src === '') {
         if (timer.isResumed === true) {
           timer.pause();
-          sendToDB(timer.time, getDate(), checkCategory());
+          sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
           timer.time = 0;
         }
       }
@@ -185,12 +198,10 @@
     chrome.runtime.onMessage.addListener(req => {
       if (req.type === 'newURL') {
         setState('hasShownNotification', false);
-
-        if (window.ytData.settings.displayCategory == 'true') ;
       }
 
       if (req.type === 'newURL' && timer.time != 0) {
-        sendToDB(timer.time, getDate(), checkCategory());
+        sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
         timer.time = 0;
         timer.pause();
       }
@@ -198,7 +209,7 @@
 
     window.onbeforeunload = () => {
       if (timer.time != 0) {
-        sendToDB(timer.time, getDate(), checkCategory());
+        sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
         timer.time = 0;
       }
     };
@@ -213,6 +224,34 @@
         const correctVideoTag = document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
         chrome.runtime.onMessage.removeListener(listenForFirstVideoInner);
         callback(correctVideoTag);
+      }
+    });
+  }
+
+  function checkTimeRemaining(category) {
+    chrome.runtime.sendMessage({
+      for: 'background',
+      type: 'restrictions/timeremaining',
+      body: {
+        category: category,
+        timeframe: 'day'
+      }
+    }, res => {
+      if (res.data.timeRemaining === null) return cLog(`no restrictions found: ${category}`);
+      cLog(`${res.data.timeRemaining} seconds left`); // user paused notifications
+
+      if (window.ytData.settings.disableNotifications == 'true') return;
+
+      if (res.data.timeRemaining <= 0) {
+        if (globalState.hasShownNotification.state === true) return;
+        setState('hasShownNotification', true);
+        return mainNotification.createNoTimeNotification(res.data.ifSpecific ? category : 'today');
+      }
+
+      if (res.data.timeRemaining < 300 && window.ytData.settings.lowTimeNotifications == 'true') {
+        if (globalState.hasShownWarning.state === true) return;
+        setState('hasShownWarning', true);
+        return mainNotification.createLowTimeNotification(res.data.ifSpecific ? category : 'today');
       }
     });
   }
@@ -258,7 +297,7 @@
       if (request.type === 'newURL') {
         setTimeout(() => {
           if (window.ytData.settings.displayCategory == 'true') {
-            injectCategoryString();
+            VideoCategoryService.injectCategoryStringIntoYouTubePage();
           }
         }, 1000);
       }
@@ -348,13 +387,12 @@
   listenForSettingChanges();
   listenForFirstVideo(foundVideo => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;
-    cLog('video found');
     video = foundVideo; // initialize notification
 
     globalThis.mainNotification = new notificationService(); // get category from YouTube
 
     chrome.storage.sync.set({
-      currentCategory: checkCategory()
+      currentCategory: VideoCategoryService.checkCurrentlyWatchedVideoCategory()
     });
 
     if (window.ytData.settings.displayCategory == 'true') {
@@ -364,7 +402,7 @@
         if (isVideoLoaded() === null || video.readyState < 2) return;
         clearInterval(pageLoadInterval);
         pageLoadInterval = null;
-        injectCategoryString();
+        VideoCategoryService.injectCategoryStringIntoYouTubePage();
       };
 
       pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
@@ -377,13 +415,13 @@
       cLog(timer.time++); // autosave every 60 seconds
 
       if (timer.time === 60) {
-        sendToDB(timer.time, getDate(), checkCategory());
+        sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
         timer.time = 0;
       }
 
       if (timer.time === 1) {
         if (window.ytData.settings.focusMode == 'true') {
-          checkIfCanWatchInFocus(checkCategory(), res => {
+          checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), res => {
             if (res === false) {
               timer.pause();
               redirectService.redirectToFocusPage();
@@ -393,14 +431,14 @@
       }
 
       if (timer.time === 2) {
-        checkTimeRemaining(checkCategory());
+        checkTimeRemaining(VideoCategoryService.checkCurrentlyWatchedVideoCategory());
       }
     }, 1000);
     timer.pause(); // listen for play / pause
 
     videoListeners(video, timer); // listen when to save progress to database
 
-    videoSaveProgressListener(video, timer, checkCategory());
+    videoSaveProgressListener(video, timer);
   });
 
 })));

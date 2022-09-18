@@ -1,6 +1,4 @@
 import { intervalTimer } from './helpers/intervalTimer';
-
-import { checkCategory } from './category/extractCategory';
 import { videoListeners } from './video/videoListeners';
 import { sendToDB, videoSaveProgressListener } from './video/videoSaveProgressListener';
 import { listenForFirstVideo } from './api/listenForFirstVideo';
@@ -9,10 +7,10 @@ import { checkTimeRemaining } from './api/checkTimeRemaining';
 import { listenForSettingChanges } from './settings/listenForSettingChanges';
 import { notificationService } from './service/notificationService';
 import { cLog, isVideoLoaded } from './utils/utils';
-import { injectCategoryString } from './inject/injectCategoryString';
 import { globalState, setState, updater } from './state/state';
 import { checkIfCanWatchInFocus } from './api/checkIfCanWatchInFocus';
 import redirectService from './service/redirectService';
+import VideoCategoryService from './service/videoCategoryService';
 
 let video = document.getElementsByTagName('video')[-1] || null;
 const hook = document.querySelector('#count');
@@ -22,14 +20,13 @@ listenForSettingChanges();
 listenForFirstVideo((foundVideo) => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;
 
-    cLog('video found');
     video = foundVideo;
 
     // initialize notification
     globalThis.mainNotification = new notificationService();
 
     // get category from YouTube
-    chrome.storage.sync.set({ currentCategory: checkCategory() });
+    chrome.storage.sync.set({ currentCategory: VideoCategoryService.checkCurrentlyWatchedVideoCategory() });
 
     if (window.ytData.settings.displayCategory == 'true') {
         let pageLoadInterval = null;
@@ -37,7 +34,7 @@ listenForFirstVideo((foundVideo) => {
             if (isVideoLoaded() === null || video.readyState < 2) return;
             clearInterval(pageLoadInterval);
             pageLoadInterval = null;
-            injectCategoryString();
+            VideoCategoryService.injectCategoryStringIntoYouTubePage();
         };
 
         pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
@@ -50,12 +47,12 @@ listenForFirstVideo((foundVideo) => {
 
         // autosave every 60 seconds
         if (timer.time === 60) {
-            sendToDB(timer.time, getDate(), checkCategory());
+            sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
             timer.time = 0;
         }
         if (timer.time === 1) {
             if (window.ytData.settings.focusMode == 'true') {
-                checkIfCanWatchInFocus(checkCategory(), (res) => {
+                checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), (res) => {
                     if (res === false) {
                         timer.pause();
                         redirectService.redirectToFocusPage();
@@ -64,7 +61,7 @@ listenForFirstVideo((foundVideo) => {
             }
         }
         if (timer.time === 2) {
-            checkTimeRemaining(checkCategory());
+            checkTimeRemaining(VideoCategoryService.checkCurrentlyWatchedVideoCategory());
         }
     }, 1000);
     timer.pause();
@@ -73,5 +70,5 @@ listenForFirstVideo((foundVideo) => {
     videoListeners(video, timer);
 
     // listen when to save progress to database
-    videoSaveProgressListener(video, timer, checkCategory());
+    videoSaveProgressListener(video, timer);
 });

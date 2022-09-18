@@ -1,7 +1,5 @@
-import { checkTimeRemaining } from '../api/checkTimeRemaining';
-import { checkCategory } from '../category/extractCategory';
 import { getDate } from '../helpers/getDate';
-import { injectCategoryString } from '../inject/injectCategoryString';
+import VideoCategoryService from '../service/videoCategoryService';
 import { setState } from '../state/state';
 
 export function sendToDB(time, date, category) {
@@ -33,13 +31,13 @@ export function sendToDB(time, date, category) {
     );
 }
 
-export function videoSaveProgressListener(video, timer, category) {
+export function videoSaveProgressListener(video, timer) {
     document.addEventListener('transitionend', () => {
         // pause timer if no video detected
         if (video.src === '') {
             if (timer.isResumed === true) {
                 timer.pause();
-                sendToDB(timer.time, getDate(), checkCategory());
+                sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
                 timer.time = 0;
             }
         }
@@ -49,15 +47,10 @@ export function videoSaveProgressListener(video, timer, category) {
     chrome.runtime.onMessage.addListener((req) => {
         if (req.type === 'newURL') {
             setState('hasShownNotification', false);
-            if (window.ytData.settings.displayCategory == 'true') {
-                // setTimeout(() => {
-                //     injectCategoryString();
-                // }, 1000);
-            }
         }
 
         if (req.type === 'newURL' && timer.time != 0) {
-            sendToDB(timer.time, getDate(), checkCategory());
+            sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
             timer.time = 0;
             timer.pause();
         }
@@ -66,7 +59,7 @@ export function videoSaveProgressListener(video, timer, category) {
     // when user closes tab
     window.onbeforeunload = () => {
         if (timer.time != 0) {
-            sendToDB(timer.time, getDate(), checkCategory());
+            sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
             timer.time = 0;
         }
     };

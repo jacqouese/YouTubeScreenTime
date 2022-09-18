@@ -1,4 +1,4 @@
-import { injectCategoryString } from '../inject/injectCategoryString';
+import VideoCategoryService from '../service/videoCategoryService';
 
 export function listenForSettingChanges() {
     window.ytData = {};
@@ -42,7 +42,7 @@ export function listenForSettingChanges() {
         if (request.type === 'newURL') {
             setTimeout(() => {
                 if (window.ytData.settings.displayCategory == 'true') {
-                    injectCategoryString();
+                    VideoCategoryService.injectCategoryStringIntoYouTubePage();
                 }
             }, 1000);
         }
