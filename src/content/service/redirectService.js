@@ -2,6 +2,7 @@ class redirectService {
     static redirectToFocusPage() {
         const mainContainer = document.createElement('div');
         mainContainer.className = 'ytt-redirected-container';
+        mainContainer.id = 'ytt-redirected-container';
 
         const mainText = document.createElement('h1');
         mainText.textContent = "You're not allowed to watch this video in Focus Mode";
@@ -17,8 +18,8 @@ class redirectService {
         mainContainer.appendChild(subText);
         mainContainer.appendChild(button);
 
-        document.querySelector('#columns').innerHTML = '';
-        document.querySelector('#columns').appendChild(mainContainer);
+        document.querySelector('body').innerHTML = '';
+        document.querySelector('body').appendChild(mainContainer);
     }
 }
 

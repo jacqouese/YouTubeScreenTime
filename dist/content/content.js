@@ -256,6 +256,28 @@
     });
   }
 
+  function getHrefSubpage() {
+    const href = window.location.href;
+    let subpage = href.split('www.youtube.com')[1];
+    subpage = subpage.split('?')[0];
+    return subpage;
+  }
+
+  function waitForElementLoad(element, callback) {
+    let pageLoadInterval = null;
+    const elementName = element;
+
+    const waitUntilPageLoaded = () => {
+      const elementObj = document.querySelector(elementName);
+      if (elementObj === null) return;
+      clearInterval(pageLoadInterval);
+      pageLoadInterval = null;
+      callback(elementObj);
+    };
+
+    pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
+  }
+
   function listenForSettingChanges() {
     window.ytData = {};
     window.ytData.settings = {}; // get settings after launching
@@ -292,14 +314,29 @@
 
       if (request.type === 'settingChange') {
         window.ytData.settings[request.body.settingName] = request.body.settingValue;
-      }
+      } // if (request.type === 'newURL') {
+      //     setTimeout(() => {
+      //         if (window.ytData.settings.displayCategory == 'true') {
+      //             VideoCategoryService.injectCategoryStringIntoYouTubePage();
+      //         }
+      //     }, 1000);
+      // }
 
-      if (request.type === 'newURL') {
-        setTimeout(() => {
-          if (window.ytData.settings.displayCategory == 'true') {
-            VideoCategoryService.injectCategoryStringIntoYouTubePage();
-          }
-        }, 1000);
+
+      if (window.ytData.settings.focusMode == 'true') {
+        console.log(getHrefSubpage());
+
+        if (getHrefSubpage() === '/') {
+          waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
+            element.innerHTML = '';
+          });
+        }
+
+        if (getHrefSubpage() === '/watch') {
+          waitForElementLoad('#secondary', element => {
+            element.innerHTML = '';
+          });
+        }
       }
     });
   }
@@ -364,6 +401,7 @@
     static redirectToFocusPage() {
       const mainContainer = document.createElement('div');
       mainContainer.className = 'ytt-redirected-container';
+      mainContainer.id = 'ytt-redirected-container';
       const mainText = document.createElement('h1');
       mainText.textContent = "You're not allowed to watch this video in Focus Mode";
       const subText = document.createElement('p');
@@ -376,8 +414,8 @@
       mainContainer.appendChild(mainText);
       mainContainer.appendChild(subText);
       mainContainer.appendChild(button);
-      document.querySelector('#columns').innerHTML = '';
-      document.querySelector('#columns').appendChild(mainContainer);
+      document.querySelector('body').innerHTML = '';
+      document.querySelector('body').appendChild(mainContainer);
     }
 
   }
@@ -423,8 +461,8 @@
         if (window.ytData.settings.focusMode == 'true') {
           checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), res => {
             if (res === false) {
-              timer.pause();
               redirectService.redirectToFocusPage();
+              video.pause();
             }
           });
         }

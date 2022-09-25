@@ -78,12 +78,17 @@
 }
 
 .ytt-redirected-container {
-  margin-top: 20vh;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  z-index: 1000;
+  padding-top: 20vh;
   display: flex;
   flex-direction: column;
   gap: 5px;
   align-items: center;
-  justify-content: center;
+  background-color: var( --yt-spec-general-background-a );
 }
 
 .ytt-redirected-container h1, .ytt-redirected-container p {

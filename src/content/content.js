@@ -54,8 +54,8 @@ listenForFirstVideo((foundVideo) => {
             if (window.ytData.settings.focusMode == 'true') {
                 checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), (res) => {
                     if (res === false) {
-                        timer.pause();
                         redirectService.redirectToFocusPage();
+                        video.pause();
                     }
                 });
             }
