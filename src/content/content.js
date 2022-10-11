@@ -11,10 +11,14 @@ import { setState } from './state/state';
 import { checkIfCanWatchInFocus } from './api/checkIfCanWatchInFocus';
 import redirectService from './service/redirectService';
 import VideoCategoryService from './service/videoCategoryService';
+import FocusModeService from './service/focusModeService';
 
 let video = document.getElementsByTagName('video')[-1] || null;
+const focusObject = new FocusModeService();
 
-listenForSettingChanges();
+listenForSettingChanges(() => {
+    if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
+});
 
 listenForFirstVideo((foundVideo) => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;

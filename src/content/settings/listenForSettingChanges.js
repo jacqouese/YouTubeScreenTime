@@ -1,7 +1,8 @@
 import getHrefSubpage from '../helpers/getHrefSubpage';
+import FocusModeService from '../service/focusModeService';
 import waitForElementLoad from '../utils/waitForElementLoad';
 
-export function listenForSettingChanges() {
+export function listenForSettingChanges(callback) {
     window.ytData = {};
     window.ytData.settings = {};
 
@@ -33,27 +34,16 @@ export function listenForSettingChanges() {
 
     getUserSettings('isExtensionPaused', (res) => {
         window.ytData.settings.isExtensionPaused = res.data.settingValue;
+        callback();
     });
+
+    const focusObject = new FocusModeService();
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('got message', request);
         if (request.type === 'settingChange') {
             window.ytData.settings[request.body.settingName] = request.body.settingValue;
-        }
-
-        if (window.ytData.settings.focusMode == 'true') {
-            console.log(getHrefSubpage());
-            if (getHrefSubpage() === '/') {
-                waitForElementLoad('ytd-two-column-browse-results-renderer', (element) => {
-                    element.innerHTML = '';
-                });
-            }
-
-            if (getHrefSubpage() === '/watch') {
-                waitForElementLoad('#secondary', (element) => {
-                    element.innerHTML = '';
-                });
-            }
+            callback();
         }
     });
 }

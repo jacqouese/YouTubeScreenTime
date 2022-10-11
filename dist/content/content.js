@@ -279,7 +279,26 @@
     pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
   }
 
-  function listenForSettingChanges() {
+  class FocusModeService {
+    hideDistractions() {
+      console.log('Hide distrations - current page:', getHrefSubpage());
+
+      if (getHrefSubpage() === '/') {
+        waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
+          element.innerHTML = '';
+        });
+      }
+
+      if (getHrefSubpage() === '/watch') {
+        waitForElementLoad('#secondary', element => {
+          element.innerHTML = '';
+        });
+      }
+    }
+
+  }
+
+  function listenForSettingChanges(callback) {
     window.ytData = {};
     window.ytData.settings = {}; // get settings after launching
 
@@ -309,35 +328,14 @@
     });
     getUserSettings('isExtensionPaused', res => {
       window.ytData.settings.isExtensionPaused = res.data.settingValue;
+      callback();
     });
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.log('got message', request);
 
       if (request.type === 'settingChange') {
         window.ytData.settings[request.body.settingName] = request.body.settingValue;
-      } // if (request.type === 'newURL') {
-      //     setTimeout(() => {
-      //         if (window.ytData.settings.displayCategory == 'true') {
-      //             VideoCategoryService.injectCategoryStringIntoYouTubePage();
-      //         }
-      //     }, 1000);
-      // }
-
-
-      if (window.ytData.settings.focusMode == 'true') {
-        console.log(getHrefSubpage());
-
-        if (getHrefSubpage() === '/') {
-          waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
-            element.innerHTML = '';
-          });
-        }
-
-        if (getHrefSubpage() === '/watch') {
-          waitForElementLoad('#secondary', element => {
-            element.innerHTML = '';
-          });
-        }
+        callback();
       }
     });
   }
@@ -422,8 +420,10 @@
   }
 
   let video = document.getElementsByTagName('video')[-1] || null;
-  const hook = document.querySelector('#count');
-  listenForSettingChanges();
+  const focusObject = new FocusModeService();
+  listenForSettingChanges(() => {
+    if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
+  });
   listenForFirstVideo(foundVideo => {
     if (window.ytData.settings.isExtensionPaused == 'true') return;
     video = foundVideo; // initialize notification
