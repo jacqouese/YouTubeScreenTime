@@ -1,5 +1,4 @@
 import getHrefSubpage from '../helpers/getHrefSubpage';
-import VideoCategoryService from '../service/videoCategoryService';
 import waitForElementLoad from '../utils/waitForElementLoad';
 
 export function listenForSettingChanges() {
@@ -41,13 +40,6 @@ export function listenForSettingChanges() {
         if (request.type === 'settingChange') {
             window.ytData.settings[request.body.settingName] = request.body.settingValue;
         }
-        // if (request.type === 'newURL') {
-        //     setTimeout(() => {
-        //         if (window.ytData.settings.displayCategory == 'true') {
-        //             VideoCategoryService.injectCategoryStringIntoYouTubePage();
-        //         }
-        //     }, 1000);
-        // }
 
         if (window.ytData.settings.focusMode == 'true') {
             console.log(getHrefSubpage());

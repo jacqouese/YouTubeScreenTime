@@ -268,6 +268,7 @@
     const elementName = element;
 
     const waitUntilPageLoaded = () => {
+      console.log('waiting');
       const elementObj = document.querySelector(elementName);
       if (elementObj === null) return;
       clearInterval(pageLoadInterval);

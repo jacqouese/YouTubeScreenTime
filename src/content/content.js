@@ -7,13 +7,12 @@ import { checkTimeRemaining } from './api/checkTimeRemaining';
 import { listenForSettingChanges } from './settings/listenForSettingChanges';
 import { notificationService } from './service/notificationService';
 import { cLog, isVideoLoaded } from './utils/utils';
-import { globalState, setState, updater } from './state/state';
+import { setState } from './state/state';
 import { checkIfCanWatchInFocus } from './api/checkIfCanWatchInFocus';
 import redirectService from './service/redirectService';
 import VideoCategoryService from './service/videoCategoryService';
 
 let video = document.getElementsByTagName('video')[-1] || null;
-const hook = document.querySelector('#count');
 
 listenForSettingChanges();
 
@@ -32,6 +31,7 @@ listenForFirstVideo((foundVideo) => {
         let pageLoadInterval = null;
         const waitUntilPageLoaded = () => {
             if (isVideoLoaded() === null || video.readyState < 2) return;
+
             clearInterval(pageLoadInterval);
             pageLoadInterval = null;
             VideoCategoryService.injectCategoryStringIntoYouTubePage();
@@ -41,6 +41,7 @@ listenForFirstVideo((foundVideo) => {
     }
     setState('hasShownNotification', false);
     setState('hasShownWarning', false);
+
     // interval with play / pause ability
     const timer = new intervalTimer(() => {
         cLog(timer.time++);
