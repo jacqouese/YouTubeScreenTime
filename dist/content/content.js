@@ -38,8 +38,9 @@
   function isVideoLoaded() {
     return document.querySelector(`ytd-watch-flexy[video-id]`) || null;
   }
-  function cLog(value) {
-    console.log(value);
+  function cLog(value1, value2) {
+    if (value2) return console.log(value1, value2);
+    console.log(value1);
   }
 
   function videoListeners(video, timer) {
@@ -268,7 +269,7 @@
     const elementName = element;
 
     const waitUntilPageLoaded = () => {
-      console.log('waiting');
+      cLog('waiting for element load', element);
       const elementObj = document.querySelector(elementName);
       if (elementObj === null) return;
       clearInterval(pageLoadInterval);
@@ -419,65 +420,80 @@
 
   }
 
-  let video = document.getElementsByTagName('video')[-1] || null;
-  const focusObject = new FocusModeService();
-  listenForSettingChanges(() => {
-    if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
-  });
-  listenForFirstVideo(foundVideo => {
-    if (window.ytData.settings.isExtensionPaused == 'true') return;
-    video = foundVideo; // initialize notification
-
-    globalThis.mainNotification = new notificationService(); // get category from YouTube
-
-    chrome.storage.sync.set({
-      currentCategory: VideoCategoryService.checkCurrentlyWatchedVideoCategory()
+  function runOnPageChange(callback) {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.type === 'newURL') {
+        callback();
+      }
     });
+  }
 
-    if (window.ytData.settings.displayCategory == 'true') {
-      let pageLoadInterval = null;
+  waitForElementLoad('body', () => {
+    let video = document.getElementsByTagName('video')[-1] || null;
+    const focusObject = new FocusModeService();
+    listenForSettingChanges(() => {
+      if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
+    });
+    runOnPageChange(() => {
+      if (getHrefSubpage() === '/watch') {
+        focusObject.hideDistractions();
+      }
+    });
+    listenForFirstVideo(foundVideo => {
+      if (window.ytData.settings.isExtensionPaused == 'true') return;
+      video = foundVideo; // initialize notification
 
-      const waitUntilPageLoaded = () => {
-        if (isVideoLoaded() === null || video.readyState < 2) return;
-        clearInterval(pageLoadInterval);
-        pageLoadInterval = null;
-        VideoCategoryService.injectCategoryStringIntoYouTubePage();
-      };
+      globalThis.mainNotification = new notificationService(); // get category from YouTube
 
-      pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
-    }
+      chrome.storage.sync.set({
+        currentCategory: VideoCategoryService.checkCurrentlyWatchedVideoCategory()
+      });
 
-    setState('hasShownNotification', false);
-    setState('hasShownWarning', false); // interval with play / pause ability
+      if (window.ytData.settings.displayCategory == 'true') {
+        let pageLoadInterval = null;
 
-    const timer = new intervalTimer(() => {
-      cLog(timer.time++); // autosave every 60 seconds
+        const waitUntilPageLoaded = () => {
+          if (isVideoLoaded() === null || video.readyState < 2) return;
+          clearInterval(pageLoadInterval);
+          pageLoadInterval = null;
+          VideoCategoryService.injectCategoryStringIntoYouTubePage();
+        };
 
-      if (timer.time === 60) {
-        sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
-        timer.time = 0;
+        pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
       }
 
-      if (timer.time === 1) {
-        if (window.ytData.settings.focusMode == 'true') {
-          checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), res => {
-            if (res === false) {
-              redirectService.redirectToFocusPage();
-              video.pause();
-            }
-          });
+      setState('hasShownNotification', false);
+      setState('hasShownWarning', false); // interval with play / pause ability
+
+      const timer = new intervalTimer(() => {
+        cLog(timer.time++); // autosave every 60 seconds
+
+        if (timer.time === 60) {
+          sendToDB(timer.time, getDate(), VideoCategoryService.checkCurrentlyWatchedVideoCategory());
+          timer.time = 0;
         }
-      }
 
-      if (timer.time === 2) {
-        checkTimeRemaining(VideoCategoryService.checkCurrentlyWatchedVideoCategory());
-      }
-    }, 1000);
-    timer.pause(); // listen for play / pause
+        if (timer.time === 1) {
+          if (window.ytData.settings.focusMode == 'true') {
+            checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), res => {
+              if (res === false) {
+                redirectService.redirectToFocusPage();
+                video.pause();
+              }
+            });
+          }
+        }
 
-    videoListeners(video, timer); // listen when to save progress to database
+        if (timer.time === 2) {
+          checkTimeRemaining(VideoCategoryService.checkCurrentlyWatchedVideoCategory());
+        }
+      }, 1000);
+      timer.pause(); // listen for play / pause
 
-    videoSaveProgressListener(video, timer);
+      videoListeners(video, timer); // listen when to save progress to database
+
+      videoSaveProgressListener(video, timer);
+    });
   });
 
 })));
