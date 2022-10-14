@@ -6,7 +6,7 @@ class FocusModeService {
         console.log('Hide distrations - current page:', getHrefSubpage());
         if (getHrefSubpage() === '/') {
             waitForElementLoad('ytd-two-column-browse-results-renderer', (element) => {
-                element.innerHTML = '';
+                element.remove();
             });
         }
 

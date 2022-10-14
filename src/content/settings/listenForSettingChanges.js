@@ -32,6 +32,14 @@ export function listenForSettingChanges(callback) {
         window.ytData.settings.focusMode = res.data.settingValue;
     });
 
+    getUserSettings('hideSuggestions', (res) => {
+        window.ytData.settings.hideSuggestions = res.data.settingValue;
+    });
+
+    getUserSettings('redirectHomepage', (res) => {
+        window.ytData.settings.redirectHomepage = res.data.settingValue;
+    });
+
     getUserSettings('isExtensionPaused', (res) => {
         window.ytData.settings.isExtensionPaused = res.data.settingValue;
         callback();

@@ -173,6 +173,12 @@
       getUserSettings('warnOnly', res => {
         window.ytData.settings.warnOnly = res.data.settingValue;
       });
+      getUserSettings('hideSuggestions', res => {
+        window.ytData.settings.hideSuggestions = res.data.settingValue;
+      });
+      getUserSettings('redirectHomepage', res => {
+        window.ytData.settings.redirectHomepage = res.data.settingValue;
+      });
       getUserSettings('focusMode', res => {
         window.ytData.settings.focusMode = res.data.settingValue;
       });
@@ -206,6 +212,8 @@
         const switchName = switchElem.getAttribute('att-switch-name'); // set initial switch state
 
         if (window.ytData.settings[switchName]) {
+          console.log(window.ytData.settings);
+
           if (window.ytData.settings[switchName] == 'true') {
             switchElem.classList.add('switch-active');
           }

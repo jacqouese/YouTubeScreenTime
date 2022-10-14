@@ -7,7 +7,7 @@ export function cLog(value1, value2) {
 
     if (DEVELOPMENT === false) return;
 
-    if (value2) return console.log(value1, value2);
+    if (value2) return console.log('[yt-d]', value1, value2);
 
-    console.log(value1);
+    console.log('[yt-d]', value1);
 }

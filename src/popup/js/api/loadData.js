@@ -74,6 +74,14 @@ export function loadData(callback) {
         window.ytData.settings.warnOnly = res.data.settingValue;
     });
 
+    getUserSettings('hideSuggestions', (res) => {
+        window.ytData.settings.hideSuggestions = res.data.settingValue;
+    });
+
+    getUserSettings('redirectHomepage', (res) => {
+        window.ytData.settings.redirectHomepage = res.data.settingValue;
+    });
+
     getUserSettings('focusMode', (res) => {
         window.ytData.settings.focusMode = res.data.settingValue;
     });

@@ -39,8 +39,8 @@
     return document.querySelector(`ytd-watch-flexy[video-id]`) || null;
   }
   function cLog(value1, value2) {
-    if (value2) return console.log(value1, value2);
-    console.log(value1);
+    if (value2) return console.log('[yt-d]', value1, value2);
+    console.log('[yt-d]', value1);
   }
 
   function videoListeners(video, timer) {
@@ -265,11 +265,19 @@
   }
 
   function waitForElementLoad(element, callback) {
+    let iterator = 0;
     let pageLoadInterval = null;
     const elementName = element;
 
     const waitUntilPageLoaded = () => {
       cLog('waiting for element load', element);
+      iterator += 1;
+
+      if (iterator > 20) {
+        console.error('[yt-d]', `Waiting for element ${element} exceeded max time`);
+        return clearInterval(pageLoadInterval);
+      }
+
       const elementObj = document.querySelector(elementName);
       if (elementObj === null) return;
       clearInterval(pageLoadInterval);
@@ -286,7 +294,7 @@
 
       if (getHrefSubpage() === '/') {
         waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
-          element.innerHTML = '';
+          element.remove();
         });
       }
 
@@ -327,6 +335,12 @@
     });
     getUserSettings('focusMode', res => {
       window.ytData.settings.focusMode = res.data.settingValue;
+    });
+    getUserSettings('hideSuggestions', res => {
+      window.ytData.settings.hideSuggestions = res.data.settingValue;
+    });
+    getUserSettings('redirectHomepage', res => {
+      window.ytData.settings.redirectHomepage = res.data.settingValue;
     });
     getUserSettings('isExtensionPaused', res => {
       window.ytData.settings.isExtensionPaused = res.data.settingValue;
@@ -433,11 +447,25 @@
     let video = document.getElementsByTagName('video')[-1] || null;
     const focusObject = new FocusModeService();
     listenForSettingChanges(() => {
-      if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
+      if (getHrefSubpage() === '/') {
+        if (window.ytData.settings.redirectHomepage == 'true') {
+          location.replace('https://www.youtube.com/feed/subscriptions');
+        }
+      }
+
+      if (getHrefSubpage() === '/' || getHrefSubpage() === '/watch') {
+        if (window.ytData.settings.hideSuggestions == 'true') focusObject.hideDistractions();
+      }
     });
     runOnPageChange(() => {
-      if (getHrefSubpage() === '/watch' || getHrefSubpage() === '/') {
-        focusObject.hideDistractions();
+      if (getHrefSubpage() === '/') {
+        if (window.ytData.settings.redirectHomepage == 'true') {
+          location.replace('https://www.youtube.com/feed/subscriptions');
+        }
+      }
+
+      if (getHrefSubpage() === '/' || getHrefSubpage() === '/watch') {
+        if (window.ytData.settings.hideSuggestions == 'true') focusObject.hideDistractions();
       }
     });
     listenForFirstVideo(foundVideo => {

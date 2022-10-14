@@ -15,18 +15,32 @@ import FocusModeService from './service/focusModeService';
 import waitForElementLoad from './utils/waitForElementLoad';
 import runOnPageChange from './helpers/runOnPageChange';
 import getHrefSubpage from './helpers/getHrefSubpage';
+import redirectHomepageToSubscribtions from './utils/redirectHomepage';
 
 waitForElementLoad('body', () => {
     let video = document.getElementsByTagName('video')[-1] || null;
     const focusObject = new FocusModeService();
 
     listenForSettingChanges(() => {
-        if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
+        if (getHrefSubpage() === '/') {
+            if (window.ytData.settings.redirectHomepage == 'true') {
+                location.replace('https://www.youtube.com/feed/subscriptions');
+            }
+        }
+
+        if (getHrefSubpage() === '/' || getHrefSubpage() === '/watch') {
+            if (window.ytData.settings.hideSuggestions == 'true') focusObject.hideDistractions();
+        }
     });
 
     runOnPageChange(() => {
-        if (getHrefSubpage() === '/watch' || getHrefSubpage() === '/') {
-            focusObject.hideDistractions();
+        if (getHrefSubpage() === '/') {
+            if (window.ytData.settings.redirectHomepage == 'true') {
+                location.replace('https://www.youtube.com/feed/subscriptions');
+            }
+        }
+        if (getHrefSubpage() === '/' || getHrefSubpage() === '/watch') {
+            if (window.ytData.settings.hideSuggestions == 'true') focusObject.hideDistractions();
         }
     });
 
