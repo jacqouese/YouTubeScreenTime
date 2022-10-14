@@ -291,8 +291,9 @@
       }
 
       if (getHrefSubpage() === '/watch') {
-        waitForElementLoad('#secondary', element => {
+        waitForElementLoad('#related', element => {
           element.innerHTML = '';
+          element.id = 'ytd-hide-suggestions';
         });
       }
     }
@@ -435,7 +436,7 @@
       if (window.ytData.settings.focusMode == 'true') focusObject.hideDistractions();
     });
     runOnPageChange(() => {
-      if (getHrefSubpage() === '/watch') {
+      if (getHrefSubpage() === '/watch' || getHrefSubpage() === '/') {
         focusObject.hideDistractions();
       }
     });

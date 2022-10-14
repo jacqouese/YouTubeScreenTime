@@ -11,8 +11,9 @@ class FocusModeService {
         }
 
         if (getHrefSubpage() === '/watch') {
-            waitForElementLoad('#secondary', (element) => {
+            waitForElementLoad('#related', (element) => {
                 element.innerHTML = '';
+                element.id = 'ytd-hide-suggestions';
             });
         }
     }

@@ -25,7 +25,7 @@ waitForElementLoad('body', () => {
     });
 
     runOnPageChange(() => {
-        if (getHrefSubpage() === '/watch') {
+        if (getHrefSubpage() === '/watch' || getHrefSubpage() === '/') {
             focusObject.hideDistractions();
         }
     });
