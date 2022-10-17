@@ -294,7 +294,8 @@
 
       if (getHrefSubpage() === '/') {
         waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
-          element.remove();
+          element.setAttribute('page-subtype', 'ytd-hide-homepage');
+          element.innerHTML = '';
         });
       }
 
