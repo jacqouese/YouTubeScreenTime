@@ -17617,7 +17617,7 @@
         <tr>
             <td>
                 <div class="detailed-elem">
-                    No history
+                    No history for this period
                 </div>
             </td>
         </tr>`;

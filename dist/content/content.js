@@ -366,7 +366,7 @@
       notificationElem.parentNode.removeChild(notificationElem);
     };
 
-    this.createSimpleNotification = (title, subtitle) => {
+    this.createSimpleNotification = (title, subtitle, actionButton) => {
       const simpleNotification = document.createElement('div');
       simpleNotification.classList.add('ytt-simple-notification');
       const notificationId = `ytt-element-${Math.floor(Math.random() * 99999)}`;
@@ -374,12 +374,12 @@
       mainContainer.appendChild(simpleNotification);
       const imgURL = chrome.extension.getURL('content/logo.png');
       const html = `
-    <div class="flex">
-        <img src="${imgURL}" alt="">
-        <h1>${title}</h1>
-    </div>
-    <p>${subtitle}</p>
-    `;
+        <div class="flex">
+            <img src="${imgURL}" alt="">
+            <h1>${title}</h1>
+        </div>
+        <p>${subtitle}</p>
+        `;
       const button = document.createElement('button');
       button.textContent = 'Dismiss';
       button.addEventListener('click', () => {
@@ -387,7 +387,25 @@
         idElem.parentNode.removeChild(idElem);
       });
       simpleNotification.innerHTML = html;
-      simpleNotification.appendChild(button);
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.width = '100%';
+      buttonContainer.style.justifyContent = 'space-between';
+      buttonContainer.appendChild(button);
+
+      if (actionButton) {
+        const actionButtonElem = document.createElement('button');
+        actionButtonElem.textContent = actionButton.name;
+        actionButtonElem.addEventListener('click', () => {
+          actionButton.onClick();
+          const idElem = document.getElementById(notificationId);
+          idElem.parentNode.removeChild(idElem);
+        });
+        simpleNotification.appendChild(actionButtonElem);
+        buttonContainer.appendChild(actionButtonElem);
+      }
+
+      simpleNotification.appendChild(buttonContainer);
     };
 
     this.createNoTimeNotification = category => {
@@ -396,6 +414,10 @@
 
     this.createLowTimeNotification = category => {
       this.createSimpleNotification(`Less than 5 min for ${category}`, `The time limit you set for ${category} has almost run out.`);
+    };
+
+    this.createFocusModeNotification = (category, action) => {
+      this.createSimpleNotification(`Video not allowed in focus`, `You can't watch this video in focus mode because its category is ${category}.`, action);
     };
   }
 
@@ -410,29 +432,6 @@
       if (res.data.canWatch === true) return callback(true);
       return callback(false);
     });
-  }
-
-  class redirectService {
-    static redirectToFocusPage() {
-      const mainContainer = document.createElement('div');
-      mainContainer.className = 'ytt-redirected-container';
-      mainContainer.id = 'ytt-redirected-container';
-      const mainText = document.createElement('h1');
-      mainText.textContent = "You're not allowed to watch this video in Focus Mode";
-      const subText = document.createElement('p');
-      subText.textContent = 'check YouTube ScreenTime extension for more information';
-      const button = document.createElement('button');
-      button.textContent = 'Go to homepage';
-
-      button.onclick = () => window.location.href = 'https://www.youtube.com';
-
-      mainContainer.appendChild(mainText);
-      mainContainer.appendChild(subText);
-      mainContainer.appendChild(button);
-      document.querySelector('body').innerHTML = '';
-      document.querySelector('body').appendChild(mainContainer);
-    }
-
   }
 
   function runOnPageChange(callback) {
@@ -458,6 +457,9 @@
       }
     });
     runOnPageChange(() => {
+      setState('hasShownNotification', false);
+      setState('hasShownWarning', false);
+
       if (getHrefSubpage() === '/') {
         if (window.ytData.settings.redirectHomepage == 'true') {
           location.replace('https://www.youtube.com/feed/subscriptions');
@@ -489,10 +491,8 @@
         };
 
         pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
-      }
+      } // interval with play / pause ability
 
-      setState('hasShownNotification', false);
-      setState('hasShownWarning', false); // interval with play / pause ability
 
       const timer = new intervalTimer(() => {
         cLog(timer.time++); // autosave every 60 seconds
@@ -506,8 +506,24 @@
           if (window.ytData.settings.focusMode == 'true') {
             checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), res => {
               if (res === false) {
-                redirectService.redirectToFocusPage();
                 video.pause();
+
+                function autoPauseVideo() {
+                  video.pause();
+                }
+
+                video.addEventListener('playing', autoPauseVideo);
+                runOnPageChange(() => {
+                  video.removeEventListener('playing', autoPauseVideo);
+                });
+                mainNotification.createFocusModeNotification(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), {
+                  name: 'Watch anyway',
+                  onClick: () => {
+                    console.log('action');
+                    video.removeEventListener('playing', autoPauseVideo);
+                    video.play();
+                  }
+                });
               }
             });
           }

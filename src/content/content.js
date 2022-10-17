@@ -34,6 +34,8 @@ waitForElementLoad('body', () => {
     });
 
     runOnPageChange(() => {
+        setState('hasShownNotification', false);
+        setState('hasShownWarning', false);
         if (getHrefSubpage() === '/') {
             if (window.ytData.settings.redirectHomepage == 'true') {
                 location.replace('https://www.youtube.com/feed/subscriptions');
@@ -67,8 +69,6 @@ waitForElementLoad('body', () => {
 
             pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
         }
-        setState('hasShownNotification', false);
-        setState('hasShownWarning', false);
 
         // interval with play / pause ability
         const timer = new intervalTimer(() => {
@@ -83,8 +83,26 @@ waitForElementLoad('body', () => {
                 if (window.ytData.settings.focusMode == 'true') {
                     checkIfCanWatchInFocus(VideoCategoryService.checkCurrentlyWatchedVideoCategory(), (res) => {
                         if (res === false) {
-                            redirectService.redirectToFocusPage();
                             video.pause();
+                            function autoPauseVideo() {
+                                video.pause();
+                            }
+
+                            video.addEventListener('playing', autoPauseVideo);
+                            runOnPageChange(() => {
+                                video.removeEventListener('playing', autoPauseVideo);
+                            });
+                            mainNotification.createFocusModeNotification(
+                                VideoCategoryService.checkCurrentlyWatchedVideoCategory(),
+                                {
+                                    name: 'Watch anyway',
+                                    onClick: () => {
+                                        console.log('action');
+                                        video.removeEventListener('playing', autoPauseVideo);
+                                        video.play();
+                                    },
+                                }
+                            );
                         }
                     });
                 }
