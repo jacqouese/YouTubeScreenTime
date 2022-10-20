@@ -372,7 +372,6 @@
     const elementName = element;
 
     const waitUntilPageLoaded = () => {
-      cLog('waiting for element load', element);
       iterator += 1;
 
       if (iterator > 20) {
@@ -384,7 +383,6 @@
       if (elementObj === null) return;
       clearInterval(pageLoadInterval);
       pageLoadInterval = null;
-      console.log('Element finally found', elementObj);
       callback(elementObj);
     };
 

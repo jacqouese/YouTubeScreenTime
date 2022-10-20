@@ -5,7 +5,6 @@ export default function waitForElementLoad(element, callback) {
     let pageLoadInterval = null;
     const elementName = element;
     const waitUntilPageLoaded = () => {
-        cLog('waiting for element load', element);
         iterator += 1;
         if (iterator > 20) {
             console.error('[yt-d]', `Waiting for element ${element} exceeded max time`);
@@ -16,7 +15,6 @@ export default function waitForElementLoad(element, callback) {
         clearInterval(pageLoadInterval);
         pageLoadInterval = null;
 
-        console.log('Element finally found', elementObj);
         callback(elementObj);
     };
 
