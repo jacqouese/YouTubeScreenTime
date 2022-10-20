@@ -1,7 +1,8 @@
-(function (factory) {
-  typeof define === 'function' && define.amd ? define('content', factory) :
-  factory();
-}((function () { 'use strict';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define('main', factory) :
+  (global = global || self, global.main = factory());
+}(this, (function () { 'use strict';
 
   function intervalTimer(callback, delay) {
     var timerId,
@@ -546,21 +547,6 @@
     });
   }
 
-  const isPageInFocus = document.hasFocus();
-  const elementToWaitFor = getHrefSubpage() === '/watch' ? 'video' : 'body'; // Wait for page to receive focus and load, then run main()
-
-  if (isPageInFocus) {
-    waitForElementLoad(elementToWaitFor, () => {
-      main();
-    });
-  } else {
-    document.addEventListener('focusin', () => {
-      waitForElementLoad(elementToWaitFor, () => {
-        main();
-      });
-    }, {
-      once: true
-    });
-  }
+  return main;
 
 })));
