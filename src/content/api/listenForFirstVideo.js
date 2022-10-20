@@ -6,9 +6,7 @@ export function listenForFirstVideo(callback) {
         // when the video has been found, remove listener and run callback
         if (video !== null) {
             const correctVideoTag =
-                document.getElementsByTagName('video')[
-                    document.getElementsByTagName('video').length - 1
-                ];
+                document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
 
             chrome.runtime.onMessage.removeListener(listenForFirstVideoInner);
 

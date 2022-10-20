@@ -217,19 +217,6 @@
     };
   }
 
-  // listen for first video after opening YouTube
-  function listenForFirstVideo(callback) {
-    chrome.runtime.onMessage.addListener(function listenForFirstVideoInner() {
-      let video = document.getElementsByTagName('video')[0] || null; // when the video has been found, remove listener and run callback
-
-      if (video !== null) {
-        const correctVideoTag = document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
-        chrome.runtime.onMessage.removeListener(listenForFirstVideoInner);
-        callback(correctVideoTag);
-      }
-    });
-  }
-
   function checkTimeRemaining(category) {
     chrome.runtime.sendMessage({
       for: 'background',
@@ -258,59 +245,6 @@
     });
   }
 
-  function getHrefSubpage() {
-    const href = window.location.href;
-    let subpage = href.split('www.youtube.com')[1];
-    subpage = subpage.split('?')[0];
-    return subpage;
-  }
-
-  function waitForElementLoad(element, callback) {
-    let iterator = 0;
-    let pageLoadInterval = null;
-    const elementName = element;
-
-    const waitUntilPageLoaded = () => {
-      cLog('waiting for element load', element);
-      iterator += 1;
-
-      if (iterator > 20) {
-        console.error('[yt-d]', `Waiting for element ${element} exceeded max time`);
-        return clearInterval(pageLoadInterval);
-      }
-
-      const elementObj = document.querySelector(elementName);
-      if (elementObj === null) return;
-      clearInterval(pageLoadInterval);
-      pageLoadInterval = null;
-      console.log('Element finally found', element);
-      callback(elementObj);
-    };
-
-    pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
-  }
-
-  class FocusModeService {
-    hideDistractions() {
-      console.log('Hide distrations - current page:', getHrefSubpage());
-
-      if (getHrefSubpage() === '/') {
-        waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
-          element.setAttribute('page-subtype', 'ytd-hide-homepage');
-          element.innerHTML = '';
-        });
-      }
-
-      if (getHrefSubpage() === '/watch') {
-        waitForElementLoad('#related', element => {
-          element.innerHTML = '';
-          element.id = 'ytd-hide-suggestions';
-        });
-      }
-    }
-
-  }
-
   function listenForSettingChanges(callback) {
     window.ytData = {};
     window.ytData.settings = {}; // get settings after launching
@@ -327,23 +261,11 @@
       });
     }
 
-    getUserSettings('displayCategory', res => {
-      window.ytData.settings.displayCategory = res.data.settingValue;
-    });
-    getUserSettings('lowTimeNotifications', res => {
-      window.ytData.settings.lowTimeNotifications = res.data.settingValue;
-    });
-    getUserSettings('disableNotifications', res => {
-      window.ytData.settings.disableNotifications = res.data.settingValue;
-    });
-    getUserSettings('focusMode', res => {
-      window.ytData.settings.focusMode = res.data.settingValue;
-    });
-    getUserSettings('hideSuggestions', res => {
-      window.ytData.settings.hideSuggestions = res.data.settingValue;
-    });
-    getUserSettings('redirectHomepage', res => {
-      window.ytData.settings.redirectHomepage = res.data.settingValue;
+    const settingOptions = ['displayCategory', 'lowTimeNotifications', 'disableNotifications', 'focusMode', 'hideSuggestions', 'redirectHomepage'];
+    settingOptions.forEach(setting => {
+      getUserSettings(setting, res => {
+        window.ytData.settings[setting] = res.data.settingValue;
+      });
     });
     getUserSettings('isExtensionPaused', res => {
       window.ytData.settings.isExtensionPaused = res.data.settingValue;
@@ -437,6 +359,59 @@
     });
   }
 
+  function getHrefSubpage() {
+    const href = window.location.href;
+    let subpage = href.split('www.youtube.com')[1];
+    subpage = subpage.split('?')[0];
+    return subpage;
+  }
+
+  function waitForElementLoad(element, callback) {
+    let iterator = 0;
+    let pageLoadInterval = null;
+    const elementName = element;
+
+    const waitUntilPageLoaded = () => {
+      cLog('waiting for element load', element);
+      iterator += 1;
+
+      if (iterator > 20) {
+        console.error('[yt-d]', `Waiting for element ${element} exceeded max time`);
+        return clearInterval(pageLoadInterval);
+      }
+
+      const elementObj = document.querySelector(elementName);
+      if (elementObj === null) return;
+      clearInterval(pageLoadInterval);
+      pageLoadInterval = null;
+      console.log('Element finally found', elementObj);
+      callback(elementObj);
+    };
+
+    pageLoadInterval = setInterval(waitUntilPageLoaded, 100);
+  }
+
+  class FocusModeService {
+    hideDistractions() {
+      console.log('Hide distrations - current page:', getHrefSubpage());
+
+      if (getHrefSubpage() === '/') {
+        waitForElementLoad('ytd-two-column-browse-results-renderer', element => {
+          element.setAttribute('page-subtype', 'ytd-hide-homepage');
+          element.innerHTML = '';
+        });
+      }
+
+      if (getHrefSubpage() === '/watch') {
+        waitForElementLoad('#related', element => {
+          element.innerHTML = '';
+          element.id = 'ytd-hide-suggestions';
+        });
+      }
+    }
+
+  }
+
   function runOnPageChange(callback) {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.type === 'newURL') {
@@ -447,7 +422,6 @@
 
   function main() {
     let video = document.getElementsByTagName('video')[-1] || null;
-    console.log('video: ', document.getElementsByTagName('video'));
     const focusObject = new FocusModeService();
     listenForSettingChanges(() => {
       if (getHrefSubpage() === '/') {
@@ -474,8 +448,7 @@
         if (window.ytData.settings.hideSuggestions == 'true') focusObject.hideDistractions();
       }
     });
-    listenForFirstVideo(foundVideo => {
-      console.log('im here');
+    waitForElementLoad('video', foundVideo => {
       if (window.ytData.settings.isExtensionPaused == 'true') return;
       video = foundVideo;
       console.log('found video', foundVideo); // initialize notification

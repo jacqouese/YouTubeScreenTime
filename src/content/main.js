@@ -15,11 +15,10 @@ import FocusModeService from './service/focusModeService';
 import waitForElementLoad from './utils/waitForElementLoad';
 import runOnPageChange from './helpers/runOnPageChange';
 import getHrefSubpage from './helpers/getHrefSubpage';
-import redirectHomepageToSubscribtions from './utils/redirectHomepage';
 
 export default function main() {
     let video = document.getElementsByTagName('video')[-1] || null;
-    console.log('video: ', document.getElementsByTagName('video'));
+
     const focusObject = new FocusModeService();
 
     listenForSettingChanges(() => {
@@ -47,8 +46,7 @@ export default function main() {
         }
     });
 
-    listenForFirstVideo((foundVideo) => {
-        console.log('im here');
+    waitForElementLoad('video', (foundVideo) => {
         if (window.ytData.settings.isExtensionPaused == 'true') return;
 
         video = foundVideo;

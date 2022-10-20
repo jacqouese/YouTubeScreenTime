@@ -16,7 +16,7 @@ export default function waitForElementLoad(element, callback) {
         clearInterval(pageLoadInterval);
         pageLoadInterval = null;
 
-        console.log('Element finally found', element);
+        console.log('Element finally found', elementObj);
         callback(elementObj);
     };
 
