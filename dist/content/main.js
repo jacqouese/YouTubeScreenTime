@@ -448,8 +448,7 @@
     });
     waitForElementLoad('video', foundVideo => {
       if (window.ytData.settings.isExtensionPaused == 'true') return;
-      video = foundVideo;
-      console.log('found video', foundVideo); // initialize notification
+      video = foundVideo; // initialize notification
 
       globalThis.mainNotification = new notificationService(); // get category from YouTube
 

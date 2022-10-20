@@ -51,7 +51,6 @@ export default function main() {
 
         video = foundVideo;
 
-        console.log('found video', foundVideo);
         // initialize notification
         globalThis.mainNotification = new notificationService();
 
